@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>my first address</title>
+    <url>/2025/02/28/hello-world/</url>
+    <content><![CDATA[this is my first article]]></content>
+  </entry>
+  <entry>
+    <title>我的博客重新开始</title>
+    <url>/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/</url>
+    <content><![CDATA[🌟 我的博客重新开始大家好！我是 forever，欢迎来到我重新搭建的博客 “Summer Flower”。
+📝 为什么重新开始？经过一段时间的思考，我决定重新整理我的博客，主要原因包括：
+
+更好的技术栈: 使用 Hexo + Butterfly 主题，提供更好的阅读体验
+规范的内容管理: 建立更完善的写作和发布流程
+专注的内容方向: 
+💻 技术学习心得
+📸 摄影作品分享
+🎓 计算机科学学习记录
+🌱 日常生活感悟
+
+
+
+🛠️ 技术栈介绍这个博客使用的技术栈：
+
+静态网站生成器: Hexo 7.3.0
+主题: Butterfly 5.3.3
+部署平台: GitHub Pages
+域名: 华为云自定义域名
+评论系统: Gitalk
+统计分析: Google Analytics + 不蒜子
+
+🎯 未来计划接下来我计划在这里分享：
+技术内容
+Rust 编程学习心得
+Git 深度使用技巧
+前端开发经验
+计算机科学课程笔记
+
+生活分享
+摄影作品和技巧
+读书心得体会
+旅行见闻
+日常思考
+
+项目展示
+GitHub 开源项目介绍
+个人项目经验分享
+课程作业总结
+
+💡 写作理念我希望这个博客能够：
+
+记录成长: 记录学习和生活中的点点滴滴
+分享经验: 把学到的知识和经验分享给大家
+交流互动: 通过博客认识更多志同道合的朋友
+持续学习: 通过写作来深化自己的理解
+
+🤝 联系方式如果你对我的文章有任何想法或建议，欢迎通过以下方式联系我：
+
+📧 Email: 231220075@smail.nju.edu.cn
+🐙 GitHub: @231220075
+💬 评论区: 每篇文章下方都可以留言
+
+🎉 结语感谢你阅读到这里！希望我的博客能为你带来一些有价值的内容。
+让我们一起在这个夏日花园里，记录美好，分享成长！🌸
+
+“每一次重新开始，都是向更好的自己迈进一步。”
+]]></content>
+      <categories>
+        <category>生活随想</category>
+      </categories>
+      <tags>
+        <tag>博客</tag>
+        <tag>新开始</tag>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+</search>
