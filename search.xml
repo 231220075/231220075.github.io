@@ -1,109 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title>my first address</title>
-    <url>/2025/02/28/hello-world/</url>
-    <content><![CDATA[this is my first article]]></content>
-  </entry>
-  <entry>
-    <title>我的博客重新开始</title>
-    <url>/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/</url>
-    <content><![CDATA[🌟 我的博客重新开始大家好！我是 forever，欢迎来到我重新搭建的博客 “Summer Flower”。
-📝 为什么重新开始？经过一段时间的思考，我决定重新整理我的博客，主要原因包括：
-
-更好的技术栈: 使用 Hexo + Butterfly 主题，提供更好的阅读体验
-规范的内容管理: 建立更完善的写作和发布流程
-专注的内容方向: 
-💻 技术学习心得
-📸 摄影作品分享
-🎓 计算机科学学习记录
-🌱 日常生活感悟
-
-
-
-🛠️ 技术栈介绍这个博客使用的技术栈：
-
-静态网站生成器: Hexo 7.3.0
-主题: Butterfly 5.3.3
-部署平台: GitHub Pages
-域名: 华为云自定义域名
-评论系统: Gitalk
-统计分析: Google Analytics + 不蒜子
-
-🎯 未来计划接下来我计划在这里分享：
-技术内容
-Rust 编程学习心得
-Git 深度使用技巧
-前端开发经验
-计算机科学课程笔记
-
-生活分享
-摄影作品和技巧
-读书心得体会
-旅行见闻
-日常思考
-
-项目展示
-GitHub 开源项目介绍
-个人项目经验分享
-课程作业总结
-
-💡 写作理念我希望这个博客能够：
-
-记录成长: 记录学习和生活中的点点滴滴
-分享经验: 把学到的知识和经验分享给大家
-交流互动: 通过博客认识更多志同道合的朋友
-持续学习: 通过写作来深化自己的理解
-
-🤝 联系方式如果你对我的文章有任何想法或建议，欢迎通过以下方式联系我：
-
-📧 Email: 231220075@smail.nju.edu.cn
-🐙 GitHub: @231220075
-💬 评论区: 每篇文章下方都可以留言
-
-🎉 结语感谢你阅读到这里！希望我的博客能为你带来一些有价值的内容。
-让我们一起在这个夏日花园里，记录美好，分享成长！🌸
-
-“每一次重新开始，都是向更好的自己迈进一步。”
-]]></content>
+<search> 
+  
+  
+    
+    <entry>
+      <title>用rust复刻git</title>
+      <link href="/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/"/>
+      <url>/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/</url>
+      
+        <content type="html"><![CDATA[<h1 id="📝-用rust复刻git"><a href="#📝-用rust复刻git" class="headerlink" title="📝 用rust复刻git"></a>📝 用rust复刻git</h1><blockquote><p>本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历</p></blockquote><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>大二下选课的时候发现有一门《rust程序设计》的课程，之前在大一上c++的时候最早接触过rust这个名字，但是一直没怎么了解过，于是抱着好奇心和同伴组队选了这门课，这也是这门项目的由来。</p><p>整个项目从4月份开始，到5月底向猪脚答辩时完成了1.0版本（<code>https://github.com/231220075/git.git</code>），包含了除远程分支外的基本功能。后续在暑假期间补上了远程分支控制的部分，即1.1版本（<code>https://github.com/231220075/rit.git</code>），命名为rit-&gt;rust-git。</p><h2 id="初步开发"><a href="#初步开发" class="headerlink" title="初步开发"></a>初步开发</h2><ul><li>首先需要了解git的工作原理，这一部分参考<code>https://git-scm.com/book/en/v</code>，不再赘述。</li><li>每一条git命令执行过程比较固定，解析好命令行参数后执行对应的处理函数即可。解析命令行参数使用clap（易于使用，能处理复杂参数解析，且自动生成help页）。clap解析命令行参数并返回具体类型的 subcommand，并调用其run函数。这里为了后续子命令的实现，我们把.git所在目录路径作为参数传给run，并为-C做了处理。</li><li>在做subcommand之前需要先实现一些底层命令，我们做了cat-file、hash-object、write&#x2F;read-tree、update-index、commit-tree、update-ref&amp;&amp;symboloc-ref等等（后两个比较简单，后续直接简化到utils&#x2F;refs作为分支管理工具了），这一部分逐步理清并构建了git的工作环境，如index区、.git文件内容管理、refs管理等等，以及git中 blob、tree、commit这几种object的结构，这些就是git的底层代码，到此为止我们就能完全读懂.git下的所有文件及其功能了。</li><li>理解底层代码后剩下的部分就比较简单了，subcommand就是在底层命令的基础上运行的，基本就是组合一下，加上判断处理。比较复杂的可能是checkout和merge，课程对merge要求比较简单，如果有冲突只要显示两个分支哪部分有不同，这部分由另一位成员完成，我不做过多阐述；而checkout主要涉及到切换分支的时间点，workspace、index和ref commit是否一致的问题。我的理解是，如果切换分支前，仅考虑目标文件，index&#x3D;workspace&#x3D;current ref commit，说明不存在未暂存&amp;&amp;未提交的更改，即index和workspace都是clean，这种情况下可以直接切换ref commit,并把目标commit的tree object写入index和更新workspace；否则说明有未暂存||未提交的更改，需要考虑保留这些更改，存在一个“merge”的过程，对于存在冲突的文件以index&#x2F;workspace为准。</li><li>这个过程中每一步开发新功能前需要先把频繁使用的method构建一个util，方便后续使用，我们主要是用到很多关于三类object构建和读写、index的读写、文件读写以及压缩、hash和做单元测试的method，构建了相关的utils。谈到unit test，需要感谢我的同伴开发了完整的测试框架，为我们的测试做出来巨大的贡献、巨大的carry，respect！也是rust优秀的单元测试让我这个懒人也愿意开始做测试了，amazing啊qwq。</li></ul><h2 id="debug-踩坑"><a href="#debug-踩坑" class="headerlink" title="debug&amp;&amp;踩坑"></a>debug&amp;&amp;踩坑</h2><ul><li>关于debug，包括两部分。一是客观方面作为课设，猪脚还是做了oj，我们这个项目需要通过测试拿分。猪脚的oj是用脚本做断言测试公开了部分测试和要求，涉及大文件、可执行文件、图片等的测试；另一方面主观上每个subcommand和底层命令我们做了对应的集成测试，主要是交替使用原版git和rust-git检查问题。</li><li>大部分bug在检测的过程中就知道哪里有问题，可以快速解决，但有的是认知问题。比较典型的是，index区暂存文件的结构和tree object的文件结构是不一样的，前者是完整的路径，<img src="/../photos/posts/rust-git/!%5Balt%20text%5D.png" alt="alt text">而后者是递归存储的。<img src="/../photos/posts/rust-git/2025-05-28-20-27-15.png" alt="alt text"></li><li>另外就是配置了GitHub的CI，<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="attr">name:</span> <span class="string">Rust</span> <span class="string">CI</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 触发条件：当代码推送到仓库或创建 Pull Request 时触发</span></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span> [ <span class="string">&#x27;**&#x27;</span> ]</span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build-and-test:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span>  <span class="comment"># 使用最新的 Ubuntu 环境</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="comment"># Step 1: 检出代码</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">code</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v3</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># Step 2: 设置 Rust 工具链</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Set</span> <span class="string">up</span> <span class="string">Rust</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions-rs/toolchain@v1</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">toolchain:</span> <span class="string">stable</span>  <span class="comment"># 使用稳定的 Rust 工具链</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># Step 3: 运行 cargo test</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Run</span> <span class="string">Tests</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">cargo</span> <span class="string">test</span> <span class="string">--</span> <span class="string">--test-threads=1</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># Step 4: 运行 cargo clippy 检查</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Run</span> <span class="string">Clippy</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">cargo</span> <span class="string">clippy</span> <span class="string">--</span> <span class="string">-D</span> <span class="string">warnings</span>  <span class="comment"># 将警告视为错误</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># （可选）Step 5: 构建项目</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Build</span> <span class="string">Project</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">cargo</span> <span class="string">build</span> <span class="string">--release</span></span><br></pre></td></tr></table></figure>这样每次提交自动触发测试，虽然每次都要发个邮件提醒有点烦就是了……<br>大概如下<img src="/../photos/posts/rust-git/image.png" alt="😗"></li></ul><hr><p><em>感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。</em></p>]]></content>
+      
+      
       <categories>
-        <category>生活随想</category>
+          
+          <category> 学习记录 </category>
+          
       </categories>
-      <tags>
-        <tag>博客</tag>
-        <tag>新开始</tag>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>用rust复刻git</title>
-    <url>/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/</url>
-    <content><![CDATA[📝 用rust复刻git
-本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历
-
-前言大二下选课的时候发现有一门《rust程序设计》的课程，之前在大一上c++的时候最早接触过rust这个名字，但是一直没怎么了解过，于是抱着好奇心和同伴组队选了这门课，这也是这门项目的由来。
-整个项目从4月份开始，到5月底向猪脚答辩时完成了1.0版本（https://github.com/231220075/git.git），包含了除远程分支外的基本功能。后续在暑假期间补上了远程分支控制的部分，即1.1版本（https://github.com/231220075/rit.git），命名为rit-&gt;rust-git。
-初步开发
-首先需要了解git的工作原理，这一部分参考https://git-scm.com/book/en/v，不再赘述。
-每一条git命令执行过程比较固定，解析好命令行参数后执行对应的处理函数即可。解析命令行参数使用clap（易于使用，能处理复杂参数解析，且自动生成help页）。clap解析命令行参数并返回具体类型的 subcommand，并调用其run函数。这里为了后续子命令的实现，我们把.git所在目录路径作为参数传给run，并为-C做了处理。
-在做subcommand之前需要先实现一些底层命令，我们做了cat-file、hash-object、write&#x2F;read-tree、update-index、commit-tree、update-ref&amp;&amp;symboloc-ref等等（后两个比较简单，后续直接简化到utils&#x2F;refs作为分支管理工具了），这一部分逐步理清并构建了git的工作环境，如index区、.git文件内容管理、refs管理等等，以及git中 blob、tree、commit这几种object的结构，这些就是git的底层代码，到此为止我们就能完全读懂.git下的所有文件及其功能了。
-理解底层代码后剩下的部分就比较简单了，subcommand就是在底层命令的基础上运行的，基本就是组合一下，加上判断处理。比较复杂的可能是checkout和merge，课程对merge要求比较简单，如果有冲突只要显示两个分支哪部分有不同，这部分由另一位成员完成，我不做过多阐述；而checkout主要涉及到切换分支的时间点，workspace、index和ref commit是否一致的问题。我的理解是，如果切换分支前，仅考虑目标文件，index&#x3D;workspace&#x3D;current ref commit，说明不存在未暂存&amp;&amp;未提交的更改，即index和workspace都是clean，这种情况下可以直接切换ref commit,并把目标commit的tree object写入index和更新workspace；否则说明有未暂存||未提交的更改，需要考虑保留这些更改，存在一个“merge”的过程，对于存在冲突的文件以index&#x2F;workspace为准。
-这个过程中每一步开发新功能前需要先把频繁使用的method构建一个util，方便后续使用，我们主要是用到很多关于三类object构建和读写、index的读写、文件读写以及压缩、hash和做单元测试的method，构建了相关的utils。谈到unit test，需要感谢我的同伴开发了完整的测试框架，为我们的测试做出来巨大的贡献、巨大的carry，respect！也是rust优秀的单元测试让我这个懒人也愿意开始做测试了，amazing啊qwq。
-
-debug&amp;&amp;踩坑
-关于debug，包括两部分。一是客观方面作为课设，猪脚还是做了oj，我们这个项目需要通过测试拿分。猪脚的oj是用脚本做断言测试公开了部分测试和要求，涉及大文件、可执行文件、图片等的测试；另一方面主观上每个subcommand和底层命令我们做了对应的集成测试，主要是交替使用原版git和rust-git检查问题。
-大部分bug在检测的过程中就知道哪里有问题，可以快速解决，但有的是认知问题。比较典型的是，index区暂存文件的结构和tree object的文件结构是不一样的，前者是完整的路径，而后者是递归存储的。
-另外就是配置了GitHub的CI，name: Rust CI# 触发条件：当代码推送到仓库或创建 Pull Request 时触发on:  push:    branches: [ &#x27;**&#x27; ]jobs:  build-and-test:    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境    steps:      # Step 1: 检出代码      - name: Checkout code        uses: actions/checkout@v3      # Step 2: 设置 Rust 工具链      - name: Set up Rust        uses: actions-rs/toolchain@v1        with:          toolchain: stable  # 使用稳定的 Rust 工具链      # Step 3: 运行 cargo test      - name: Run Tests        run: cargo test -- --test-threads=1      # Step 4: 运行 cargo clippy 检查      - name: Run Clippy        run: cargo clippy -- -D warnings  # 将警告视为错误      # （可选）Step 5: 构建项目      - name: Build Project        run: cargo build --release
-这样每次提交自动触发测试，虽然每次都要发个邮件提醒有点烦就是了……大概如下
-
-
-感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
-]]></content>
+      
+      
+        <tags>
+            
+            <tag> 默认 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>我的博客重新开始</title>
+      <link href="/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/"/>
+      <url>/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/</url>
+      
+        <content type="html"><![CDATA[<h1 id="🌟-我的博客重新开始"><a href="#🌟-我的博客重新开始" class="headerlink" title="🌟 我的博客重新开始"></a>🌟 我的博客重新开始</h1><p>大家好！我是 forever，欢迎来到我重新搭建的博客 “Summer Flower”。</p><h2 id="📝-为什么重新开始？"><a href="#📝-为什么重新开始？" class="headerlink" title="📝 为什么重新开始？"></a>📝 为什么重新开始？</h2><p>经过一段时间的思考，我决定重新整理我的博客，主要原因包括：</p><ol><li><strong>更好的技术栈</strong>: 使用 Hexo + Butterfly 主题，提供更好的阅读体验</li><li><strong>规范的内容管理</strong>: 建立更完善的写作和发布流程</li><li><strong>专注的内容方向</strong>: <ul><li>💻 技术学习心得</li><li>📸 摄影作品分享</li><li>🎓 计算机科学学习记录</li><li>🌱 日常生活感悟</li></ul></li></ol><h2 id="🛠️-技术栈介绍"><a href="#🛠️-技术栈介绍" class="headerlink" title="🛠️ 技术栈介绍"></a>🛠️ 技术栈介绍</h2><p>这个博客使用的技术栈：</p><ul><li><strong>静态网站生成器</strong>: Hexo 7.3.0</li><li><strong>主题</strong>: Butterfly 5.3.3</li><li><strong>部署平台</strong>: GitHub Pages</li><li><strong>域名</strong>: 华为云自定义域名</li><li><strong>评论系统</strong>: Gitalk</li><li><strong>统计分析</strong>: Google Analytics + 不蒜子</li></ul><h2 id="🎯-未来计划"><a href="#🎯-未来计划" class="headerlink" title="🎯 未来计划"></a>🎯 未来计划</h2><p>接下来我计划在这里分享：</p><h3 id="技术内容"><a href="#技术内容" class="headerlink" title="技术内容"></a>技术内容</h3><ul><li>Rust 编程学习心得</li><li>Git 深度使用技巧</li><li>前端开发经验</li><li>计算机科学课程笔记</li></ul><h3 id="生活分享"><a href="#生活分享" class="headerlink" title="生活分享"></a>生活分享</h3><ul><li>摄影作品和技巧</li><li>读书心得体会</li><li>旅行见闻</li><li>日常思考</li></ul><h3 id="项目展示"><a href="#项目展示" class="headerlink" title="项目展示"></a>项目展示</h3><ul><li>GitHub 开源项目介绍</li><li>个人项目经验分享</li><li>课程作业总结</li></ul><h2 id="💡-写作理念"><a href="#💡-写作理念" class="headerlink" title="💡 写作理念"></a>💡 写作理念</h2><p>我希望这个博客能够：</p><ul><li><strong>记录成长</strong>: 记录学习和生活中的点点滴滴</li><li><strong>分享经验</strong>: 把学到的知识和经验分享给大家</li><li><strong>交流互动</strong>: 通过博客认识更多志同道合的朋友</li><li><strong>持续学习</strong>: 通过写作来深化自己的理解</li></ul><h2 id="🤝-联系方式"><a href="#🤝-联系方式" class="headerlink" title="🤝 联系方式"></a>🤝 联系方式</h2><p>如果你对我的文章有任何想法或建议，欢迎通过以下方式联系我：</p><ul><li>📧 Email: <a href="mailto:&#x32;&#51;&#x31;&#x32;&#x32;&#x30;&#48;&#55;&#x35;&#x40;&#x73;&#x6d;&#x61;&#x69;&#x6c;&#46;&#x6e;&#106;&#x75;&#46;&#x65;&#100;&#x75;&#x2e;&#x63;&#110;">231220075@smail.nju.edu.cn</a></li><li>🐙 GitHub: <a href="https://github.com/231220075">@231220075</a></li><li>💬 评论区: 每篇文章下方都可以留言</li></ul><h2 id="🎉-结语"><a href="#🎉-结语" class="headerlink" title="🎉 结语"></a>🎉 结语</h2><p>感谢你阅读到这里！希望我的博客能为你带来一些有价值的内容。</p><p>让我们一起在这个夏日花园里，记录美好，分享成长！🌸</p><hr><p><em>“每一次重新开始，都是向更好的自己迈进一步。”</em></p>]]></content>
+      
+      
       <categories>
-        <category>学习记录</category>
+          
+          <category> 生活随想 </category>
+          
       </categories>
-      <tags>
-        <tag>默认</tag>
-      </tags>
-  </entry>
+      
+      
+        <tags>
+            
+            <tag> 博客 </tag>
+            
+            <tag> 新开始 </tag>
+            
+            <tag> Hexo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>my first address</title>
+      <link href="/2025/02/28/hello-world/"/>
+      <url>/2025/02/28/hello-world/</url>
+      
+        <content type="html"><![CDATA[<h2 id="this-is-my-first-article"><a href="#this-is-my-first-article" class="headerlink" title="this is my first article"></a>this is my first article</h2>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
 </search>
