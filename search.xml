@@ -19,6 +19,12 @@
       </tags>
   </entry>
   <entry>
+    <title>my first address</title>
+    <url>/2025/02/28/hello-world/</url>
+    <content><![CDATA[this is my first articletest文件，梦开始的地方
+]]></content>
+  </entry>
+  <entry>
     <title>我的博客重新开始</title>
     <url>/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/</url>
     <content><![CDATA[🌟 我的博客重新开始大家好！我是 forever，欢迎来到我重新搭建的博客 “Summer Flower”。
@@ -414,11 +420,5 @@ document.getElementById('bvid-input').addEventListener('keypress', function(e) {
         <tag>多媒体</tag>
         <tag>测试</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>my first address</title>
-    <url>/2025/02/28/hello-world/</url>
-    <content><![CDATA[this is my first articletest文件，梦开始的地方
-]]></content>
   </entry>
 </search>
