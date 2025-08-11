@@ -7,7 +7,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://summer-flower.com/photos/avatar.jpg">
 <meta property="article:published_time" content="2025-08-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-08-11T01:52:55.339Z">
+<meta property="article:modified_time" content="2025-08-11T02:18:29.661Z">
 <meta property="article:author" content="forever">
 <meta property="article:tag" content="life cs">
 <meta name="twitter:card" content="summary">
@@ -154,222 +154,29 @@
 </div>
 
 <div class="photo-gallery" id="photo-gallery">
-  <div class="loading" id="loading">
-    <p>正在加载图片...</p>
+  
+  <div class="date-section" data-date="2025-08-11">
+    <h3>2025年8月11日</h3>
+    <div class="photos-grid">
+      <img src="/photos-gallery/1.jpg" alt="图片1" onclick="openLightbox(this.src, '图片1')">
+      <img src="/photos-gallery/2.jpg" alt="图片2" onclick="openLightbox(this.src, '图片2')">
+      <img src="/photos-gallery/3.jpg" alt="图片3" onclick="openLightbox(this.src, '图片3')">
+      <img src="/photos-gallery/4.jpg" alt="图片4" onclick="openLightbox(this.src, '图片4')">
+      <img src="/photos-gallery/5.jpg" alt="图片5" onclick="openLightbox(this.src, '图片5')">
+      <img src="/photos-gallery/6.jpg" alt="图片6" onclick="openLightbox(this.src, '图片6')">
+      <img src="/photos-gallery/7.jpg" alt="图片7" onclick="openLightbox(this.src, '图片7')">
+      <img src="/photos-gallery/8.jpg" alt="图片8" onclick="openLightbox(this.src, '图片8')">
+      <img src="/photos-gallery/9.jpg" alt="图片9" onclick="openLightbox(this.src, '图片9')">
+    </div>
   </div>
+
 </div>
 
 <script>
-// 图片文件扩展名列表
-const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
-
-// 存储所有图片信息
-let allPhotos = [];
-let dateGroups = {};
-
-// 页面加载完成后自动扫描图片
+// 页面加载完成后显示所有图片
 document.addEventListener('DOMContentLoaded', function() {
-  loadPhotosAutomatically();
-});
-
-// 自动加载photos-gallery目录下的所有图片
-async function loadPhotosAutomatically() {
-  try {
-    // 尝试通过多种方式获取图片列表
-    await scanForImages();
-  } catch (error) {
-    console.log('自动扫描失败，使用预设图片列表');
-    // 如果自动扫描失败，使用已知的图片
-    loadKnownImages();
-  }
-}
-
-// 扫描图片的主要逻辑
-async function scanForImages() {
-  const gallery = document.getElementById('photo-gallery');
-  const loading = document.getElementById('loading');
-  
-  // 预设的图片文件名模式（常见的命名方式）
-  const possibleImages = [];
-  
-  // 1. 数字命名：1.jpg, 2.jpg, ... 100.jpg
-  for (let i = 1; i <= 100; i++) {
-    imageExtensions.forEach(ext => {
-      possibleImages.push(`${i}.${ext}`);
-    });
-  }
-  
-  // 2. IMG_开头：IMG_001.jpg, IMG_002.jpg, ...
-  for (let i = 1; i <= 100; i++) {
-    const num = i.toString().padStart(3, '0');
-    imageExtensions.forEach(ext => {
-      possibleImages.push(`IMG_${num}.${ext}`);
-      possibleImages.push(`img_${num}.${ext}`);
-    });
-  }
-  
-  // 3. 常见的图片名称
-  const commonNames = ['photo', 'image', 'pic', 'picture', 'gallery', 'avatar', 'cover'];
-  commonNames.forEach(name => {
-    imageExtensions.forEach(ext => {
-      possibleImages.push(`${name}.${ext}`);
-      for (let i = 1; i <= 20; i++) {
-        possibleImages.push(`${name}${i}.${ext}`);
-        possibleImages.push(`${name}_${i}.${ext}`);
-      }
-    });
-  });
-  
-  // 4. 日期格式：2025-08-11.jpg, 20250811.jpg
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  
-  imageExtensions.forEach(ext => {
-    possibleImages.push(`${year}-${month}-${day}.${ext}`);
-    possibleImages.push(`${year}${month}${day}.${ext}`);
-  });
-  
-  // 检查哪些图片实际存在
-  const existingImages = [];
-  const checkPromises = possibleImages.map(async (filename) => {
-    try {
-      const response = await fetch(`/photos-gallery/${filename}`, { method: 'HEAD' });
-      if (response.ok) {
-        existingImages.push(filename);
-      }
-    } catch (error) {
-      // 图片不存在，忽略
-    }
-  });
-  
-  await Promise.all(checkPromises);
-  
-  if (existingImages.length === 0) {
-    throw new Error('没有找到图片');
-  }
-  
-  // 生成图片信息
-  allPhotos = existingImages.map(filename => ({
-    filename: filename,
-    src: `/photos-gallery/${filename}`,
-    alt: getImageAlt(filename),
-    date: getImageDate(filename)
-  }));
-  
-  generateGallery();
-}
-
-// 如果自动扫描失败，加载已知图片
-function loadKnownImages() {
-  // 已知存在的图片
-  const knownImages = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg'];
-  
-  allPhotos = knownImages.map(filename => ({
-    filename: filename,
-    src: `/photos-gallery/${filename}`,
-    alt: `图片${filename.split('.')[0]}`,
-    date: '2025-08-11'
-  }));
-  
-  generateGallery();
-}
-
-// 根据文件名生成合适的alt文本
-function getImageAlt(filename) {
-  const name = filename.split('.')[0];
-  
-  // 如果是数字，返回"图片X"
-  if (/^\d+$/.test(name)) {
-    return `图片${name}`;
-  }
-  
-  // 如果是IMG_格式，返回"图片 IMG_XXX"
-  if (/^IMG_\d+$/i.test(name)) {
-    return `图片 ${name}`;
-  }
-  
-  // 其他情况直接使用文件名
-  return name;
-}
-
-// 根据文件名或当前日期生成日期
-function getImageDate(filename) {
-  // 尝试从文件名中提取日期
-  const dateMatch = filename.match(/(\d{4})-?(\d{2})-?(\d{2})/);
-  if (dateMatch) {
-    return `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
-  }
-  
-  // 如果没有日期信息，使用当前日期
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-// 生成画廊HTML
-function generateGallery() {
-  const gallery = document.getElementById('photo-gallery');
-  const loading = document.getElementById('loading');
-  
-  // 按日期分组
-  dateGroups = {};
-  allPhotos.forEach(photo => {
-    if (!dateGroups[photo.date]) {
-      dateGroups[photo.date] = [];
-    }
-    dateGroups[photo.date].push(photo);
-  });
-  
-  // 更新日期筛选按钮
-  updateDateFilter();
-  
-  // 生成图片展示
-  let galleryHTML = '';
-  Object.keys(dateGroups).sort().reverse().forEach(date => {
-    const photos = dateGroups[date];
-    const dateDisplay = formatDateDisplay(date);
-    
-    galleryHTML += `
-      <div class="date-section" data-date="${date}">
-        <h3>${dateDisplay}</h3>
-        <div class="photos-grid">
-          ${photos.map(photo => 
-            `<img src="${photo.src}" alt="${photo.alt}" onclick="openLightbox('${photo.src}', '${photo.alt}')" loading="lazy">`
-          ).join('')}
-        </div>
-      </div>
-    `;
-  });
-  
-  gallery.innerHTML = galleryHTML;
-  
-  // 默认显示所有图片
   showDate('all');
-}
-
-// 更新日期筛选按钮
-function updateDateFilter() {
-  const dateFilter = document.querySelector('.date-filter');
-  const dates = Object.keys(dateGroups).sort().reverse();
-  
-  let filterHTML = '<button class="date-btn active" onclick="showDate(\'all\')">全部</button>';
-  dates.forEach(date => {
-    const dateDisplay = formatDateDisplay(date);
-    filterHTML += `<button class="date-btn" onclick="showDate('${date}')">${dateDisplay}</button>`;
-  });
-  
-  dateFilter.innerHTML = filterHTML;
-}
-
-// 格式化日期显示
-function formatDateDisplay(date) {
-  const [year, month, day] = date.split('-');
-  return `${year}年${parseInt(month)}月${parseInt(day)}日`;
-}
+});
 
 // 显示指定日期的照片
 function showDate(date) {
@@ -430,19 +237,6 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <style>
-/* 加载状态 */
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-  font-style: italic;
-}
-
-.loading p {
-  margin: 0;
-  font-size: 1.1em;
-}
-
 /* 日期筛选按钮 */
 .date-filter {
   display: flex;
@@ -619,7 +413,7 @@ document.addEventListener('keydown', function(e) {
           </div>
           <ul class="card-category-list" id="aside-cat-list">
             <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"><span class="card-category-list-name">学习记录</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"><span class="card-category-list-name">技术分享</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E6%83%B3/"><span class="card-category-list-name">生活随想</span><span class="card-category-list-count">2</span></a></li>
-          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/Hexo/" style="font-size: 1.1em; color: #999">Hexo</a> <a href="/tags/%E4%B9%A1%E6%84%81/" style="font-size: 1.1em; color: #999">乡愁</a> <a href="/tags/%E5%A4%9A%E5%AA%92%E4%BD%93/" style="font-size: 1.1em; color: #999">多媒体</a> <a href="/tags/%E6%B5%8B%E8%AF%95/" style="font-size: 1.1em; color: #999">测试</a> <a href="/tags/%E6%96%B0%E5%BC%80%E5%A7%8B/" style="font-size: 1.1em; color: #999">新开始</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 1.1em; color: #999">博客</a> <a href="/tags/%E9%BB%98%E8%AE%A4/" style="font-size: 1.1em; color: #999">默认</a></div></div><div class="card-widget card-archives">
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E5%A4%9A%E5%AA%92%E4%BD%93/" style="font-size: 1.1em; color: #999">多媒体</a> <a href="/tags/%E6%96%B0%E5%BC%80%E5%A7%8B/" style="font-size: 1.1em; color: #999">新开始</a> <a href="/tags/%E4%B9%A1%E6%84%81/" style="font-size: 1.1em; color: #999">乡愁</a> <a href="/tags/%E9%BB%98%E8%AE%A4/" style="font-size: 1.1em; color: #999">默认</a> <a href="/tags/%E6%B5%8B%E8%AF%95/" style="font-size: 1.1em; color: #999">测试</a> <a href="/tags/Hexo/" style="font-size: 1.1em; color: #999">Hexo</a> <a href="/tags/%E5%8D%9A%E5%AE%A2/" style="font-size: 1.1em; color: #999">博客</a></div></div><div class="card-widget card-archives">
     <div class="item-headline">
       <i class="fas fa-archive"></i>
       <span>Archives</span>
@@ -647,4 +441,4 @@ document.addEventListener('keydown', function(e) {
         </li>
       
     </ul>
-  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">5</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">6.4k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-08-11T01:54:41.867Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2025 By forever</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.3</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body></html>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">5</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">6.4k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-08-11T02:19:00.582Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2025 By forever</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.3</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body></html>
