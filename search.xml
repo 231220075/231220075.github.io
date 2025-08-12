@@ -1,492 +1,301 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Java 注解</title>
+    <url>/2025/08/12/Java%20%E6%B3%A8%E8%A7%A3/</url>
+    <content><![CDATA[📝 Java 注解完全指南
+yys-project中延伸学习Java注解，上传一下
+
+1. 什么是Java注解？Java注解（Annotation）是Java 5引入的一种元数据机制，它为代码提供了一种描述性的信息，而不直接影响代码的执行逻辑。可以把注解理解为”给代码贴标签”，这些标签可以被编译器、开发工具或运行时环境读取和处理。
+注解的本质
+注解本质上是一种特殊的接口
+继承自java.lang.annotation.Annotation接口
+在编译后会生成相应的字节码信息
+
+2. Java注解 vs C++的对比
+
+
+特性
+Java注解
+C++宏&#x2F;预处理指令
+C++属性(C++11+)
+
+
+
+语法
+@注解名
+#define, #pragma
+[[属性名]]
+
+
+处理时机
+编译时&#x2F;运行时
+预处理时
+编译时
+
+
+类型安全
+强类型
+弱类型
+强类型
+
+
+反射支持
+完全支持
+不支持
+有限支持
+
+
+功能范围
+元数据、验证、代码生成
+文本替换、条件编译
+优化提示、属性标记
+
+
+举例对比：Java注解：
+@Overridepublic String toString() &#123;    return &quot;example&quot;;&#125;
+
+C++属性：
+[[override]]virtual std::string toString() &#123;    return &quot;example&quot;;&#125;
+
+C++宏：
+#define OVERRIDE virtualOVERRIDE std::string toString() &#123;    return &quot;example&quot;;&#125;
+
+3. 注解的工作原理3.1 编译时处理// 源代码@Overridepublic void method() &#123;&#125;// 编译后的字节码中会包含注解信息// 可以通过反射API在运行时访问
+
+3.2 三个处理阶段
+源码阶段：注解存在于.java文件中
+编译阶段：注解被编译器处理，可能生成额外代码
+运行阶段：通过反射API读取注解信息
+
+3.3 注解处理器（Annotation Processor）// 自定义注解处理器示例@SupportedAnnotationTypes(&quot;com.example.MyAnnotation&quot;)public class MyProcessor extends AbstractProcessor &#123;    @Override    public boolean process(Set&lt;? extends TypeElement&gt; annotations,                           RoundEnvironment roundEnv) &#123;        // 在编译时处理注解        return true;    &#125;&#125;
+
+4. 注解的分类4.1 按生命周期分类SOURCE（源码级）@Retention(RetentionPolicy.SOURCE)public @interface SourceAnnotation &#123;    String value();&#125;
+
+只在源码中存在，编译后丢弃
+主要用于编译时检查
+例如：@Override, @SuppressWarnings
+
+CLASS（字节码级）@Retention(RetentionPolicy.CLASS)public @interface ClassAnnotation &#123;    String value();&#125;
+
+在字节码中保留，但运行时不可访问
+默认的保留策略
+用于编译时或字节码处理工具
+
+RUNTIME（运行时级）@Retention(RetentionPolicy.RUNTIME)public @interface RuntimeAnnotation &#123;    String value();&#125;
+
+运行时可通过反射访问
+最常用的类型
+用于框架和库的运行时处理
+
+4.2 按作用目标分类@Target(&#123;ElementType.TYPE, ElementType.METHOD&#125;)public @interface MyAnnotation &#123;    // 可以用在类和方法上&#125;
+
+常见的ElementType：
+
+TYPE：类、接口、枚举
+METHOD：方法
+FIELD：字段
+PARAMETER：参数
+CONSTRUCTOR：构造器
+PACKAGE：包
+
+5. 常见内置注解详解5.1 基础注解@Overridepublic class Child extends Parent &#123;    @Override  // 确保正确重写父类方法    public void method() &#123;        System.out.println(&quot;子类实现&quot;);    &#125;&#125;
+功能：
+
+编译时检查是否正确重写了父类方法
+提高代码可读性
+防止方法签名错误
+
+@Deprecatedpublic class OldAPI &#123;    @Deprecated(since = &quot;1.5&quot;, forRemoval = true)    public void oldMethod() &#123;        // 已废弃的方法    &#125;        public void newMethod() &#123;        // 推荐使用的新方法    &#125;&#125;
+功能：
+
+标记已废弃的API
+编译时产生警告
+可以指定废弃版本和是否将被移除
+
+@SuppressWarningspublic class Example &#123;    @SuppressWarnings(&quot;unchecked&quot;)    public void method() &#123;        List list = new ArrayList();  // 原始类型警告被抑制        list.add(&quot;item&quot;);    &#125;        @SuppressWarnings(&#123;&quot;unused&quot;, &quot;deprecation&quot;&#125;)    private void anotherMethod() &#123;        // 抑制多种警告    &#125;&#125;
+常用警告类型：
+
+unchecked：未检查转换
+unused：未使用的变量
+deprecation：使用已废弃的API
+rawtypes：使用原始类型
+
+@SafeVarargspublic class VarargsExample &#123;    @SafeVarargs    public static &lt;T&gt; void printAll(T... items) &#123;        for (T item : items) &#123;            System.out.println(item);        &#125;    &#125;&#125;
+
+5.2 函数式接口注解@FunctionalInterface 详细解释@FunctionalInterface注解用来标记一个接口是函数式接口，这是Java 8引入Lambda表达式后的重要概念。
+什么是函数式接口？函数式接口是只有一个抽象方法的接口，它可以被Lambda表达式实现。
+@FunctionalInterfacepublic interface Calculator &#123;    // 只能有一个抽象方法（核心要求）    int calculate(int a, int b);        // 可以有默认方法（不算抽象方法）    default void log() &#123;        System.out.println(&quot;计算完成&quot;);    &#125;        // 可以有静态方法（不算抽象方法）    static void info() &#123;        System.out.println(&quot;这是一个计算器接口&quot;);    &#125;&#125;
+
+Lambda表达式实现传统方式 vs Lambda方式的对比：
+// ❌ 传统方式：使用匿名内部类Calculator add = new Calculator() &#123;    @Override    public int calculate(int a, int b) &#123;        return a + b;    &#125;&#125;;// ✅ Lambda方式：简洁明了Calculator add = (a, b) -&gt; a + b;Calculator multiply = (a, b) -&gt; a * b;Calculator subtract = (a, b) -&gt; a - b;// 使用示例int result1 = add.calculate(5, 3);        // 结果：8int result2 = multiply.calculate(4, 6);   // 结果：24int result3 = subtract.calculate(10, 4);  // 结果：6
+
+Lambda表达式语法详解// 完整语法：(参数列表) -&gt; &#123; 方法体 &#125;Calculator complex = (int a, int b) -&gt; &#123;    System.out.println(&quot;正在计算: &quot; + a + &quot; + &quot; + b);    int result = a + b;    return result;&#125;;// 简化语法：参数类型可以省略（类型推断）Calculator simple = (a, b) -&gt; a + b;// 单参数可以省略括号Function&lt;Integer, Integer&gt; square = x -&gt; x * x;// 无参数必须保留空括号Supplier&lt;String&gt; greeting = () -&gt; &quot;Hello World&quot;;// 单条语句可以省略大括号和returnCalculator add = (a, b) -&gt; a + b;// 多条语句必须使用大括号和returnCalculator verbose = (a, b) -&gt; &#123;    System.out.println(&quot;开始计算&quot;);    return a + b;&#125;;
+
+常见的函数式接口Java提供了许多内置的函数式接口：
+// 1. Supplier&lt;T&gt; - 供应商：无参数，返回T类型Supplier&lt;String&gt; stringSupplier = () -&gt; &quot;Hello&quot;;Supplier&lt;Integer&gt; randomNum = () -&gt; new Random().nextInt(100);// 2. Consumer&lt;T&gt; - 消费者：接受T类型参数，无返回值Consumer&lt;String&gt; printer = str -&gt; System.out.println(str);Consumer&lt;Integer&gt; logger = num -&gt; System.out.println(&quot;数字：&quot; + num);// 3. Function&lt;T, R&gt; - 函数：接受T类型，返回R类型Function&lt;String, Integer&gt; stringLength = str -&gt; str.length();Function&lt;Integer, String&gt; intToString = num -&gt; &quot;数字：&quot; + num;// 4. Predicate&lt;T&gt; - 断言：接受T类型，返回booleanPredicate&lt;String&gt; isEmpty = str -&gt; str.isEmpty();Predicate&lt;Integer&gt; isEven = num -&gt; num % 2 == 0;// 5. BiFunction&lt;T, U, R&gt; - 双参数函数：接受T和U，返回RBiFunction&lt;Integer, Integer, Integer&gt; add = (a, b) -&gt; a + b;BiFunction&lt;String, String, String&gt; concat = (s1, s2) -&gt; s1 + s2;
+
+实际应用示例public class CalculatorDemo &#123;    public static void main(String[] args) &#123;        // 定义不同的计算方式        Calculator add = (a, b) -&gt; a + b;        Calculator multiply = (a, b) -&gt; a * b;        Calculator max = (a, b) -&gt; Math.max(a, b);                // 使用计算器        performCalculation(10, 5, add);      // 输出：结果：15        performCalculation(10, 5, multiply); // 输出：结果：50        performCalculation(10, 5, max);      // 输出：结果：10                // 集合操作中使用Lambda        List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);                // 过滤偶数        List&lt;Integer&gt; evenNumbers = numbers.stream()            .filter(n -&gt; n % 2 == 0)            .collect(Collectors.toList());                // 平方运算        List&lt;Integer&gt; squares = numbers.stream()            .map(n -&gt; n * n)            .collect(Collectors.toList());                // 求和        int sum = numbers.stream()            .reduce(0, (a, b) -&gt; a + b);    &#125;        // 高阶函数：接受函数作为参数    public static void performCalculation(int a, int b, Calculator calc) &#123;        int result = calc.calculate(a, b);        System.out.println(&quot;结果：&quot; + result);        calc.log(); // 调用默认方法    &#125;&#125;
+
+@FunctionalInterface注解的作用
+编译时检查：确保接口只有一个抽象方法
+
+@FunctionalInterfacepublic interface InvalidInterface &#123;    void method1();    void method2(); // 编译错误！函数式接口只能有一个抽象方法&#125;
+
+
+文档说明：明确表示这是一个函数式接口
+IDE支持：开发工具可以提供更好的Lambda支持
+
+与传统接口的区别// 传统接口 - 可能有多个抽象方法public interface TraditionalInterface &#123;    void method1();    void method2();    void method3();&#125;// 函数式接口 - 只有一个抽象方法@FunctionalInterfacepublic interface FunctionalInterface &#123;    void singleMethod();        // 可以有默认方法和静态方法    default void defaultMethod() &#123;&#125;    static void staticMethod() &#123;&#125;&#125;
+
+方法引用（Method Reference）Lambda表达式的进一步简化：
+// Lambda表达式Function&lt;String, Integer&gt; lengthLambda = str -&gt; str.length();// 方法引用（更简洁）Function&lt;String, Integer&gt; lengthMethodRef = String::length;// 其他方法引用示例Consumer&lt;String&gt; printLambda = str -&gt; System.out.println(str);Consumer&lt;String&gt; printMethodRef = System.out::println;// 构造器引用Supplier&lt;ArrayList&lt;String&gt;&gt; listSupplier = ArrayList::new;
+
+总结：@FunctionalInterface让Java支持函数式编程，使代码更简洁、更具表达力。Lambda表达式本质上是匿名函数的简写，让我们可以将行为作为参数传递，这是现代Java编程的重要特性！
+6. 框架中的常用注解什么是Spring框架？Spring是Java企业级开发中最流行的应用框架，它提供了：
+
+依赖注入（DI）：自动管理对象间的依赖关系
+面向切面编程（AOP）：统一处理横切关注点（如日志、事务）
+事务管理：简化数据库事务处理
+Web开发支持：MVC架构支持
+
+Spring Boot是Spring的进化版，它：
+
+自动配置：根据依赖自动配置Spring应用
+内嵌服务器：无需外部Tomcat，直接运行
+简化配置：减少XML配置，基于注解开发
+微服务友好：易于构建独立的微服务应用
+
+6.1 Spring核心注解详解组件注解系列@Component - 通用组件注解/** * @Component: Spring的基础组件注解 * 功能：告诉Spring这是一个需要管理的Bean（对象） * 作用：Spring会自动创建这个类的实例，并放入容器中管理 */@Componentpublic class EmailService &#123;    public void sendEmail(String to, String message) &#123;        System.out.println(&quot;发送邮件到: &quot; + to);        System.out.println(&quot;内容: &quot; + message);    &#125;&#125;// 可以指定Bean的名称@Component(&quot;customEmailService&quot;)public class CustomEmailService &#123;    // Spring容器中这个Bean的名称是&quot;customEmailService&quot;&#125;
+
+@Service - 业务逻辑层注解/** * @Service: 标记业务逻辑层组件 * 功能：本质上等同于@Component，但语义更明确 * 用途：处理业务逻辑、调用数据访问层、实现业务规则 */@Servicepublic class UserService &#123;        @Autowired    private UserRepository userRepository;        // 业务方法：创建用户    public User createUser(String username, String email) &#123;        // 业务逻辑：验证用户名是否重复        if (userRepository.existsByUsername(username)) &#123;            throw new IllegalArgumentException(&quot;用户名已存在&quot;);        &#125;                // 创建用户对象        User user = new User();        user.setUsername(username);        user.setEmail(email);        user.setCreatedAt(new Date());                // 保存到数据库        return userRepository.save(user);    &#125;        // 业务方法：用户登录验证    public boolean authenticate(String username, String password) &#123;        User user = userRepository.findByUsername(username);        return user != null &amp;&amp; user.getPassword().equals(password);    &#125;&#125;
+
+@Repository - 数据访问层注解/** * @Repository: 标记数据访问层组件 * 功能： * 1. 等同于@Component，但语义更明确 * 2. 自动将数据访问异常转换为Spring的DataAccessException * 用途：处理数据库操作、文件操作等数据访问逻辑 */@Repositorypublic class UserRepository &#123;        @Autowired    private JdbcTemplate jdbcTemplate;        // 数据访问方法：根据ID查找用户    public User findById(Long id) &#123;        String sql = &quot;SELECT * FROM users WHERE id = ?&quot;;        return jdbcTemplate.queryForObject(sql, new Object[]&#123;id&#125;,             (rs, rowNum) -&gt; &#123;                User user = new User();                user.setId(rs.getLong(&quot;id&quot;));                user.setUsername(rs.getString(&quot;username&quot;));                user.setEmail(rs.getString(&quot;email&quot;));                return user;            &#125;);    &#125;        // 数据访问方法：保存用户    public User save(User user) &#123;        if (user.getId() == null) &#123;            // 新建用户            String sql = &quot;INSERT INTO users (username, email, created_at) VALUES (?, ?, ?)&quot;;            KeyHolder keyHolder = new GeneratedKeyHolder();            jdbcTemplate.update(connection -&gt; &#123;                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);                ps.setString(1, user.getUsername());                ps.setString(2, user.getEmail());                ps.setTimestamp(3, new Timestamp(user.getCreatedAt().getTime()));                return ps;            &#125;, keyHolder);            user.setId(keyHolder.getKey().longValue());        &#125; else &#123;            // 更新用户            String sql = &quot;UPDATE users SET username = ?, email = ? WHERE id = ?&quot;;            jdbcTemplate.update(sql, user.getUsername(), user.getEmail(), user.getId());        &#125;        return user;    &#125;        public boolean existsByUsername(String username) &#123;        String sql = &quot;SELECT COUNT(*) FROM users WHERE username = ?&quot;;        int count = jdbcTemplate.queryForObject(sql, Integer.class, username);        return count &gt; 0;    &#125;&#125;
+
+@Controller - Web控制器注解/** * @Controller: 标记Web控制器组件 * 功能：处理HTTP请求，返回视图（如JSP、Thymeleaf模板） * 用途：传统的MVC架构中的Controller层 */@Controller@RequestMapping(&quot;/web&quot;)public class WebController &#123;        @Autowired    private UserService userService;        // 处理GET请求，返回用户列表页面    @GetMapping(&quot;/users&quot;)    public String listUsers(Model model) &#123;        List&lt;User&gt; users = userService.getAllUsers();        model.addAttribute(&quot;users&quot;, users);        return &quot;user-list&quot;; // 返回视图名称，对应user-list.html模板    &#125;        // 处理GET请求，显示用户详情页面    @GetMapping(&quot;/users/&#123;id&#125;&quot;)    public String userDetail(@PathVariable Long id, Model model) &#123;        User user = userService.findById(id);        model.addAttribute(&quot;user&quot;, user);        return &quot;user-detail&quot;; // 返回user-detail.html模板    &#125;        // 处理POST请求，创建用户后重定向    @PostMapping(&quot;/users&quot;)    public String createUser(@ModelAttribute User user) &#123;        userService.createUser(user.getUsername(), user.getEmail());        return &quot;redirect:/web/users&quot;; // 重定向到用户列表页面    &#125;&#125;
+
+依赖注入注解@Autowired - 自动装配注解/** * @Autowired: 自动依赖注入注解 * 功能：Spring自动查找匹配的Bean并注入 * 原理：按类型（Type）匹配，如果有多个同类型Bean则按名称匹配 */@Servicepublic class OrderService &#123;        // 1. 字段注入（最常用，但不推荐用于测试）    @Autowired    private UserService userService;        @Autowired    private PaymentService paymentService;        // 2. 构造器注入（推荐方式，便于测试和确保依赖不为null）    private final EmailService emailService;    private final InventoryService inventoryService;        @Autowired    public OrderService(EmailService emailService, InventoryService inventoryService) &#123;        this.emailService = emailService;        this.inventoryService = inventoryService;    &#125;        // 3. Setter注入（可选依赖）    private NotificationService notificationService;        @Autowired(required = false) // required=false表示这个依赖是可选的    public void setNotificationService(NotificationService notificationService) &#123;        this.notificationService = notificationService;    &#125;        public Order createOrder(Long userId, List&lt;OrderItem&gt; items) &#123;        // 使用注入的依赖        User user = userService.findById(userId);                // 检查库存        for (OrderItem item : items) &#123;            if (!inventoryService.isAvailable(item.getProductId(), item.getQuantity())) &#123;                throw new RuntimeException(&quot;库存不足&quot;);            &#125;        &#125;                // 创建订单        Order order = new Order();        order.setUser(user);        order.setItems(items);        order.setStatus(&quot;CREATED&quot;);                // 处理支付        boolean paymentSuccess = paymentService.processPayment(order.getTotalAmount());        if (paymentSuccess) &#123;            order.setStatus(&quot;PAID&quot;);                        // 发送邮件通知            emailService.sendEmail(user.getEmail(), &quot;订单创建成功&quot;);                        // 可选的通知服务            if (notificationService != null) &#123;                notificationService.sendPushNotification(user.getId(), &quot;您的订单已创建&quot;);            &#125;        &#125;                return order;    &#125;&#125;
+
+@Qualifier - 指定具体Bean/** * @Qualifier: 当有多个同类型Bean时，指定要注入哪一个 * 场景：一个接口有多个实现类 */// 接口public interface PaymentService &#123;    boolean processPayment(BigDecimal amount);&#125;// 实现类1@Service(&quot;alipayService&quot;)public class AlipayService implements PaymentService &#123;    public boolean processPayment(BigDecimal amount) &#123;        System.out.println(&quot;使用支付宝支付: &quot; + amount);        return true;    &#125;&#125;// 实现类2@Service(&quot;wechatPayService&quot;)public class WechatPayService implements PaymentService &#123;    public boolean processPayment(BigDecimal amount) &#123;        System.out.println(&quot;使用微信支付: &quot; + amount);        return true;    &#125;&#125;// 使用时指定具体的实现@Servicepublic class OrderService &#123;        @Autowired    @Qualifier(&quot;alipayService&quot;) // 明确指定使用支付宝服务    private PaymentService paymentService;        // 或者使用构造器注入    public OrderService(@Qualifier(&quot;wechatPayService&quot;) PaymentService paymentService) &#123;        this.paymentService = paymentService;    &#125;&#125;
+
+@Value - 属性值注入/** * @Value: 注入配置文件中的属性值 * 功能：从application.properties或application.yml读取配置 */// application.properties文件内容：// app.name=我的应用// app.version=1.0.0// database.url=jdbc:mysql://localhost:3306/mydb// email.smtp.host=smtp.gmail.com// email.smtp.port=587@Servicepublic class ConfigService &#123;        // 注入简单属性值    @Value(&quot;$&#123;app.name&#125;&quot;)    private String appName;        @Value(&quot;$&#123;app.version&#125;&quot;)    private String appVersion;        // 注入数字类型    @Value(&quot;$&#123;email.smtp.port&#125;&quot;)    private int smtpPort;        // 提供默认值（如果配置文件中没有该属性）    @Value(&quot;$&#123;app.debug:false&#125;&quot;) // 默认值为false    private boolean debugMode;        @Value(&quot;$&#123;app.max-users:1000&#125;&quot;) // 默认值为1000    private int maxUsers;        // 注入系统属性    @Value(&quot;$&#123;java.version&#125;&quot;)    private String javaVersion;        // 注入环境变量    @Value(&quot;$&#123;HOME&#125;&quot;) // Unix/Linux系统的HOME环境变量    private String homeDirectory;        public void printConfig() &#123;        System.out.println(&quot;应用名称: &quot; + appName);        System.out.println(&quot;应用版本: &quot; + appVersion);        System.out.println(&quot;SMTP端口: &quot; + smtpPort);        System.out.println(&quot;调试模式: &quot; + debugMode);        System.out.println(&quot;最大用户数: &quot; + maxUsers);        System.out.println(&quot;Java版本: &quot; + javaVersion);        System.out.println(&quot;主目录: &quot; + homeDirectory);    &#125;&#125;
+
+6.2 Spring Boot注解详解@SpringBootApplication - 启动类注解/** * @SpringBootApplication: Spring Boot应用的核心注解 * 功能：这是一个组合注解，等价于以下三个注解的组合： * 1. @Configuration: 标记这是一个配置类 * 2. @EnableAutoConfiguration: 启用Spring Boot的自动配置 * 3. @ComponentScan: 启用组件扫描 */@SpringBootApplicationpublic class MyApplication &#123;    public static void main(String[] args) &#123;        // 启动Spring Boot应用        SpringApplication.run(MyApplication.class, args);                /*         * 这一行代码会：         * 1. 创建Spring应用上下文         * 2. 扫描当前包及子包中的@Component、@Service等注解         * 3. 根据classpath中的依赖自动配置Bean         * 4. 启动内嵌的Web服务器（如Tomcat）         * 5. 部署应用到服务器上         */    &#125;&#125;// 如果需要自定义配置，可以分别使用：@Configuration@EnableAutoConfiguration@ComponentScan(basePackages = &#123;&quot;com.example.service&quot;, &quot;com.example.repository&quot;&#125;)public class CustomApplication &#123;    // 自定义配置&#125;
+
+REST API注解系列@RestController - REST控制器注解/** * @RestController: REST API控制器注解 * 功能：等价于 @Controller + @ResponseBody * 特点：方法返回的对象会自动转换为JSON格式返回给客户端 * 用途：构建RESTful Web服务 */@RestController@RequestMapping(&quot;/api/v1&quot;) // 基础路径public class UserRestController &#123;        @Autowired    private UserService userService;        /**     * GET /api/v1/users - 获取所有用户     * 返回JSON格式的用户列表     */    @GetMapping(&quot;/users&quot;)    public List&lt;User&gt; getAllUsers() &#123;        return userService.getAllUsers();        // Spring会自动将List&lt;User&gt;转换为JSON数组返回    &#125;        /**     * GET /api/v1/users/123 - 根据ID获取用户     * @PathVariable: 从URL路径中提取参数     */    @GetMapping(&quot;/users/&#123;id&#125;&quot;)    public ResponseEntity&lt;User&gt; getUserById(@PathVariable Long id) &#123;        try &#123;            User user = userService.findById(id);            return ResponseEntity.ok(user); // 返回200状态码和用户数据        &#125; catch (UserNotFoundException e) &#123;            return ResponseEntity.notFound().build(); // 返回404状态码        &#125;    &#125;        /**     * POST /api/v1/users - 创建新用户     * @RequestBody: 将请求体中的JSON转换为Java对象     */    @PostMapping(&quot;/users&quot;)    public ResponseEntity&lt;User&gt; createUser(@RequestBody CreateUserRequest request) &#123;        try &#123;            User user = userService.createUser(request.getUsername(), request.getEmail());            return ResponseEntity.status(HttpStatus.CREATED).body(user); // 返回201状态码        &#125; catch (IllegalArgumentException e) &#123;            return ResponseEntity.badRequest().build(); // 返回400状态码        &#125;    &#125;        /**     * PUT /api/v1/users/123 - 更新用户信息     */    @PutMapping(&quot;/users/&#123;id&#125;&quot;)    public ResponseEntity&lt;User&gt; updateUser(@PathVariable Long id,                                          @RequestBody UpdateUserRequest request) &#123;        try &#123;            User user = userService.updateUser(id, request.getUsername(), request.getEmail());            return ResponseEntity.ok(user);        &#125; catch (UserNotFoundException e) &#123;            return ResponseEntity.notFound().build();        &#125;    &#125;        /**     * DELETE /api/v1/users/123 - 删除用户     */    @DeleteMapping(&quot;/users/&#123;id&#125;&quot;)    public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable Long id) &#123;        try &#123;            userService.deleteUser(id);            return ResponseEntity.noContent().build(); // 返回204状态码        &#125; catch (UserNotFoundException e) &#123;            return ResponseEntity.notFound().build();        &#125;    &#125;        /**     * GET /api/v1/users?page=0&amp;size=10&amp;sort=username - 分页查询     * @RequestParam: 从URL查询参数中提取值     */    @GetMapping(&quot;/users&quot;)    public ResponseEntity&lt;Page&lt;User&gt;&gt; getUsers(            @RequestParam(defaultValue = &quot;0&quot;) int page,            @RequestParam(defaultValue = &quot;10&quot;) int size,            @RequestParam(defaultValue = &quot;id&quot;) String sort) &#123;                PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sort));        Page&lt;User&gt; users = userService.getUsers(pageRequest);        return ResponseEntity.ok(users);    &#125;&#125;
+
+HTTP方法映射注解详解/** * HTTP方法映射注解详解 */@RestController@RequestMapping(&quot;/api/products&quot;)public class ProductController &#123;        /**     * @GetMapping: 处理GET请求     * 用途：获取资源，不会修改服务器状态     * 特点：幂等（多次调用结果相同）、可缓存     */    @GetMapping // 等价于 @RequestMapping(method = RequestMethod.GET)    public List&lt;Product&gt; getAllProducts() &#123;        return productService.findAll();    &#125;        @GetMapping(&quot;/&#123;id&#125;&quot;)    public Product getProduct(@PathVariable Long id) &#123;        return productService.findById(id);    &#125;        /**     * @PostMapping: 处理POST请求     * 用途：创建新资源     * 特点：非幂等（多次调用可能产生不同结果）     */    @PostMapping    public ResponseEntity&lt;Product&gt; createProduct(@RequestBody Product product) &#123;        Product created = productService.save(product);        return ResponseEntity.status(HttpStatus.CREATED).body(created);    &#125;        /**     * @PutMapping: 处理PUT请求     * 用途：完整更新资源（替换整个资源）     * 特点：幂等     */    @PutMapping(&quot;/&#123;id&#125;&quot;)    public ResponseEntity&lt;Product&gt; updateProduct(@PathVariable Long id,                                                @RequestBody Product product) &#123;        product.setId(id);        Product updated = productService.save(product);        return ResponseEntity.ok(updated);    &#125;        /**     * @PatchMapping: 处理PATCH请求     * 用途：部分更新资源（只更新指定字段）     * 特点：幂等     */    @PatchMapping(&quot;/&#123;id&#125;&quot;)    public ResponseEntity&lt;Product&gt; patchProduct(@PathVariable Long id,                                               @RequestBody Map&lt;String, Object&gt; updates) &#123;        Product updated = productService.partialUpdate(id, updates);        return ResponseEntity.ok(updated);    &#125;        /**     * @DeleteMapping: 处理DELETE请求     * 用途：删除资源     * 特点：幂等     */    @DeleteMapping(&quot;/&#123;id&#125;&quot;)    public ResponseEntity&lt;Void&gt; deleteProduct(@PathVariable Long id) &#123;        productService.delete(id);        return ResponseEntity.noContent().build();    &#125;&#125;
+
+参数绑定注解详解@RestController@RequestMapping(&quot;/api/search&quot;)public class SearchController &#123;        /**     * @PathVariable: 从URL路径中提取变量     * URL示例: /api/search/users/123/orders/456     */    @GetMapping(&quot;/users/&#123;userId&#125;/orders/&#123;orderId&#125;&quot;)    public Order getUserOrder(@PathVariable Long userId,                             @PathVariable Long orderId) &#123;        return orderService.findByUserIdAndOrderId(userId, orderId);    &#125;        // 路径变量名称与参数名不同时    @GetMapping(&quot;/products/&#123;productId&#125;&quot;)    public Product getProduct(@PathVariable(&quot;productId&quot;) Long id) &#123;        return productService.findById(id);    &#125;        /**     * @RequestParam: 从URL查询参数中提取值     * URL示例: /api/search/products?keyword=手机&amp;category=电子&amp;minPrice=1000&amp;maxPrice=5000     */    @GetMapping(&quot;/products&quot;)    public List&lt;Product&gt; searchProducts(            @RequestParam String keyword,                    // 必需参数            @RequestParam(required = false) String category, // 可选参数            @RequestParam(defaultValue = &quot;0&quot;) BigDecimal minPrice, // 有默认值            @RequestParam(defaultValue = &quot;999999&quot;) BigDecimal maxPrice) &#123;                return productService.search(keyword, category, minPrice, maxPrice);    &#125;        /**     * @RequestHeader: 从HTTP请求头中提取值     */    @GetMapping(&quot;/secure-data&quot;)    public ResponseEntity&lt;String&gt; getSecureData(            @RequestHeader(&quot;Authorization&quot;) String authToken,            @RequestHeader(value = &quot;User-Agent&quot;, required = false) String userAgent,            @RequestHeader(defaultValue = &quot;application/json&quot;) String accept) &#123;                if (!isValidToken(authToken)) &#123;            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        &#125;                return ResponseEntity.ok(&quot;安全数据&quot;);    &#125;        /**     * @RequestBody: 将请求体内容绑定到对象     * 常用于POST/PUT请求，自动将JSON转换为Java对象     */    @PostMapping(&quot;/users&quot;)    public User createUser(@RequestBody CreateUserRequest request) &#123;        // Spring自动将请求体中的JSON转换为CreateUserRequest对象        return userService.createUser(request);    &#125;        /**     * @ModelAttribute: 将请求参数绑定到对象（适用于表单提交）     * 适用于传统的表单提交，参数以key=value形式提交     */    @PostMapping(&quot;/users/form&quot;)    public String createUserForm(@ModelAttribute User user, Model model) &#123;        User created = userService.save(user);        model.addAttribute(&quot;user&quot;, created);        return &quot;user-created&quot;; // 返回视图名称    &#125;&#125;
+
+REST API完整示例/** * 完整的REST API示例：用户管理 * 展示了标准的RESTful设计模式 */@RestController@RequestMapping(&quot;/api/v1/users&quot;)@Validated // 启用参数验证public class UserApiController &#123;        @Autowired    private UserService userService;        // GET /api/v1/users - 获取用户列表（支持分页和搜索）    @GetMapping    public ResponseEntity&lt;ApiResponse&lt;Page&lt;UserDto&gt;&gt;&gt; getUsers(            @RequestParam(defaultValue = &quot;0&quot;) int page,            @RequestParam(defaultValue = &quot;10&quot;) int size,            @RequestParam(defaultValue = &quot;id&quot;) String sort,            @RequestParam(defaultValue = &quot;asc&quot;) String direction,            @RequestParam(required = false) String search) &#123;                Sort.Direction sortDirection = &quot;desc&quot;.equalsIgnoreCase(direction) ?                                      Sort.Direction.DESC : Sort.Direction.ASC;        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));                Page&lt;UserDto&gt; users = userService.findUsers(search, pageable);                ApiResponse&lt;Page&lt;UserDto&gt;&gt; response = ApiResponse.&lt;Page&lt;UserDto&gt;&gt;builder()            .success(true)            .message(&quot;用户列表获取成功&quot;)            .data(users)            .timestamp(LocalDateTime.now())            .build();                    return ResponseEntity.ok(response);    &#125;        // GET /api/v1/users/123 - 获取单个用户    @GetMapping(&quot;/&#123;id&#125;&quot;)    public ResponseEntity&lt;ApiResponse&lt;UserDto&gt;&gt; getUser(@PathVariable Long id) &#123;        try &#123;            UserDto user = userService.findById(id);            return ResponseEntity.ok(ApiResponse.success(&quot;用户信息获取成功&quot;, user));        &#125; catch (UserNotFoundException e) &#123;            return ResponseEntity.status(HttpStatus.NOT_FOUND)                .body(ApiResponse.error(&quot;用户不存在&quot;, null));        &#125;    &#125;        // POST /api/v1/users - 创建用户    @PostMapping    public ResponseEntity&lt;ApiResponse&lt;UserDto&gt;&gt; createUser(            @Valid @RequestBody CreateUserRequest request) &#123;        try &#123;            UserDto user = userService.createUser(request);            return ResponseEntity.status(HttpStatus.CREATED)                .body(ApiResponse.success(&quot;用户创建成功&quot;, user));        &#125; catch (DuplicateUsernameException e) &#123;            return ResponseEntity.status(HttpStatus.CONFLICT)                .body(ApiResponse.error(&quot;用户名已存在&quot;, null));        &#125;    &#125;        // PUT /api/v1/users/123 - 更新用户    @PutMapping(&quot;/&#123;id&#125;&quot;)    public ResponseEntity&lt;ApiResponse&lt;UserDto&gt;&gt; updateUser(            @PathVariable Long id,            @Valid @RequestBody UpdateUserRequest request) &#123;        try &#123;            UserDto user = userService.updateUser(id, request);            return ResponseEntity.ok(ApiResponse.success(&quot;用户更新成功&quot;, user));        &#125; catch (UserNotFoundException e) &#123;            return ResponseEntity.status(HttpStatus.NOT_FOUND)                .body(ApiResponse.error(&quot;用户不存在&quot;, null));        &#125;    &#125;        // DELETE /api/v1/users/123 - 删除用户    @DeleteMapping(&quot;/&#123;id&#125;&quot;)    public ResponseEntity&lt;ApiResponse&lt;Void&gt;&gt; deleteUser(@PathVariable Long id) &#123;        try &#123;            userService.deleteUser(id);            return ResponseEntity.ok(ApiResponse.success(&quot;用户删除成功&quot;, null));        &#125; catch (UserNotFoundException e) &#123;            return ResponseEntity.status(HttpStatus.NOT_FOUND)                .body(ApiResponse.error(&quot;用户不存在&quot;, null));        &#125;    &#125;        // POST /api/v1/users/123/avatar - 上传用户头像    @PostMapping(&quot;/&#123;id&#125;/avatar&quot;)    public ResponseEntity&lt;ApiResponse&lt;String&gt;&gt; uploadAvatar(            @PathVariable Long id,            @RequestParam(&quot;file&quot;) MultipartFile file) &#123;        try &#123;            String avatarUrl = userService.uploadAvatar(id, file);            return ResponseEntity.ok(ApiResponse.success(&quot;头像上传成功&quot;, avatarUrl));        &#125; catch (Exception e) &#123;            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)                .body(ApiResponse.error(&quot;头像上传失败&quot;, null));        &#125;    &#125;&#125;// 统一的API响应格式@Data@Builderpublic class ApiResponse&lt;T&gt; &#123;    private boolean success;    private String message;    private T data;    private LocalDateTime timestamp;        public static &lt;T&gt; ApiResponse&lt;T&gt; success(String message, T data) &#123;        return ApiResponse.&lt;T&gt;builder()            .success(true)            .message(message)            .data(data)            .timestamp(LocalDateTime.now())            .build();    &#125;        public static &lt;T&gt; ApiResponse&lt;T&gt; error(String message, T data) &#123;        return ApiResponse.&lt;T&gt;builder()            .success(false)            .message(message)            .data(data)            .timestamp(LocalDateTime.now())            .build();    &#125;&#125;
+
+6.3 JPA&#x2F;Hibernate注解详解**JPA（Java Persistence API）**是Java的数据持久化标准，Hibernate是JPA的最流行实现。这些注解用于将Java对象映射到数据库表。
+核心实体注解@Entity - 实体类注解/** * @Entity: 标记这是一个JPA实体类 * 功能：告诉JPA这个类对应数据库中的一张表 * 要求： * 1. 必须有一个无参构造器 * 2. 必须有一个主键字段（用@Id标记） * 3. 字段不能是final的 */@Entity@Table(name = &quot;users&quot;) // 可选：指定数据库表名，不指定则使用类名public class User &#123;        @Id // 标记主键字段    @GeneratedValue(strategy = GenerationType.IDENTITY) // 主键生成策略    private Long id;        @Column(name = &quot;username&quot;, nullable = false, unique = true, length = 50)    private String username;        @Column(name = &quot;email&quot;)    private String email;        @Column(name = &quot;created_at&quot;)    private LocalDateTime createdAt;        // 必须有无参构造器    public User() &#123;&#125;        public User(String username, String email) &#123;        this.username = username;        this.email = email;        this.createdAt = LocalDateTime.now();    &#125;        // getter和setter方法...&#125;
+
+@Table - 表映射注解/** * @Table: 指定实体对应的数据库表的详细信息 */@Entity@Table(    name = &quot;user_profiles&quot;,           // 表名    catalog = &quot;myapp_db&quot;,            // 数据库名（可选）    schema = &quot;public&quot;,               // 模式名（可选）    uniqueConstraints = &#123;            // 唯一约束        @UniqueConstraint(            name = &quot;uk_user_email&quot;,             columnNames = &#123;&quot;user_id&quot;, &quot;email&quot;&#125;        )    &#125;,    indexes = &#123;                      // 索引        @Index(name = &quot;idx_user_email&quot;, columnList = &quot;email&quot;),        @Index(name = &quot;idx_user_created&quot;, columnList = &quot;created_at&quot;)    &#125;)public class UserProfile &#123;    // 字段定义...&#125;
+
+@Id 和主键生成策略@Entitypublic class Product &#123;        /**     * @Id: 标记主键字段     * @GeneratedValue: 主键值生成策略     */        // 策略1: AUTO - 让JPA自动选择合适的策略    @Id    @GeneratedValue(strategy = GenerationType.AUTO)    private Long id;        // 策略2: IDENTITY - 使用数据库的自增字段（MySQL的AUTO_INCREMENT）    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        // 策略3: SEQUENCE - 使用数据库序列（Oracle、PostgreSQL）    @Id    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = &quot;product_seq&quot;)    @SequenceGenerator(name = &quot;product_seq&quot;, sequenceName = &quot;product_sequence&quot;, allocationSize = 1)    private Long id;        // 策略4: TABLE - 使用单独的表来生成主键    @Id    @GeneratedValue(strategy = GenerationType.TABLE, generator = &quot;product_gen&quot;)    @TableGenerator(name = &quot;product_gen&quot;, table = &quot;id_generator&quot;,                    pkColumnName = &quot;gen_name&quot;, valueColumnName = &quot;gen_value&quot;,                   pkColumnValue = &quot;product_id&quot;, allocationSize = 1)    private Long id;        // 复合主键：使用@IdClass或@EmbeddedId    // 方式1: @IdClass    @Id    private Long userId;    @Id    private Long productId;        // 字段定义...&#125;// 复合主键类@IdClass(UserProductId.class)@Entitypublic class UserProduct &#123;    @Id    private Long userId;    @Id    private Long productId;    private Integer quantity;    // ...&#125;// 主键类必须实现Serializablepublic class UserProductId implements Serializable &#123;    private Long userId;    private Long productId;        // 必须重写equals和hashCode    @Override    public boolean equals(Object o) &#123; /* ... */ &#125;        @Override    public int hashCode() &#123; /* ... */ &#125;&#125;
+
+@Column - 字段映射注解@Entitypublic class User &#123;        /**     * @Column: 指定字段映射到数据库列的详细信息     */        // 基本用法    @Column(name = &quot;user_name&quot;)  // 指定数据库列名    private String username;        // 详细配置    @Column(        name = &quot;email_address&quot;,      // 列名        nullable = false,            // 不能为null（相当于NOT NULL约束）        unique = true,              // 唯一约束        length = 255,               // 字符串长度（varchar(255)）        columnDefinition = &quot;TEXT&quot;   // 自定义列定义    )    private String email;        // 数字类型配置    @Column(        name = &quot;salary&quot;,        precision = 10,  // 总位数        scale = 2        // 小数位数（decimal(10,2)）    )    private BigDecimal salary;        // 不需要映射到数据库的字段    @Transient    private String tempPassword; // 这个字段不会保存到数据库        // 时间类型    @Column(name = &quot;birth_date&quot;)    @Temporal(TemporalType.DATE)      // 只保存日期部分    private Date birthDate;        @Column(name = &quot;created_at&quot;)    @Temporal(TemporalType.TIMESTAMP) // 保存日期和时间    private Date createdAt;        @Column(name = &quot;login_time&quot;)    @Temporal(TemporalType.TIME)      // 只保存时间部分    private Date loginTime;        // 枚举类型    @Enumerated(EnumType.STRING)      // 保存枚举的字符串值    private UserStatus status;        // 如：ACTIVE, INACTIVE, BANNED        @Enumerated(EnumType.ORDINAL)     // 保存枚举的序号值    private UserRole role;            // 如：0, 1, 2        // 大对象类型    @Lob  // Large Object：用于存储大文本或二进制数据    @Column(name = &quot;profile_photo&quot;)    private byte[] photo;             // 存储图片        @Lob    @Column(name = &quot;description&quot;)    private String description;       // 存储长文本&#125;// 枚举类型示例public enum UserStatus &#123;    ACTIVE, INACTIVE, BANNED, SUSPENDED&#125;public enum UserRole &#123;    USER, ADMIN, MODERATOR&#125;
+
+关联关系注解@OneToOne - 一对一关系/** * 一对一关系：一个用户对应一个用户详情 */// 主表（拥有外键的一方）@Entitypublic class User &#123;    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        private String username;        /**     * @OneToOne: 一对一关系     * @JoinColumn: 指定外键列     */    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)    @JoinColumn(name = &quot;profile_id&quot;, referencedColumnName = &quot;id&quot;)    private UserProfile profile;        // 构造器、getter、setter...&#125;// 从表@Entitypublic class UserProfile &#123;    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        private String firstName;    private String lastName;    private String bio;    private String avatarUrl;        // 双向关联：从UserProfile也能访问User    @OneToOne(mappedBy = &quot;profile&quot;) // mappedBy指向User类中的profile字段    private User user;        // 构造器、getter、setter...&#125;// 使用示例@Servicepublic class UserService &#123;        @Autowired    private UserRepository userRepository;        public User createUserWithProfile(String username, String firstName, String lastName) &#123;        // 创建用户详情        UserProfile profile = new UserProfile();        profile.setFirstName(firstName);        profile.setLastName(lastName);                // 创建用户        User user = new User();        user.setUsername(username);        user.setProfile(profile);                // 设置双向关联        profile.setUser(user);                // 由于设置了cascade = CascadeType.ALL，保存user时会自动保存profile        return userRepository.save(user);    &#125;&#125;
+
+@OneToMany - 一对多关系/** * 一对多关系：一个用户可以有多个订单 */// &quot;一&quot;的一方：User@Entitypublic class User &#123;    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        private String username;        /**     * @OneToMany: 一对多关系     * mappedBy: 指向Order类中的user字段（表示外键在Order表中）     * cascade: 级联操作（保存用户时自动处理订单）     * fetch: 加载策略（LAZY表示需要时才加载订单列表）     */    @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL, fetch = FetchType.LAZY)    private List&lt;Order&gt; orders = new ArrayList&lt;&gt;();        // 便利方法：添加订单    public void addOrder(Order order) &#123;        orders.add(order);        order.setUser(this); // 设置双向关联    &#125;        // 便利方法：移除订单    public void removeOrder(Order order) &#123;        orders.remove(order);        order.setUser(null);    &#125;&#125;// &quot;多&quot;的一方：Order@Entitypublic class Order &#123;    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        private BigDecimal totalAmount;    private LocalDateTime orderTime;        /**     * @ManyToOne: 多对一关系（从Order的角度看，多个订单对应一个用户）     * @JoinColumn: 指定外键列名     */    @ManyToOne(fetch = FetchType.LAZY)    @JoinColumn(name = &quot;user_id&quot;, nullable = false)    private User user;        // 构造器、getter、setter...&#125;// 使用示例@Servicepublic class OrderService &#123;        public Order createOrder(Long userId, BigDecimal amount) &#123;        User user = userRepository.findById(userId)            .orElseThrow(() -&gt; new UserNotFoundException(&quot;用户不存在&quot;));                Order order = new Order();        order.setTotalAmount(amount);        order.setOrderTime(LocalDateTime.now());                // 建立关联关系        user.addOrder(order);                return orderRepository.save(order);    &#125;        // 获取用户的所有订单    public List&lt;Order&gt; getUserOrders(Long userId) &#123;        User user = userRepository.findById(userId)            .orElseThrow(() -&gt; new UserNotFoundException(&quot;用户不存在&quot;));                // 由于使用了LAZY加载，这里会触发数据库查询        return user.getOrders();    &#125;&#125;
+
+@ManyToMany - 多对多关系/** * 多对多关系：用户和角色的关系（一个用户可以有多个角色，一个角色可以分配给多个用户） */// 主控方：User@Entitypublic class User &#123;    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        private String username;        /**     * @ManyToMany: 多对多关系     * @JoinTable: 指定中间表的信息     */    @ManyToMany(cascade = &#123;CascadeType.PERSIST, CascadeType.MERGE&#125;, fetch = FetchType.LAZY)    @JoinTable(        name = &quot;user_roles&quot;,                    // 中间表名        joinColumns = @JoinColumn(name = &quot;user_id&quot;),     // 当前实体的外键列        inverseJoinColumns = @JoinColumn(name = &quot;role_id&quot;) // 关联实体的外键列    )    private Set&lt;Role&gt; roles = new HashSet&lt;&gt;();        // 便利方法：添加角色    public void addRole(Role role) &#123;        roles.add(role);        role.getUsers().add(this);    &#125;        // 便利方法：移除角色    public void removeRole(Role role) &#123;        roles.remove(role);        role.getUsers().remove(this);    &#125;&#125;// 被控方：Role@Entitypublic class Role &#123;    @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        private String name; // ADMIN, USER, MODERATOR等    private String description;        /**     * mappedBy: 指向User类中的roles字段，表示这是关系的被控方     */    @ManyToMany(mappedBy = &quot;roles&quot;)    private Set&lt;User&gt; users = new HashSet&lt;&gt;();        // 构造器、getter、setter...&#125;// 带额外信息的多对多关系：用户和课程的关系（包含注册时间、成绩等额外信息）@Entitypublic class User &#123;    @Id    private Long id;    private String username;        @OneToMany(mappedBy = &quot;user&quot;, cascade = CascadeType.ALL)    private Set&lt;UserCourse&gt; userCourses = new HashSet&lt;&gt;();&#125;@Entitypublic class Course &#123;    @Id    private Long id;    private String name;        @OneToMany(mappedBy = &quot;course&quot;, cascade = CascadeType.ALL)    private Set&lt;UserCourse&gt; userCourses = new HashSet&lt;&gt;();&#125;// 中间实体：包含额外信息@Entity@Table(name = &quot;user_courses&quot;)public class UserCourse &#123;        @EmbeddedId    private UserCourseId id;        @ManyToOne    @MapsId(&quot;userId&quot;) // 映射到复合主键的userId部分    @JoinColumn(name = &quot;user_id&quot;)    private User user;        @ManyToOne    @MapsId(&quot;courseId&quot;) // 映射到复合主键的courseId部分    @JoinColumn(name = &quot;course_id&quot;)    private Course course;        // 额外信息    private LocalDateTime enrollmentDate;    private BigDecimal grade;    private String status; // ENROLLED, COMPLETED, DROPPED        // 构造器、getter、setter...&#125;// 复合主键@Embeddablepublic class UserCourseId implements Serializable &#123;    private Long userId;    private Long courseId;        // 必须重写equals和hashCode    @Override    public boolean equals(Object o) &#123; /* ... */ &#125;        @Override    public int hashCode() &#123; /* ... */ &#125;&#125;
+
+级联操作和获取策略级联操作（Cascade）@Entitypublic class User &#123;        /**     * 级联操作类型：     * CascadeType.PERSIST: 保存用户时，自动保存关联的订单     * CascadeType.MERGE: 更新用户时，自动更新关联的订单     * CascadeType.REMOVE: 删除用户时，自动删除关联的订单     * CascadeType.REFRESH: 刷新用户时，自动刷新关联的订单     * CascadeType.DETACH: 分离用户时，自动分离关联的订单     * CascadeType.ALL: 包含所有上述操作     */        // 删除用户时不会删除订单（业务需要保留订单记录）    @OneToMany(mappedBy = &quot;user&quot;, cascade = &#123;CascadeType.PERSIST, CascadeType.MERGE&#125;)    private List&lt;Order&gt; orders;        // 删除用户时会删除用户详情（因为详情没有独立存在的意义）    @OneToOne(cascade = CascadeType.ALL)    private UserProfile profile;        // 不会删除角色（角色是独立的实体，可能被其他用户使用）    @ManyToMany(cascade = &#123;CascadeType.PERSIST, CascadeType.MERGE&#125;)    private Set&lt;Role&gt; roles;&#125;
+
+获取策略（Fetch）@Entitypublic class User &#123;        /**     * 获取策略：     * FetchType.LAZY（懒加载）: 需要时才从数据库加载     * FetchType.EAGER（急加载）: 立即从数据库加载     */        // 懒加载：获取用户时不立即加载订单列表，只有访问orders时才查询数据库    @OneToMany(mappedBy = &quot;user&quot;, fetch = FetchType.LAZY)    private List&lt;Order&gt; orders;        // 急加载：获取用户时立即加载用户详情    @OneToOne(fetch = FetchType.EAGER)    private UserProfile profile;        // 默认的获取策略：    // @OneToOne, @ManyToOne: 默认是EAGER    // @OneToMany, @ManyToMany: 默认是LAZY&#125;// 解决N+1查询问题的方法@Repositorypublic class UserRepository extends JpaRepository&lt;User, Long&gt; &#123;        // 使用JOIN FETCH避免N+1问题    @Query(&quot;SELECT u FROM User u JOIN FETCH u.orders WHERE u.id = :id&quot;)    Optional&lt;User&gt; findByIdWithOrders(@Param(&quot;id&quot;) Long id);        // 使用@EntityGraph    @EntityGraph(attributePaths = &#123;&quot;orders&quot;, &quot;profile&quot;&#125;)    @Query(&quot;SELECT u FROM User u WHERE u.id = :id&quot;)    Optional&lt;User&gt; findByIdWithOrdersAndProfile(@Param(&quot;id&quot;) Long id);&#125;
+
+完整的JPA实体示例/** * 完整的JPA实体示例：电商系统的订单实体 */@Entity@Table(name = &quot;orders&quot;)@EntityListeners(AuditingEntityListener.class) // 启用审计功能public class Order &#123;        @Id    @GeneratedValue(strategy = GenerationType.IDENTITY)    private Long id;        @Column(name = &quot;order_number&quot;, nullable = false, unique = true, length = 50)    private String orderNumber;        @Column(name = &quot;total_amount&quot;, nullable = false, precision = 10, scale = 2)    private BigDecimal totalAmount;        @Enumerated(EnumType.STRING)    @Column(name = &quot;status&quot;, nullable = false)    private OrderStatus status;        @ManyToOne(fetch = FetchType.LAZY)    @JoinColumn(name = &quot;user_id&quot;, nullable = false)    private User user;        @OneToMany(mappedBy = &quot;order&quot;, cascade = CascadeType.ALL, fetch = FetchType.LAZY)    private List&lt;OrderItem&gt; orderItems = new ArrayList&lt;&gt;();        @Embedded    private Address shippingAddress;        // 审计字段    @CreatedDate    @Column(name = &quot;created_at&quot;, nullable = false, updatable = false)    private LocalDateTime createdAt;        @LastModifiedDate    @Column(name = &quot;updated_at&quot;)    private LocalDateTime updatedAt;        @CreatedBy    @Column(name = &quot;created_by&quot;, updatable = false)    private String createdBy;        @LastModifiedBy    @Column(name = &quot;updated_by&quot;)    private String updatedBy;        // 生命周期回调方法    @PrePersist    protected void onCreate() &#123;        if (orderNumber == null) &#123;            orderNumber = generateOrderNumber();        &#125;        if (status == null) &#123;            status = OrderStatus.PENDING;        &#125;    &#125;        @PreUpdate    protected void onUpdate() &#123;        // 更新前的逻辑    &#125;        private String generateOrderNumber() &#123;        return &quot;ORD&quot; + System.currentTimeMillis();    &#125;        // 便利方法    public void addOrderItem(OrderItem item) &#123;        orderItems.add(item);        item.setOrder(this);    &#125;        public void removeOrderItem(OrderItem item) &#123;        orderItems.remove(item);        item.setOrder(null);    &#125;        // 构造器、getter、setter...&#125;// 嵌入式值对象@Embeddablepublic class Address &#123;    @Column(name = &quot;street&quot;)    private String street;        @Column(name = &quot;city&quot;)    private String city;        @Column(name = &quot;state&quot;)    private String state;        @Column(name = &quot;zip_code&quot;)    private String zipCode;        @Column(name = &quot;country&quot;)    private String country;        // 构造器、getter、setter...&#125;// 枚举类型public enum OrderStatus &#123;    PENDING(&quot;待处理&quot;),    CONFIRMED(&quot;已确认&quot;),    SHIPPED(&quot;已发货&quot;),    DELIVERED(&quot;已送达&quot;),    CANCELLED(&quot;已取消&quot;);        private final String description;        OrderStatus(String description) &#123;        this.description = description;    &#125;        public String getDescription() &#123;        return description;    &#125;&#125;
+
+6.4 Bean Validation（数据验证）注解详解Bean Validation是Java的数据验证标准，用于验证Java对象的字段值是否符合预期。Spring Boot默认集成了Hibernate Validator（Bean Validation的实现）。
+基础验证注解空值检查注解/** * 数据验证注解示例：用户注册表单 */public class UserRegistrationDto &#123;        /**     * @NotNull: 值不能为null     * @NotEmpty: 值不能为null且长度大于0（用于字符串、集合、数组）     * @NotBlank: 值不能为null、空字符串或只包含空白字符（只用于字符串）     */        @NotNull(message = &quot;用户名不能为空&quot;)    @NotBlank(message = &quot;用户名不能为空白&quot;)    @Size(min = 3, max = 20, message = &quot;用户名长度必须在3-20个字符之间&quot;)    private String username;        @NotEmpty(message = &quot;密码不能为空&quot;)    @Size(min = 6, max = 50, message = &quot;密码长度必须在6-50个字符之间&quot;)    private String password;        @NotBlank(message = &quot;确认密码不能为空&quot;)    private String confirmPassword;        @NotNull(message = &quot;邮箱不能为空&quot;)    @NotBlank(message = &quot;邮箱不能为空白&quot;)    @Email(message = &quot;邮箱格式不正确&quot;)    private String email;        // 构造器、getter、setter...&#125;// 验证示例@RestController@RequestMapping(&quot;/api/auth&quot;)@Validated // 启用方法级别的验证public class AuthController &#123;        @PostMapping(&quot;/register&quot;)    public ResponseEntity&lt;String&gt; register(@Valid @RequestBody UserRegistrationDto dto) &#123;        // @Valid 会自动触发验证，如果验证失败会抛出MethodArgumentNotValidException                // 验证通过后的业务逻辑        userService.registerUser(dto);        return ResponseEntity.ok(&quot;注册成功&quot;);    &#125;        // 方法参数验证    @GetMapping(&quot;/check-username&quot;)    public ResponseEntity&lt;Boolean&gt; checkUsername(            @RequestParam @NotBlank @Size(min = 3, max = 20) String username) &#123;        boolean available = userService.isUsernameAvailable(username);        return ResponseEntity.ok(available);    &#125;&#125;
+
+数值范围验证注解public class ProductDto &#123;        @NotBlank(message = &quot;商品名称不能为空&quot;)    @Size(max = 100, message = &quot;商品名称不能超过100个字符&quot;)    private String name;        /**     * 数值验证注解：     * @Min: 最小值     * @Max: 最大值     * @DecimalMin: 最小小数值     * @DecimalMax: 最大小数值     * @Positive: 正数（大于0）     * @PositiveOrZero: 正数或0     * @Negative: 负数（小于0）     * @NegativeOrZero: 负数或0     */        @NotNull(message = &quot;价格不能为空&quot;)    @DecimalMin(value = &quot;0.01&quot;, message = &quot;价格必须大于0.01&quot;)    @DecimalMax(value = &quot;999999.99&quot;, message = &quot;价格不能超过999999.99&quot;)    @Digits(integer = 6, fraction = 2, message = &quot;价格格式不正确，最多6位整数和2位小数&quot;)    private BigDecimal price;        @Min(value = 0, message = &quot;库存数量不能为负数&quot;)    @Max(value = 10000, message = &quot;库存数量不能超过10000&quot;)    private Integer stockQuantity;        @Positive(message = &quot;重量必须为正数&quot;)    private Double weight;        @PositiveOrZero(message = &quot;折扣不能为负数&quot;)    @DecimalMax(value = &quot;1.0&quot;, message = &quot;折扣不能超过1.0&quot;)    private BigDecimal discount;        // 构造器、getter、setter...&#125;
+
+字符串格式验证注解public class ContactDto &#123;        /**     * 字符串格式验证注解：     * @Email: 邮箱格式     * @Pattern: 正则表达式匹配     * @Size: 字符串长度     */        @NotBlank(message = &quot;姓名不能为空&quot;)    @Size(min = 2, max = 50, message = &quot;姓名长度必须在2-50个字符之间&quot;)    @Pattern(regexp = &quot;^[\\u4e00-\\u9fa5a-zA-Z\\s]+$&quot;, message = &quot;姓名只能包含中文、英文字母和空格&quot;)    private String name;        @Email(message = &quot;邮箱格式不正确&quot;)    @NotBlank(message = &quot;邮箱不能为空&quot;)    private String email;        // 中国手机号验证    @Pattern(regexp = &quot;^1[3-9]\\d&#123;9&#125;$&quot;, message = &quot;手机号格式不正确&quot;)    @NotBlank(message = &quot;手机号不能为空&quot;)    private String phoneNumber;        // 身份证号验证    @Pattern(regexp = &quot;^[1-9]\\d&#123;5&#125;(18|19|20)\\d&#123;2&#125;((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d&#123;3&#125;[0-9Xx]$&quot;,              message = &quot;身份证号格式不正确&quot;)    private String idCard;        // URL验证    @Pattern(regexp = &quot;^https?://.+&quot;, message = &quot;网址格式不正确&quot;)    private String website;        // 邮政编码验证    @Pattern(regexp = &quot;^\\d&#123;6&#125;$&quot;, message = &quot;邮政编码必须是6位数字&quot;)    private String zipCode;        // 构造器、getter、setter...&#125;
+
+时间日期验证注解public class EventDto &#123;        @NotBlank(message = &quot;活动名称不能为空&quot;)    private String name;        /**     * 时间验证注解：     * @Past: 过去的时间     * @PastOrPresent: 过去或现在的时间     * @Future: 未来的时间     * @FutureOrPresent: 未来或现在的时间     */        @NotNull(message = &quot;生日不能为空&quot;)    @Past(message = &quot;生日必须是过去的日期&quot;)    private LocalDate birthday;        @NotNull(message = &quot;开始时间不能为空&quot;)    @FutureOrPresent(message = &quot;开始时间不能早于当前时间&quot;)    private LocalDateTime startTime;        @NotNull(message = &quot;结束时间不能为空&quot;)    @Future(message = &quot;结束时间必须是未来的时间&quot;)    private LocalDateTime endTime;        @PastOrPresent(message = &quot;创建时间不能是未来时间&quot;)    private LocalDateTime createdAt;        // 构造器、getter、setter...&#125;
+
+高级验证功能自定义验证注解/** * 自定义验证注解：密码强度验证 */@Target(&#123;ElementType.FIELD, ElementType.PARAMETER&#125;)@Retention(RetentionPolicy.RUNTIME)@Constraint(validatedBy = PasswordValidator.class)@Documentedpublic @interface ValidPassword &#123;    String message() default &quot;密码强度不够：至少8位，包含大小写字母、数字和特殊字符&quot;;    Class&lt;?&gt;[] groups() default &#123;&#125;;    Class&lt;? extends Payload&gt;[] payload() default &#123;&#125;;&#125;// 验证器实现public class PasswordValidator implements ConstraintValidator&lt;ValidPassword, String&gt; &#123;        private static final String PASSWORD_PATTERN =         &quot;^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&amp;])[A-Za-z\\d@$!%*?&amp;]&#123;8,&#125;$&quot;;        private Pattern pattern;        @Override    public void initialize(ValidPassword constraintAnnotation) &#123;        pattern = Pattern.compile(PASSWORD_PATTERN);    &#125;        @Override    public boolean isValid(String password, ConstraintValidatorContext context) &#123;        if (password == null) &#123;            return false;        &#125;                Matcher matcher = pattern.matcher(password);        if (!matcher.matches()) &#123;            // 自定义错误消息            context.disableDefaultConstraintViolation();                        List&lt;String&gt; errors = new ArrayList&lt;&gt;();            if (password.length() &lt; 8) &#123;                errors.add(&quot;密码长度至少8位&quot;);            &#125;            if (!password.matches(&quot;.*[a-z].*&quot;)) &#123;                errors.add(&quot;必须包含小写字母&quot;);            &#125;            if (!password.matches(&quot;.*[A-Z].*&quot;)) &#123;                errors.add(&quot;必须包含大写字母&quot;);            &#125;            if (!password.matches(&quot;.*\\d.*&quot;)) &#123;                errors.add(&quot;必须包含数字&quot;);            &#125;            if (!password.matches(&quot;.*[@$!%*?&amp;].*&quot;)) &#123;                errors.add(&quot;必须包含特殊字符(@$!%*?&amp;)&quot;);            &#125;                        String errorMessage = &quot;密码要求：&quot; + String.join(&quot;、&quot;, errors);            context.buildConstraintViolationWithTemplate(errorMessage)                   .addConstraintViolation();                        return false;        &#125;                return true;    &#125;&#125;// 使用自定义验证注解public class ChangePasswordDto &#123;        @NotBlank(message = &quot;当前密码不能为空&quot;)    private String currentPassword;        @ValidPassword // 使用自定义验证注解    @NotBlank(message = &quot;新密码不能为空&quot;)    private String newPassword;        @NotBlank(message = &quot;确认密码不能为空&quot;)    private String confirmPassword;        // 构造器、getter、setter...&#125;
+
+类级别验证（跨字段验证）/** * 类级别验证注解：确保两个字段相等 */@Target(&#123;ElementType.TYPE&#125;)@Retention(RetentionPolicy.RUNTIME)@Constraint(validatedBy = FieldMatchValidator.class)@Documentedpublic @interface FieldMatch &#123;    String message() default &quot;字段不匹配&quot;;    String first();    String second();    Class&lt;?&gt;[] groups() default &#123;&#125;;    Class&lt;? extends Payload&gt;[] payload() default &#123;&#125;;&#125;// 验证器实现public class FieldMatchValidator implements ConstraintValidator&lt;FieldMatch, Object&gt; &#123;        private String firstFieldName;    private String secondFieldName;        @Override    public void initialize(FieldMatch constraintAnnotation) &#123;        firstFieldName = constraintAnnotation.first();        secondFieldName = constraintAnnotation.second();    &#125;        @Override    public boolean isValid(Object value, ConstraintValidatorContext context) &#123;        try &#123;            Object firstObj = getFieldValue(value, firstFieldName);            Object secondObj = getFieldValue(value, secondFieldName);                        boolean valid = Objects.equals(firstObj, secondObj);                        if (!valid) &#123;                context.disableDefaultConstraintViolation();                context.buildConstraintViolationWithTemplate(                    String.format(&quot;%s和%s必须相同&quot;, firstFieldName, secondFieldName))                       .addPropertyNode(secondFieldName)                       .addConstraintViolation();            &#125;                        return valid;        &#125; catch (Exception e) &#123;            return false;        &#125;    &#125;        private Object getFieldValue(Object object, String fieldName) throws Exception &#123;        Class&lt;?&gt; clazz = object.getClass();        Field field = clazz.getDeclaredField(fieldName);        field.setAccessible(true);        return field.get(object);    &#125;&#125;// 使用类级别验证@FieldMatch(first = &quot;password&quot;, second = &quot;confirmPassword&quot;, message = &quot;密码和确认密码必须相同&quot;)@FieldMatch(first = &quot;email&quot;, second = &quot;confirmEmail&quot;, message = &quot;邮箱和确认邮箱必须相同&quot;)public class UserRegistrationDto &#123;        @NotBlank(message = &quot;用户名不能为空&quot;)    @Size(min = 3, max = 20, message = &quot;用户名长度必须在3-20个字符之间&quot;)    private String username;        @ValidPassword    @NotBlank(message = &quot;密码不能为空&quot;)    private String password;        @NotBlank(message = &quot;确认密码不能为空&quot;)    private String confirmPassword;        @Email(message = &quot;邮箱格式不正确&quot;)    @NotBlank(message = &quot;邮箱不能为空&quot;)    private String email;        @NotBlank(message = &quot;确认邮箱不能为空&quot;)    private String confirmEmail;        // 构造器、getter、setter...&#125;
+
+验证组（Validation Groups）/** * 验证组：在不同场景下应用不同的验证规则 */// 定义验证组接口public interface CreateGroup &#123;&#125;public interface UpdateGroup &#123;&#125;public class UserDto &#123;        // ID只在更新时需要    @NotNull(groups = UpdateGroup.class, message = &quot;更新时ID不能为空&quot;)    @Null(groups = CreateGroup.class, message = &quot;创建时ID必须为空&quot;)    private Long id;        // 用户名在创建和更新时都需要验证    @NotBlank(groups = &#123;CreateGroup.class, UpdateGroup.class&#125;, message = &quot;用户名不能为空&quot;)    @Size(min = 3, max = 20, groups = &#123;CreateGroup.class, UpdateGroup.class&#125;,           message = &quot;用户名长度必须在3-20个字符之间&quot;)    private String username;        // 密码只在创建时需要    @NotBlank(groups = CreateGroup.class, message = &quot;创建时密码不能为空&quot;)    @ValidPassword(groups = CreateGroup.class)    private String password;        // 邮箱在创建和更新时都需要验证    @Email(groups = &#123;CreateGroup.class, UpdateGroup.class&#125;, message = &quot;邮箱格式不正确&quot;)    @NotBlank(groups = &#123;CreateGroup.class, UpdateGroup.class&#125;, message = &quot;邮箱不能为空&quot;)    private String email;        // 构造器、getter、setter...&#125;// 在控制器中使用验证组@RestController@RequestMapping(&quot;/api/users&quot;)public class UserController &#123;        @PostMapping    public ResponseEntity&lt;User&gt; createUser(@Validated(CreateGroup.class) @RequestBody UserDto dto) &#123;        // 只验证CreateGroup组的注解        User user = userService.createUser(dto);        return ResponseEntity.status(HttpStatus.CREATED).body(user);    &#125;        @PutMapping(&quot;/&#123;id&#125;&quot;)    public ResponseEntity&lt;User&gt; updateUser(@PathVariable Long id,                                          @Validated(UpdateGroup.class) @RequestBody UserDto dto) &#123;        // 只验证UpdateGroup组的注解        dto.setId(id);        User user = userService.updateUser(dto);        return ResponseEntity.ok(user);    &#125;&#125;
+
+全局异常处理/** * 全局异常处理：统一处理验证错误 */@RestControllerAdvicepublic class GlobalExceptionHandler &#123;        /**     * 处理@Valid验证失败的异常（请求体验证）     */    @ExceptionHandler(MethodArgumentNotValidException.class)    public ResponseEntity&lt;ValidationErrorResponse&gt; handleValidationException(            MethodArgumentNotValidException ex) &#123;                ValidationErrorResponse errorResponse = new ValidationErrorResponse();        errorResponse.setMessage(&quot;请求参数验证失败&quot;);        errorResponse.setTimestamp(LocalDateTime.now());                // 收集所有验证错误        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();        ex.getBindingResult().getFieldErrors().forEach(error -&gt; &#123;            errors.put(error.getField(), error.getDefaultMessage());        &#125;);                // 收集类级别验证错误        ex.getBindingResult().getGlobalErrors().forEach(error -&gt; &#123;            errors.put(error.getObjectName(), error.getDefaultMessage());        &#125;);                errorResponse.setErrors(errors);                return ResponseEntity.badRequest().body(errorResponse);    &#125;        /**     * 处理@Validated验证失败的异常（方法参数验证）     */    @ExceptionHandler(ConstraintViolationException.class)    public ResponseEntity&lt;ValidationErrorResponse&gt; handleConstraintViolationException(            ConstraintViolationException ex) &#123;                ValidationErrorResponse errorResponse = new ValidationErrorResponse();        errorResponse.setMessage(&quot;参数验证失败&quot;);        errorResponse.setTimestamp(LocalDateTime.now());                Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();        ex.getConstraintViolations().forEach(violation -&gt; &#123;            String propertyPath = violation.getPropertyPath().toString();            String message = violation.getMessage();            errors.put(propertyPath, message);        &#125;);                errorResponse.setErrors(errors);                return ResponseEntity.badRequest().body(errorResponse);    &#125;&#125;// 验证错误响应类@Datapublic class ValidationErrorResponse &#123;    private String message;    private LocalDateTime timestamp;    private Map&lt;String, String&gt; errors;&#125;
+
+6.5 测试注解详解（JUnit 5 + Spring Boot Test）JUnit 5是Java的标准测试框架，Spring Boot Test提供了Spring应用的测试支持。
+JUnit 5 核心注解基础测试注解/** * JUnit 5 基础测试示例 */class CalculatorTest &#123;        private Calculator calculator;        /**     * @BeforeAll: 在所有测试方法之前执行一次（必须是static方法）     * 用途：初始化昂贵的资源，如数据库连接池、文件读取等     */    @BeforeAll    static void setUpClass() &#123;        System.out.println(&quot;初始化测试类资源&quot;);        // 例如：初始化数据库连接池        // DatabasePool.initialize();    &#125;        /**     * @AfterAll: 在所有测试方法之后执行一次（必须是static方法）     * 用途：清理昂贵的资源     */    @AfterAll    static void tearDownClass() &#123;        System.out.println(&quot;清理测试类资源&quot;);        // 例如：关闭数据库连接池        // DatabasePool.close();    &#125;        /**     * @BeforeEach: 在每个测试方法之前执行     * 用途：为每个测试创建干净的环境     */    @BeforeEach    void setUp() &#123;        calculator = new Calculator();        System.out.println(&quot;为测试方法准备Calculator实例&quot;);    &#125;        /**     * @AfterEach: 在每个测试方法之后执行     * 用途：清理每个测试产生的副作用     */    @AfterEach    void tearDown() &#123;        calculator = null;        System.out.println(&quot;清理Calculator实例&quot;);    &#125;        /**     * @Test: 标记这是一个测试方法     * @DisplayName: 为测试提供可读的名称（在测试报告中显示）     */    @Test    @DisplayName(&quot;测试两个正数相加&quot;)    void testAddPositiveNumbers() &#123;        // Given（准备）        int a = 5;        int b = 3;        int expected = 8;                // When（执行）        int actual = calculator.add(a, b);                // Then（验证）        assertEquals(expected, actual, &quot;5 + 3 应该等于 8&quot;);    &#125;        @Test    @DisplayName(&quot;测试除法操作&quot;)    void testDivision() &#123;        assertEquals(2.0, calculator.divide(10, 5), 0.001, &quot;10 / 5 应该等于 2.0&quot;);    &#125;        /**     * @Test注解的异常测试     */    @Test    @DisplayName(&quot;测试除零异常&quot;)    void testDivisionByZero() &#123;        // 验证是否抛出预期的异常        ArithmeticException exception = assertThrows(            ArithmeticException.class,             () -&gt; calculator.divide(10, 0),            &quot;除零应该抛出ArithmeticException&quot;        );                // 验证异常消息        assertEquals(&quot;/ by zero&quot;, exception.getMessage());    &#125;        /**     * @Disabled: 禁用测试（类似于JUnit 4的@Ignore）     */    @Test    @Disabled(&quot;暂时禁用，等待修复bug #123&quot;)    void testComplexCalculation() &#123;        // 这个测试不会执行    &#125;&#125;
+
+参数化测试注解/** * 参数化测试：使用不同的参数运行同一个测试 */class ParameterizedTestExample &#123;        /**     * @ParameterizedTest: 参数化测试     * @ValueSource: 提供简单类型的参数值     */    @ParameterizedTest    @DisplayName(&quot;测试字符串长度验证&quot;)    @ValueSource(strings = &#123;&quot;&quot;, &quot;   &quot;, &quot;test&quot;, &quot;hello world&quot;&#125;)    void testStringLength(String input) &#123;        if (input.trim().isEmpty()) &#123;            assertTrue(input.trim().length() == 0);        &#125; else &#123;            assertTrue(input.length() &gt; 0);        &#125;    &#125;        @ParameterizedTest    @DisplayName(&quot;测试数字是否为偶数&quot;)    @ValueSource(ints = &#123;2, 4, 6, 8, 10&#125;)    void testEvenNumbers(int number) &#123;        assertTrue(number % 2 == 0, number + &quot; 应该是偶数&quot;);    &#125;        /**     * @CsvSource: 提供CSV格式的参数     */    @ParameterizedTest    @DisplayName(&quot;测试加法运算&quot;)    @CsvSource(&#123;        &quot;1, 2, 3&quot;,        &quot;5, 7, 12&quot;,         &quot;-2, 3, 1&quot;,        &quot;0, 0, 0&quot;    &#125;)    void testAddition(int a, int b, int expected) &#123;        Calculator calculator = new Calculator();        assertEquals(expected, calculator.add(a, b));    &#125;        /**     * @CsvFileSource: 从CSV文件读取参数     */    @ParameterizedTest    @DisplayName(&quot;从文件测试用户数据&quot;)    @CsvFileSource(resources = &quot;/test-users.csv&quot;, numLinesToSkip = 1)    void testUserValidation(String username, String email, boolean expectedValid) &#123;        User user = new User(username, email);        assertEquals(expectedValid, UserValidator.isValid(user));    &#125;        /**     * @MethodSource: 使用方法提供参数     */    @ParameterizedTest    @DisplayName(&quot;测试密码强度&quot;)    @MethodSource(&quot;providePasswordTestCases&quot;)    void testPasswordStrength(String password, boolean expectedStrong) &#123;        assertEquals(expectedStrong, PasswordValidator.isStrong(password));    &#125;        // 提供测试参数的静态方法    static Stream&lt;Arguments&gt; providePasswordTestCases() &#123;        return Stream.of(            Arguments.of(&quot;123456&quot;, false),            Arguments.of(&quot;Password123!&quot;, true),            Arguments.of(&quot;weakpass&quot;, false),            Arguments.of(&quot;Strong@Pass123&quot;, true)        );    &#125;        /**     * @EnumSource: 使用枚举值作为参数     */    @ParameterizedTest    @DisplayName(&quot;测试用户状态&quot;)    @EnumSource(UserStatus.class)    void testUserStatus(UserStatus status) &#123;        assertNotNull(status);        assertNotNull(status.getDescription());    &#125;        /**     * @ArgumentsSource: 使用自定义参数提供者     */    @ParameterizedTest    @DisplayName(&quot;测试自定义参数&quot;)    @ArgumentsSource(CustomArgumentsProvider.class)    void testWithCustomProvider(String input, int expectedLength) &#123;        assertEquals(expectedLength, input.length());    &#125;&#125;// 自定义参数提供者class CustomArgumentsProvider implements ArgumentsProvider &#123;    @Override    public Stream&lt;? extends Arguments&gt; provideArguments(ExtensionContext context) &#123;        return Stream.of(            Arguments.of(&quot;hello&quot;, 5),            Arguments.of(&quot;world&quot;, 5),            Arguments.of(&quot;test&quot;, 4)        );    &#125;&#125;
+
+Spring Boot 测试注解完整应用上下文测试/** * @SpringBootTest: 加载完整的Spring应用上下文 * 用途：集成测试，测试整个应用的交互 */@SpringBootTest(    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, // 随机端口启动Web服务器    properties = &#123;&quot;spring.profiles.active=test&quot;&#125; // 激活test配置文件)@TestPropertySource(locations = &quot;classpath:application-test.properties&quot;) // 额外的测试配置@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // 每个测试后重建上下文class UserServiceIntegrationTest &#123;        @Autowired    private UserService userService;        @Autowired    private UserRepository userRepository;        @Autowired    private TestRestTemplate restTemplate; // 用于HTTP请求测试        @LocalServerPort    private int port; // 获取随机分配的端口号        @Test    @DisplayName(&quot;集成测试：创建用户的完整流程&quot;)    void testCreateUserIntegration() &#123;        // Given        String username = &quot;testuser&quot;;        String email = &quot;test@example.com&quot;;                // When        User user = userService.createUser(username, email);                // Then        assertNotNull(user.getId());        assertEquals(username, user.getUsername());        assertEquals(email, user.getEmail());                // 验证数据确实保存到数据库        Optional&lt;User&gt; savedUser = userRepository.findById(user.getId());        assertTrue(savedUser.isPresent());        assertEquals(username, savedUser.get().getUsername());    &#125;        @Test    @DisplayName(&quot;HTTP接口集成测试&quot;)    void testUserApiEndpoint() &#123;        // Given        CreateUserRequest request = new CreateUserRequest(&quot;apiuser&quot;, &quot;api@example.com&quot;);                // When        ResponseEntity&lt;User&gt; response = restTemplate.postForEntity(            &quot;http://localhost:&quot; + port + &quot;/api/users&quot;,            request,            User.class        );                // Then        assertEquals(HttpStatus.CREATED, response.getStatusCode());        assertNotNull(response.getBody());        assertEquals(&quot;apiuser&quot;, response.getBody().getUsername());    &#125;&#125;
+
+Web层测试/** * @WebMvcTest: 只加载Web层组件（Controller、Filter、WebMvcConfigurer等） * 优点：启动速度快，只测试Web层逻辑 */@WebMvcTest(UserController.class) // 只加载UserControllerclass UserControllerTest &#123;        @Autowired    private MockMvc mockMvc; // 模拟HTTP请求        @MockBean    private UserService userService; // 模拟Service层        @Autowired    private ObjectMapper objectMapper; // JSON序列化工具        @Test    @DisplayName(&quot;测试获取用户API - 成功案例&quot;)    void testGetUser_Success() throws Exception &#123;        // Given        Long userId = 1L;        User mockUser = new User(&quot;testuser&quot;, &quot;test@example.com&quot;);        mockUser.setId(userId);                when(userService.findById(userId)).thenReturn(mockUser);                // When &amp; Then        mockMvc.perform(get(&quot;/api/users/&#123;id&#125;&quot;, userId)                .contentType(MediaType.APPLICATION_JSON))                .andExpect(status().isOk())                .andExpect(jsonPath(&quot;$.id&quot;).value(userId))                .andExpect(jsonPath(&quot;$.username&quot;).value(&quot;testuser&quot;))                .andExpect(jsonPath(&quot;$.email&quot;).value(&quot;test@example.com&quot;))                .andDo(print()); // 打印请求和响应详情                // 验证Service方法被调用        verify(userService, times(1)).findById(userId);    &#125;        @Test    @DisplayName(&quot;测试获取用户API - 用户不存在&quot;)    void testGetUser_NotFound() throws Exception &#123;        // Given        Long userId = 999L;        when(userService.findById(userId)).thenThrow(new UserNotFoundException(&quot;用户不存在&quot;));                // When &amp; Then        mockMvc.perform(get(&quot;/api/users/&#123;id&#125;&quot;, userId)                .contentType(MediaType.APPLICATION_JSON))                .andExpect(status().isNotFound());                verify(userService, times(1)).findById(userId);    &#125;        @Test    @DisplayName(&quot;测试创建用户API - 成功案例&quot;)    void testCreateUser_Success() throws Exception &#123;        // Given        CreateUserRequest request = new CreateUserRequest(&quot;newuser&quot;, &quot;new@example.com&quot;);        User createdUser = new User(&quot;newuser&quot;, &quot;new@example.com&quot;);        createdUser.setId(1L);                when(userService.createUser(anyString(), anyString())).thenReturn(createdUser);                // When &amp; Then        mockMvc.perform(post(&quot;/api/users&quot;)                .contentType(MediaType.APPLICATION_JSON)                .content(objectMapper.writeValueAsString(request)))                .andExpect(status().isCreated())                .andExpect(jsonPath(&quot;$.id&quot;).exists())                .andExpect(jsonPath(&quot;$.username&quot;).value(&quot;newuser&quot;))                .andExpect(jsonPath(&quot;$.email&quot;).value(&quot;new@example.com&quot;));                verify(userService, times(1)).createUser(&quot;newuser&quot;, &quot;new@example.com&quot;);    &#125;        @Test    @DisplayName(&quot;测试创建用户API - 验证失败&quot;)    void testCreateUser_ValidationError() throws Exception &#123;        // Given: 无效的请求数据        CreateUserRequest request = new CreateUserRequest(&quot;&quot;, &quot;invalid-email&quot;);                // When &amp; Then        mockMvc.perform(post(&quot;/api/users&quot;)                .contentType(MediaType.APPLICATION_JSON)                .content(objectMapper.writeValueAsString(request)))                .andExpect(status().isBadRequest())                .andExpect(jsonPath(&quot;$.errors&quot;).exists())                .andExpect(jsonPath(&quot;$.errors.username&quot;).exists())                .andExpect(jsonPath(&quot;$.errors.email&quot;).exists());                // 验证Service方法没有被调用        verify(userService, never()).createUser(anyString(), anyString());    &#125;&#125;
+
+数据层测试/** * @DataJpaTest: 只加载JPA相关组件 * 特点：使用内存数据库，事务自动回滚 */@DataJpaTestclass UserRepositoryTest &#123;        @Autowired    private TestEntityManager entityManager; // 用于测试的EntityManager        @Autowired    private UserRepository userRepository;        @Test    @DisplayName(&quot;测试根据用户名查找用户&quot;)    void testFindByUsername() &#123;        // Given        User user = new User(&quot;testuser&quot;, &quot;test@example.com&quot;);        entityManager.persistAndFlush(user); // 立即保存到数据库                // When        Optional&lt;User&gt; found = userRepository.findByUsername(&quot;testuser&quot;);                // Then        assertTrue(found.isPresent());        assertEquals(&quot;testuser&quot;, found.get().getUsername());        assertEquals(&quot;test@example.com&quot;, found.get().getEmail());    &#125;        @Test    @DisplayName(&quot;测试根据邮箱查找用户&quot;)    void testFindByEmail() &#123;        // Given        User user1 = new User(&quot;user1&quot;, &quot;user1@example.com&quot;);        User user2 = new User(&quot;user2&quot;, &quot;user2@example.com&quot;);        entityManager.persist(user1);        entityManager.persist(user2);        entityManager.flush();                // When        Optional&lt;User&gt; found = userRepository.findByEmail(&quot;user1@example.com&quot;);                // Then        assertTrue(found.isPresent());        assertEquals(&quot;user1&quot;, found.get().getUsername());    &#125;        @Test    @DisplayName(&quot;测试用户名是否存在&quot;)    void testExistsByUsername() &#123;        // Given        User user = new User(&quot;existinguser&quot;, &quot;existing@example.com&quot;);        entityManager.persistAndFlush(user);                // When &amp; Then        assertTrue(userRepository.existsByUsername(&quot;existinguser&quot;));        assertFalse(userRepository.existsByUsername(&quot;nonexistentuser&quot;));    &#125;        @Test    @DisplayName(&quot;测试自定义查询方法&quot;)    void testFindActiveUsers() &#123;        // Given        User activeUser = new User(&quot;activeuser&quot;, &quot;active@example.com&quot;);        activeUser.setStatus(UserStatus.ACTIVE);                User inactiveUser = new User(&quot;inactiveuser&quot;, &quot;inactive@example.com&quot;);        inactiveUser.setStatus(UserStatus.INACTIVE);                entityManager.persist(activeUser);        entityManager.persist(inactiveUser);        entityManager.flush();                // When        List&lt;User&gt; activeUsers = userRepository.findByStatus(UserStatus.ACTIVE);                // Then        assertEquals(1, activeUsers.size());        assertEquals(&quot;activeuser&quot;, activeUsers.get(0).getUsername());    &#125;&#125;
+
+服务层测试（使用Mock）/** * 纯单元测试：不加载Spring上下文，使用Mock对象 */@ExtendWith(MockitoExtension.class) // JUnit 5 + Mockitoclass UserServiceTest &#123;        @Mock    private UserRepository userRepository; // Mock的Repository        @Mock    private EmailService emailService; // Mock的邮件服务        @Mock    private PasswordEncoder passwordEncoder; // Mock的密码编码器        @InjectMocks    private UserService userService; // 被测试的服务（自动注入Mock对象）        @Test    @DisplayName(&quot;测试创建用户 - 成功案例&quot;)    void testCreateUser_Success() &#123;        // Given        String username = &quot;newuser&quot;;        String email = &quot;new@example.com&quot;;        String rawPassword = &quot;password123&quot;;        String encodedPassword = &quot;encoded_password&quot;;                User savedUser = new User(username, email);        savedUser.setId(1L);        savedUser.setPassword(encodedPassword);                // Mock行为设置        when(userRepository.existsByUsername(username)).thenReturn(false);        when(userRepository.existsByEmail(email)).thenReturn(false);        when(passwordEncoder.encode(rawPassword)).thenReturn(encodedPassword);        when(userRepository.save(any(User.class))).thenReturn(savedUser);                // When        User result = userService.createUser(username, email, rawPassword);                // Then        assertNotNull(result);        assertEquals(1L, result.getId());        assertEquals(username, result.getUsername());        assertEquals(email, result.getEmail());        assertEquals(encodedPassword, result.getPassword());                // 验证Mock对象的调用        verify(userRepository, times(1)).existsByUsername(username);        verify(userRepository, times(1)).existsByEmail(email);        verify(passwordEncoder, times(1)).encode(rawPassword);        verify(userRepository, times(1)).save(any(User.class));        verify(emailService, times(1)).sendWelcomeEmail(email, username);    &#125;        @Test    @DisplayName(&quot;测试创建用户 - 用户名已存在&quot;)    void testCreateUser_UsernameExists() &#123;        // Given        String username = &quot;existinguser&quot;;        String email = &quot;new@example.com&quot;;                when(userRepository.existsByUsername(username)).thenReturn(true);                // When &amp; Then        DuplicateUsernameException exception = assertThrows(            DuplicateUsernameException.class,            () -&gt; userService.createUser(username, email, &quot;password&quot;)        );                assertEquals(&quot;用户名已存在: &quot; + username, exception.getMessage());                // 验证后续方法没有被调用        verify(userRepository, times(1)).existsByUsername(username);        verify(userRepository, never()).existsByEmail(anyString());        verify(userRepository, never()).save(any(User.class));        verify(emailService, never()).sendWelcomeEmail(anyString(), anyString());    &#125;        @Test    @DisplayName(&quot;测试用户登录 - 成功案例&quot;)    void testAuthenticate_Success() &#123;        // Given        String username = &quot;testuser&quot;;        String rawPassword = &quot;password123&quot;;        String encodedPassword = &quot;encoded_password&quot;;                User user = new User(username, &quot;test@example.com&quot;);        user.setPassword(encodedPassword);        user.setStatus(UserStatus.ACTIVE);                when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));        when(passwordEncoder.matches(rawPassword, encodedPassword)).thenReturn(true);                // When        boolean result = userService.authenticate(username, rawPassword);                // Then        assertTrue(result);                verify(userRepository, times(1)).findByUsername(username);        verify(passwordEncoder, times(1)).matches(rawPassword, encodedPassword);    &#125;        @Test    @DisplayName(&quot;测试用户登录 - 密码错误&quot;)    void testAuthenticate_WrongPassword() &#123;        // Given        String username = &quot;testuser&quot;;        String rawPassword = &quot;wrongpassword&quot;;        String encodedPassword = &quot;encoded_password&quot;;                User user = new User(username, &quot;test@example.com&quot;);        user.setPassword(encodedPassword);                when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));        when(passwordEncoder.matches(rawPassword, encodedPassword)).thenReturn(false);                // When        boolean result = userService.authenticate(username, rawPassword);                // Then        assertFalse(result);                verify(userRepository, times(1)).findByUsername(username);        verify(passwordEncoder, times(1)).matches(rawPassword, encodedPassword);    &#125;&#125;
+
+7. 自定义注解7.1 创建自定义注解// 定义注解@Target(ElementType.METHOD)@Retention(RetentionPolicy.RUNTIME)@Documentedpublic @interface LogExecutionTime &#123;    String value() default &quot;&quot;;    boolean enabled() default true;&#125;// 使用注解public class BusinessService &#123;        @LogExecutionTime(&quot;用户查询&quot;)    public User findUser(Long id) &#123;        // 业务逻辑        return userRepository.findById(id);    &#125;        @LogExecutionTime(value = &quot;数据处理&quot;, enabled = false)    public void processData() &#123;        // 处理逻辑    &#125;&#125;
+
+7.2 注解处理器实现@Component@Aspectpublic class LogExecutionTimeAspect &#123;        private static final Logger logger = LoggerFactory.getLogger(LogExecutionTimeAspect.class);        @Around(&quot;@annotation(logExecutionTime)&quot;)    public Object logExecutionTime(ProceedingJoinPoint joinPoint,                                   LogExecutionTime logExecutionTime) throws Throwable &#123;                if (!logExecutionTime.enabled()) &#123;            return joinPoint.proceed();        &#125;                long startTime = System.currentTimeMillis();        String operation = logExecutionTime.value().isEmpty() ?                           joinPoint.getSignature().getName() :                           logExecutionTime.value();                try &#123;            Object result = joinPoint.proceed();            long endTime = System.currentTimeMillis();            logger.info(&quot;操作 [&#123;&#125;] 执行时间: &#123;&#125;ms&quot;, operation, endTime - startTime);            return result;        &#125; catch (Exception e) &#123;            logger.error(&quot;操作 [&#123;&#125;] 执行失败&quot;, operation, e);            throw e;        &#125;    &#125;&#125;
+
+7.3 通过反射处理注解public class AnnotationProcessor &#123;        public static void processAnnotations(Object obj) &#123;        Class&lt;?&gt; clazz = obj.getClass();                // 处理类级别注解        if (clazz.isAnnotationPresent(Component.class)) &#123;            Component component = clazz.getAnnotation(Component.class);            System.out.println(&quot;组件名称: &quot; + component.value());        &#125;                // 处理方法级别注解        Method[] methods = clazz.getDeclaredMethods();        for (Method method : methods) &#123;            if (method.isAnnotationPresent(LogExecutionTime.class)) &#123;                LogExecutionTime annotation = method.getAnnotation(LogExecutionTime.class);                System.out.println(&quot;方法 &quot; + method.getName() +                                  &quot; 需要记录执行时间: &quot; + annotation.value());            &#125;        &#125;                // 处理字段级别注解        Field[] fields = clazz.getDeclaredFields();        for (Field field : fields) &#123;            if (field.isAnnotationPresent(Autowired.class)) &#123;                System.out.println(&quot;字段 &quot; + field.getName() + &quot; 需要自动注入&quot;);            &#125;        &#125;    &#125;&#125;
+
+8. 注解的最佳实践8.1 设计原则
+单一职责：每个注解只做一件事
+命名清晰：注解名称应该清楚表达其用途
+参数合理：提供合理的默认值，减少使用复杂度
+文档完善：为注解和参数提供详细文档
+
+8.2 使用建议// ❌ 不好的设计 - 职责不清@AllInOne(log = true, validate = true, cache = true, retry = 3)public void method() &#123;&#125;// ✅ 好的设计 - 职责分离@Log@Validate@Cacheable@Retry(times = 3)public void method() &#123;&#125;
+
+8.3 性能考虑// 反射操作应该缓存public class AnnotationCache &#123;    private static final Map&lt;Class&lt;?&gt;, List&lt;Method&gt;&gt; methodCache = new ConcurrentHashMap&lt;&gt;();        public static List&lt;Method&gt; getAnnotatedMethods(Class&lt;?&gt; clazz, Class&lt;? extends Annotation&gt; annotation) &#123;        return methodCache.computeIfAbsent(clazz, k -&gt; &#123;            return Arrays.stream(k.getDeclaredMethods())                        .filter(m -&gt; m.isAnnotationPresent(annotation))                        .collect(Collectors.toList());        &#125;);    &#125;&#125;
+
+9. 常见错误和解决方案9.1 注解丢失问题// 问题：运行时无法获取注解@Target(ElementType.METHOD)// @Retention(RetentionPolicy.RUNTIME)  // 忘记添加public @interface MyAnnotation &#123;&#125;// 解决：正确设置保留策略@Target(ElementType.METHOD)@Retention(RetentionPolicy.RUNTIME)public @interface MyAnnotation &#123;&#125;
+
+9.2 继承问题// 问题：子类无法继承父类的注解@Inherited  // 添加此注解使得注解可以被继承@Target(ElementType.TYPE)@Retention(RetentionPolicy.RUNTIME)public @interface Service &#123;&#125;
+
+9.3 重复注解// Java 8+ 支持重复注解@Repeatable(Schedules.class)public @interface Schedule &#123;    String time();&#125;public @interface Schedules &#123;    Schedule[] value();&#125;// 使用@Schedule(time = &quot;morning&quot;)@Schedule(time = &quot;evening&quot;)public void task() &#123;&#125;
+
+10. 学习建议10.1 循序渐进
+理解基础：先掌握内置注解的使用
+框架应用：学习Spring等框架中注解的使用
+自定义注解：尝试创建自己的注解
+深入原理：了解注解处理器和反射机制
+
+10.2 实践项目
+创建一个简单的Web项目，使用Spring Boot注解
+实现一个日志记录的自定义注解
+编写一个数据验证的注解系统
+
+10.3 进阶学习
+学习APT（Annotation Processing Tool）
+了解编译时代码生成
+研究主流框架的注解实现原理
+
+总结Java注解是一个强大的元编程工具，它让代码更加简洁、可读性更强。相比C++的宏系统，Java注解提供了更安全、更强大的元数据机制。掌握注解的使用不仅能让你更好地使用现有框架，还能帮你设计出更优雅的API。
+注解是对代码的描述，而不是代码本身。正确理解和使用注解，将大大提升Java编程水平。
+
+感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+]]></content>
+      <categories>
+        <category>技术学习</category>
+      </categories>
+      <tags>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>my first address</title>
     <url>/2025/02/28/hello-world/</url>
     <content><![CDATA[this is my first articletest文件，梦开始的地方
 ]]></content>
-  </entry>
-  <entry>
-    <title>归去来</title>
-    <url>/2025/08/09/%E5%BD%92%E5%8E%BB%E6%9D%A5/</url>
-    <content><![CDATA[📝 归去来
-回看一年前的随笔，情更切。pyq发文，如今补上，仅供纪念。
-
-还是感觉以后回村里隐居也挺好。
-​这里只是晋东南群山中的一个小村落，我知道上一次回来是去年暑假，却不知道下一次要到什么时候了。一条马路将村子分成两片，也连接此处与县城，其上来往的公交车司机也成了姥姥姥爷的老熟人。曾几何时公交车并不像现在一样一元通全线，但在这数不清多少年的时间里唯一改变的也只是票价，始终是两位老人入城的主要交通工具。这条公交线很慢，小时候印象里的从村到城1小时至今不变。
-​往前回倒十几年，回到村里还没修水泥路，回到一些老人离开之前，印象比较深刻的是那时日常用水还是靠担的。记忆里的三处水井现在只能找到两处，一处后山，一处水库旁，现在自然是荒废了。只有我妈体验过担水，还没等我长大就舍弃了这种原始方式，不过担子倒还留存着，也是某种历史的见证了。​​前几天和姥爷下镇里理发，临返程时正巧下雨，我们俩冒着雨骑摩托车在山路上冲刺，感觉姥爷像施了避雨咒一样，结合我下雨时骑摩托被遮挡视线的经历，简直不可思议。返程之前路人还调侃老人带年轻人，只是这位朋友不明其中缘由，这辆摩托车比我年龄还大，借我姥姥的话，这玩意只有我姥爷驾驭得了。多少年过去了，自从地开始荒废之后拖拉机就不怎么开了，但摩托车仍是姥爷的得力干将，只是不知道他还想骑多少年，又能骑多少年。​​从我有记忆开始两位老人就主要靠种地和养蚕为主要收入，以至于我来到晋北看到那里的农家人甚至没见过蚕时感到惊讶。种地自然没什么好说的，主要就是小麦、玉米、土豆、高粱之类的经济作物，除去自己留一些磨成面和自给，其余便卖作收入。而房子周围两位老人也开垦了数小块土地，种一些萝卜、西红柿、豆角之类的果蔬，省去了天天去镇里买菜了。甚至后来表妹想吃草莓的时候，姥爷也真能在房子背后那片难以称得上是肥沃的土地上给她变出草莓，真的很神奇吧。除了种的田，他们还会打核桃、摘柿子和山楂，甚至会摘桑椹。不知道现在还有多少人知道核桃最外层是青皮的，去皮之后洗净才是棕色的壳。姥姥曾多次念叨村里人都觉得核桃不值钱，而城里人却愿意花较贵的钱去超市称，她表示相当不理解。而摘下的柿子除去现吃的，为了方便保存往往会做成柿饼，至今仍是；山楂则去核做成红果罐头，估计是山楂树虽着地一起荒了，我也已经记不得上一次吃红果罐头是什么时候了。​​不论病逝还是进城，在一些老人没离开前，整个村子都会养蚕。养蚕以季为周期，分春夏秋冬蚕。村里人先统计各家各户的养殖量，以张为单位，那是因为一开始拿回来的蚕籽在粘板上。从一个个小黑点长成白蚕再到结茧，喂桑叶从切成细碎到整叶铺盖，它们的住处也从粘板到数个木篓子，直到喷上药，将它们移到网格栅上，静待结茧。随着不少老人的离开，养蚕人越来越少，在前些年姥姥姥爷也因身体原因不在养蚕，网格栅也终于收进了牛圈，恐怕再无可用之日。​​如今，除了种少许地，姥爷还常常骑车上山采摘连翘（P3）。实际上近些年十里八乡的老年男女都在采这种药来卖钱，以6到9月最为频繁，但价格偏低，几元到十几元一斤上下浮动；冬天的干连翘价高，往往在五六十元一斤，但却难寻。采药人早八晚六地摘，一天下来好的话人均十几斤，不好则只有六七斤。姥姥也常会开玩笑说，今天出去吃顿饭又把姥爷一天的采药钱吃没了，我笑罢只觉得苦涩，但也知道老人是闲不住的。采药人采回药后也要观察行情，但又因为连翘不经放所以也要尽快出手，和各地收药人的搏弈始终存在，但不幸的是今年夏天我姥爷总是在涨价前出手，只能在吃饭时骂几句收药人罢了。今天的采摘量为九斤，行情为十二元每斤，在此记录一下。​​我还是会吐槽两位老人生活的地方：房子都是上个世纪的产物，到冬天特别冷；一把铁勺子从姥姥的母亲传到现在；在村里夏天要时刻盯防蚊子，尤其是上厕所qwq；种几块地还要提防野猪，也总会被拱得粮食减产；现在的日常用水每隔五天统一供应，日常囤水；村子里的人越来越少，现在凑桌麻将都难；不时还有蝎子和蛇出没（前几天我就被蝎子咬了(⁄ ⁄•⁄ω⁄•⁄ ⁄)）。但他们俩丝毫不在意。昨天又谈到我想让他们俩彻底离开这里，常住县城，给小姨做饭带娃，但姥姥仍是不在意。我说你们俩总有干不动的时候，早点下城里享受不好呗，姥姥执意说春夏之际凉快。我又说城里有空调不比村里凉快？她又提到费电了。对，这两位就是这么节俭，省了一辈子，处处细打算，却在两位女儿买房时拿出好几万，每次我回来都去超市割肉买菜，在离开的时候以前是塞钱，现在是转账，也只会告诫我好好学习……​​千反田用来形容她家乡的话也正是这个村子的现状，”这里是我的故乡，只有水和土地，人们也在渐渐衰老，失去活力”。我并不觉得这里是最美的地方，也并不觉得这里充满可能性，但是，我愿意讲述这里过往的点滴。可以预见以姥姥姥爷为代表的一代老人也离开这里后，在未来的三十年间这个村子终将荒无人烟。我不知道其他户人家的后代怎么看，我想我还会回到这里，去寻访过往踪迹。​​写在即将启程却不知何时归来之际。
-感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
-]]></content>
-      <categories>
-        <category>生活随想</category>
-      </categories>
-      <tags>
-        <tag>乡愁</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>我的博客重新开始</title>
-    <url>/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/</url>
-    <content><![CDATA[🌟 我的博客重新开始大家好！我是 forever，欢迎来到我重新搭建的博客 “Summer Flower”。
-📝 为什么重新开始？经过一段时间的思考，我决定重新整理我的博客，主要原因包括：
-
-更好的技术栈: 使用 Hexo + Butterfly 主题，提供更好的阅读体验
-规范的内容管理: 建立更完善的写作和发布流程
-专注的内容方向: 
-💻 技术学习心得
-📸 摄影作品分享
-🎓 计算机科学学习记录
-🌱 日常生活感悟
-
-
-
-🛠️ 技术栈介绍这个博客使用的技术栈：
-
-静态网站生成器: Hexo 7.3.0
-主题: Butterfly 5.3.3
-部署平台: GitHub Pages
-域名: 华为云自定义域名
-评论系统: Gitalk
-统计分析: Google Analytics + 不蒜子
-
-🎯 未来计划接下来我计划在这里分享：
-技术内容
-Rust 编程学习心得
-Git 深度使用技巧
-前端开发经验
-计算机科学课程笔记
-
-生活分享
-摄影作品和技巧
-读书心得体会
-旅行见闻
-日常思考
-
-项目展示
-GitHub 开源项目介绍
-个人项目经验分享
-课程作业总结
-
-💡 写作理念我希望这个博客能够：
-
-记录成长: 记录学习和生活中的点点滴滴
-分享经验: 把学到的知识和经验分享给大家
-交流互动: 通过博客认识更多志同道合的朋友
-持续学习: 通过写作来深化自己的理解
-
-🤝 联系方式如果你对我的文章有任何想法或建议，欢迎通过以下方式联系我：
-
-📧 Email: 231220075@smail.nju.edu.cn
-🐙 GitHub: @231220075
-💬 评论区: 每篇文章下方都可以留言
-
-🎉 结语感谢你阅读到这里！希望我的博客能为你带来一些有价值的内容。
-让我们一起在这个夏日花园里，记录美好，分享成长！🌸
-
-“每一次重新开始，都是向更好的自己迈进一步。”
-]]></content>
-      <categories>
-        <category>生活随想</category>
-      </categories>
-      <tags>
-        <tag>博客</tag>
-        <tag>新开始</tag>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>云原生结课project</title>
-    <url>/2025/08/12/%E4%BA%91%E5%8E%9F%E7%94%9F%E7%BB%93%E8%AF%BEproject/</url>
-    <content><![CDATA[📝 云原生结课project
-顺手上传暑课项目
-
-1. 项目组员信息
-
-
-姓名
-学号
-个人贡献
-
-
-
-黄睿智
-231220075
-part3 + 文档编写
-
-
-白子敬
-231220077
-part1
-
-
-陈翔宇
-231220088
-part2
-
-
-
-2. 限流功能相关的关键代码和说明2.1 限流系统架构概述本项目采用基于 Bucket4j + Redis 的分布式限流方案，实现了多层次的流量控制机制：
-
-应用层限流：使用 Bucket4j 令牌桶算法
-连接层限流：Spring Boot Tomcat 连接池限制
-网络层限流：Kubernetes 网络策略和端口转发限制
-
-2.2 核心限流组件限流配置类 (RateLimitConfig.java)@Configurationpublic class RedisConfig &#123;        @Value(&quot;$&#123;REDIS_HOST:$&#123;spring.redis.host:localhost&#125;&#125;&quot;)    private String redisHost;        @Value(&quot;$&#123;REDIS_PORT:$&#123;spring.redis.port:6379&#125;&#125;&quot;)    private int redisPort;        @Bean    @Primary    public RedisConnectionFactory redisConnectionFactory() &#123;        // 直接从环境变量读取        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Spring Data Redis connecting to: &quot; + host + &quot;:&quot; + port);                RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();        config.setHostName(host);        config.setPort(port);                JedisConnectionFactory factory = new JedisConnectionFactory(config);        return factory;    &#125;        @Bean    public RedisTemplate&lt;String, Object&gt; redisTemplate(RedisConnectionFactory connectionFactory) &#123;        RedisTemplate&lt;String, Object&gt; template = new RedisTemplate&lt;&gt;();        template.setConnectionFactory(connectionFactory);        return template;    &#125;        @Bean    public JedisPool jedisPool() &#123;        // 直接从环境变量读取，如果为空则使用配置文件        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Jedis Pool connecting to: &quot; + host + &quot;:&quot; + port);                JedisPoolConfig config = new JedisPoolConfig();        config.setMaxTotal(8);        config.setMaxIdle(8);        config.setMinIdle(0);        config.setTestOnBorrow(true);        config.setTestOnReturn(true);        config.setTestWhileIdle(true);        return new JedisPool(config, host, port);    &#125;&#125;
-
-限流服务类 (RateLimiterService.java)@Servicepublic class RateLimiterService &#123;    private final ProxyManager&lt;byte[]&gt; buckets;    private static final byte[] KEY = &quot;global-rate-limit-key&quot;.getBytes();    @Autowired    public RateLimiterService(ProxyManager&lt;byte[]&gt; buckets) &#123;        this.buckets = buckets;    &#125;    public Bucket resolveBucket() &#123;        return buckets.builder().build(KEY, getConfigSupplier());    &#125;    private Supplier&lt;BucketConfiguration&gt; getConfigSupplier() &#123;        return () -&gt; BucketConfiguration.builder()                .addLimit(Bandwidth.classic(                    100,                     Refill.greedy(100, Duration.ofSeconds(1)))                )                .build();    &#125;&#125;
-
-限流拦截器 (RateLimitInterceptor.java)@Componentpublic class RateLimitInterceptor implements HandlerInterceptor &#123;    @Autowired    private RateLimiterService rateLimiterService;    @Override    public boolean preHandle(HttpServletRequest request,                             HttpServletResponse response,                             Object handler) throws Exception &#123;        Bucket bucket = rateLimiterService.resolveBucket();        if (bucket.tryConsume(1)) &#123;            return true;        &#125; else &#123;            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());            response.getWriter().write(&quot;Too many requests&quot;);            return false;        &#125;    &#125;&#125;
-
-Web 配置类 (WebMvcConfig.java)@Configurationpublic class WebMvcConfig implements WebMvcConfigurer &#123;    @Autowired    private RateLimitInterceptor rateLimitInterceptor;    @Override    public void addInterceptors(InterceptorRegistry registry) &#123;        // 注册限流拦截器并指定拦截路径        registry.addInterceptor(rateLimitInterceptor)                .addPathPatterns(&quot;/hello&quot;)  // 只拦截/hello路径                .order(0);    &#125;&#125;
-
-2.3 应用配置application.properties 限流相关配置spring.application.name=prometheus-test-demo# 统一使用8998端口server.port=8998# Redis 配置 - 直接使用环境变量spring.redis.host=$&#123;REDIS_HOST:localhost&#125;spring.redis.port=$&#123;REDIS_PORT:6379&#125;spring.redis.timeout=2000ms# 强制使用 Jedis 客户端spring.redis.jedis.pool.enabled=truespring.redis.lettuce.pool.enabled=false# Actuator 配置management.endpoints.web.exposure.include=health,info,prometheus,metricsmanagement.endpoint.health.show-details=always# 限流相关配置rate.limit.enabled=truerate.limit.global.key=global-rate-limit-keyrate.limit.capacity=100rate.limit.refill.tokens=100rate.limit.refill.period=1s
-
-2.4 限流工作流程用户请求 → Spring MVC → RateLimitInterceptor → RateLimiterService                                ↓                          检查 Redis 令牌桶                                ↓                    有令牌？─── YES ──→ 继续处理 → HelloController                        │                        NO                        ↓                  返回 HTTP 429 错误
-
-2.5 限流算法说明令牌桶算法 (Token Bucket Algorithm)：
-
-初始化：创建容量为100的令牌桶
-令牌补充：每秒向桶中添加100个令牌
-请求处理：每个请求尝试消费1个令牌
-限流判断：
-有令牌：允许请求，消费令牌
-无令牌：拒绝请求，返回429状态码
-
-
-
-
-3. Dockerfile及K8s 编排文件3.1 Dockerfile# 第一阶段：构建阶段 - 统一使用Java 11FROM maven:3.9.6-eclipse-temurin-17 AS builder# 设置工作目录WORKDIR /usr/src/mymaven# 复制 Maven 配置文件RUN mkdir -p /root/.m2COPY settings.xml /root/.m2/settings.xml# 复制pom.xml和源代码COPY pom.xml .COPY src ./src# 构建项目RUN mvn -B  clean package# 第二阶段：运行阶段FROM eclipse-temurin:17-jre-centos7# 设置时区RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtimeRUN echo &#x27;Asia/Shanghai&#x27; &gt;/etc/timezone# 设置环境变量ENV JAVA_OPTS &#x27;&#x27;# 设置工作目录WORKDIR /app# 从构建阶段复制构建结果COPY --from=builder /usr/src/mymaven/target/prometheus-test-demo-0.0.1-SNAPSHOT.jar ./prometheus-test-demo-0.0.1-SNAPSHOT.jar# 启动命令 - 使用Java 11兼容的JVM参数ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;set -e &amp;&amp; java -XX:+PrintFlagsFinal \                                           -XX:+HeapDumpOnOutOfMemoryError \                                           -XX:HeapDumpPath=/heapdump/heapdump.hprof \                                           -XX:+UseContainerSupport \                                           -XX:MaxRAMPercentage=75.0 \                                           -Djava.security.egd=file:/dev/./urandom \                                           $JAVA_OPTS -jar prometheus-test-demo-0.0.1-SNAPSHOT.jar&quot;]
-
-Dockerfile 设计说明：
-
-构建项目时删去原demo的 -DskipTests 参数，直接运行测试样例，因此在 Jenkinsfile 中不再执行test。
-下图为测试运行结果
-
-
-3.2 Kubernetes 部署文件 (prometheus-test-demo.yaml)apiVersion: apps/v1kind: Deploymentmetadata:  labels:    app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  replicas: 1  selector:    matchLabels:      app: prometheus-test-demo  template:    metadata:      annotations:        prometheus.io/path: /actuator/prometheus        prometheus.io/port: &quot;8998&quot;        prometheus.io/scheme: http        prometheus.io/scrape: &quot;true&quot;      labels:        app: prometheus-test-demo    spec:      initContainers:      - name: wait-for-redis        ../photos/posts/yys/image: busybox:1.36        command: [&#x27;sh&#x27;, &#x27;-c&#x27;]        args:        - |          until nc -z redis-service 6379; do            echo &quot;Waiting for Redis to be ready...&quot;            sleep 2          done          echo &quot;Redis is ready!&quot;      containers:        - ../photos/posts/yys/image: 172.22.83.19:30003/nju08/prometheus-test-demo:&#123;VERSION&#125;          name: prometheus-test-demo          ports:          - containerPort: 8998          env:          - name: REDIS_HOST            value: &quot;redis-service&quot;          - name: REDIS_PORT            value: &quot;6379&quot;          resources:            requests:              memory: &quot;128Mi&quot;                  cpu: &quot;100m&quot;                    limits:              memory: &quot;512Mi&quot;                  cpu: &quot;500m&quot;                  livenessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 120            periodSeconds: 30            timeoutSeconds: 10            failureThreshold: 3          readinessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 90            periodSeconds: 10            timeoutSeconds: 5            failureThreshold: 5---apiVersion: apps/v1kind: Deploymentmetadata:  name: redis  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  replicas: 1  selector:    matchLabels:      app: redis  template:    metadata:      labels:        app: redis    spec:      containers:      - name: redis        ../photos/posts/yys/image: redis:7-alpine        ports:        - containerPort: 6379        resources:          requests:            memory: &quot;64Mi&quot;            cpu: &quot;50m&quot;          limits:            memory: &quot;128Mi&quot;            cpu: &quot;100m&quot;        args:        - redis-server        - --appendonly        - &quot;yes&quot;        volumeMounts:        - name: redis-data          mountPath: /data      volumes:      - name: redis-data        emptyDir: &#123;&#125;---apiVersion: v1kind: Servicemetadata:  name: redis-service  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  selector:    app: redis  ports:  - name: redis    port: 6379    targetPort: 6379  type: ClusterIP---apiVersion: v1kind: Servicemetadata:  name: prometheus-test-demo  labels:    app: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  type: NodePort  selector:    app: prometheus-test-demo  ports:    - name: management-port      protocol: TCP      port: 8998      targetPort: 8998
-
-K8s 配置说明：
-
-使用 InitContainer 确保 Redis 先启动
-配置了资源限制防止资源耗尽
-设置了健康检查确保服务可用
-
-3.3 ServiceMonitor 配置 (prometheus-test-serviceMonitor.yaml)apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
-
-
-4. Jenkins 持续集成、持续部署、持续测试配置文件与说明4.1 Jenkinsfile 完整配置pipeline &#123;    agent none        // 环境变量管理    environment &#123;        HARBOR_REGISTRY = &#x27;172.22.83.19:30003&#x27;        IMAGE_NAME = &#x27;nju08/prometheus-test-demo&#x27;        GIT_REPO = &#x27;https://gitee.com/grissom_sh/prometheus-test-demo.git&#x27;        NAMESPACE = &#x27;nju08&#x27;        MONITOR_NAMESPACE = &#x27;nju08&#x27;        HARBOR_USER = &#x27;nju08&#x27;    &#125;        parameters &#123;        string(name: &#x27;HARBOR_PASS&#x27;, defaultValue: &#x27;&#x27;, description: &#x27;Harbor login password&#x27;)    &#125;        stages &#123;        stage(&#x27;Clone Code&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;1.Git Clone Code&quot;                script &#123;                    try &#123;                        git url: &quot;$&#123;env.GIT_REPO&#125;&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Git clone failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                stage(&#x27;Image Build&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;2.Image Build Stage (包含 Maven 构建)&quot;                timeout(time: 30, unit: &#x27;MINUTES&#x27;) &#123;                    script &#123;                        retry(3) &#123;                            try &#123;                                // 使用 Dockerfile 多阶段构建，包含 Maven 构建和镜像构建                                sh &quot;docker build --cache-from $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest .&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Docker build attempt failed: $&#123;e.getMessage()&#125;&quot;                                throw e                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;        stage(&#x27;Push&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;3.Push Docker Image Stage&quot;                script &#123;                    try &#123;                        sh &quot;echo &#x27;$&#123;HARBOR_PASS&#125;&#x27; | docker login --username=$&#123;HARBOR_USER&#125; --password-stdin $&#123;env.HARBOR_REGISTRY&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Docker push failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                        stage(&#x27;Deploy to Kubernetes&#x27;) &#123;            agent &#123;                label &#x27;slave&#x27;            &#125;            steps &#123;                container(&#x27;jnlp-kubectl&#x27;) &#123;                    script &#123;                        stage(&#x27;Clone YAML&#x27;) &#123;                            echo &quot;4. Git Clone YAML To Slave&quot;                            try &#123;                                // 使用 checkout scm 获取当前流水线的源代码                                checkout scm                            &#125; catch (Exception e) &#123;                                error &quot;Git clone on slave failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Config YAML&#x27;) &#123;                            echo &quot;5. Change YAML File Stage&quot;                            sh &#x27;sed -i &quot;s/&#123;VERSION&#125;/$&#123;BUILD_NUMBER&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;MONITOR_NAMESPACE&#125;/$&#123;MONITOR_NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo&#x27;) &#123;                            echo &quot;6. Deploy To K8s Stage&quot;                            sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                        &#125;                                                stage(&#x27;Wait for Redis&#x27;) &#123;                            echo &quot;6.5. Wait for Redis to be ready&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=redis -n $&#123;NAMESPACE&#125; --timeout=120s&quot;                                echo &quot;Redis is ready!&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Redis readiness check failed, but continuing: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo ServiceMonitor&#x27;) &#123;                            echo &quot;7. Deploy ServiceMonitor To K8s Stage&quot;                            try &#123;                                sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            &#125; catch (Exception e) &#123;                                error &quot;ServiceMonitor deployment failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Health Check&#x27;) &#123;                            echo &quot;8. Health Check Stage&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=prometheus-test-demo -n $&#123;NAMESPACE&#125; --timeout=300s&quot;                                echo &quot;Application is healthy and ready!&quot;                            &#125; catch (Exception e) &#123;                                error &quot;Health check failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;    &#125;        // 通知机制和清理    post &#123;        success &#123;            echo &#x27;🎉 Pipeline succeeded! Application deployed successfully.&#x27;            script &#123;                echo &quot;✅ Deployment Summary:&quot;                echo &quot;   - Image: $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                echo &quot;   - Namespace: $&#123;NAMESPACE&#125;&quot;                echo &quot;   - Monitor Namespace: $&#123;MONITOR_NAMESPACE&#125;&quot;            &#125;        &#125;        failure &#123;            echo &#x27;❌ Pipeline failed! Please check the logs for details.&#x27;        &#125;        always &#123;            echo &#x27;🔄 Pipeline execution completed.&#x27;            // 清理本地镜像以节省磁盘空间            script &#123;                try &#123;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; || true&quot;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest || true&quot;                    sh &quot;docker system prune -f || true&quot;                &#125; catch (Exception e) &#123;                    echo &quot;Image cleanup failed: $&#123;e.getMessage()&#125;&quot;                &#125;            &#125;        &#125;    &#125;&#125;
-
-4.2 Jenkins 流水线说明流水线各阶段详解：
-
-Checkout 阶段：
-
-拉取源代码
-生成构建版本号
-
-
-Build 阶段：
-
-Maven 编译和测试
-生成构建产物
-
-
-Docker Build &amp; Push 阶段：
-
-构建容器镜像
-推送到镜像仓库
-
-
-Deploy to Kubernetes 阶段：
-
-配置 K8s 部署文件
-部署应用和依赖服务
-健康检查
-
-
-
-4.3 CI&#x2F;CD 流程验证截图位置镜像构建截图：
-构建成功截图：
-部署成功截图：
-
-5. 监控指标采集的配置及说明；Grafana 监控大屏截图5.1 Prometheus 监控配置5.1.1 应用监控注解配置应用 Pod 配置了 Prometheus 自动发现注解：
-annotations:  prometheus.io/path: /actuator/prometheus    # 指标采集路径  prometheus.io/port: &quot;8998&quot;                  # 监控端口  prometheus.io/scheme: http                  # 协议  prometheus.io/scrape: &quot;true&quot;               # 启用自动发现
-
-5.1.2 ServiceMonitor 配置apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
-
-5.2 关键监控指标5.2.1 应用性能指标
-HTTP 请求指标：
-
-http_server_requests_seconds_count - 请求总数
-http_server_requests_seconds_sum - 请求总耗时
-http_server_requests_seconds_max - 最大响应时间
-
-
-JVM 指标：
-
-jvm_memory_used_bytes - JVM 内存使用
-jvm_gc_pause_seconds - GC 暂停时间
-jvm_threads_live_threads - 活跃线程数
-
-
-
-5.2.2 限流相关指标
-Bucket4j 指标（如果配置了 Micrometer 集成）：
-
-bucket4j_consumed_tokens_total - 消费的令牌总数
-bucket4j_rejected_requests_total - 被拒绝的请求数
-bucket4j_available_tokens - 可用令牌数
-
-
-Tomcat 连接池指标：
-
-tomcat_sessions_active_current - 活跃会话数
-tomcat_threads_busy_threads - 繁忙线程数
-tomcat_threads_config_max_threads - 最大线程数
-
-
-指标监测：
-
-端口转发之后 curl http://localhost:8998/actuator/prometheus，得到详细数据。
-
-# HELP application_ready_time_seconds Time taken for the application to be ready to service requests# TYPE application_ready_time_seconds gaugeapplication_ready_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.994# HELP application_started_time_seconds Time taken to start the application# TYPE application_started_time_seconds gaugeapplication_started_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.787# HELP disk_free_bytes Usable space for path# TYPE disk_free_bytes gaugedisk_free_bytes&#123;path=&quot;/app/.&quot;&#125; 4.1373339648E10# HELP disk_total_bytes Total space for path# TYPE disk_total_bytes gaugedisk_total_bytes&#123;path=&quot;/app/.&quot;&#125; 5.36608768E10# HELP executor_active_threads The approximate number of threads that are actively executing tasks# TYPE executor_active_threads gaugeexecutor_active_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution# TYPE executor_completed_tasks_total counterexecutor_completed_tasks_total&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_pool_core_threads The core number of threads for the pool# TYPE executor_pool_core_threads gaugeexecutor_pool_core_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 8.0# HELP executor_pool_max_threads The maximum allowed number of threads in the pool# TYPE executor_pool_max_threads gaugeexecutor_pool_max_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_pool_size_threads The current number of threads in the pool# TYPE executor_pool_size_threads gaugeexecutor_pool_size_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_queue_remaining_tasks The number of additional elements that this queue can ideally accept without blocking# TYPE executor_queue_remaining_tasks gaugeexecutor_queue_remaining_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_queued_tasks The approximate number of tasks that are queued for execution# TYPE executor_queued_tasks gaugeexecutor_queued_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP http_server_requests_active_seconds  # TYPE http_server_requests_active_seconds summaryhttp_server_requests_active_seconds_count&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 1http_server_requests_active_seconds_sum&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.194124977# HELP http_server_requests_active_seconds_max  # TYPE http_server_requests_active_seconds_max gaugehttp_server_requests_active_seconds_max&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.262306658# HELP http_server_requests_seconds  # TYPE http_server_requests_seconds summaryhttp_server_requests_seconds_count&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 77http_server_requests_seconds_sum&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 588.946979862http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 1314http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 8.224338786http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 4708http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 15666.990410086# HELP http_server_requests_seconds_max  # TYPE http_server_requests_seconds_max gaugehttp_server_requests_seconds_max&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 0.003561359http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0# HELP jvm_info JVM version info# TYPE jvm_info gaugejvm_info&#123;runtime=&quot;OpenJDK Runtime Environment&quot;,vendor=&quot;Eclipse Adoptium&quot;,version=&quot;17.0.11+9&quot;&#125; 1# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool# TYPE jvm_buffer_count_buffers gaugejvm_buffer_count_buffers&#123;id=&quot;direct&quot;&#125; 12.0jvm_buffer_count_buffers&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_count_buffers&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool# TYPE jvm_buffer_memory_used_bytes gaugejvm_buffer_memory_used_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool# TYPE jvm_buffer_total_capacity_bytes gaugejvm_buffer_total_capacity_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine# TYPE jvm_classes_loaded_classes gaugejvm_classes_loaded_classes 10568.0# HELP jvm_classes_unloaded_classes_total The number of classes unloaded in the Java virtual machine# TYPE jvm_classes_unloaded_classes_total counterjvm_classes_unloaded_classes_total 80.0# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation# TYPE jvm_compilation_time_ms_total counterjvm_compilation_time_ms_total&#123;compiler=&quot;HotSpot 64-Bit Tiered Compilers&quot;&#125; 218885.0# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation# TYPE jvm_gc_live_data_size_bytes gaugejvm_gc_live_data_size_bytes 8.5416936E7# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool# TYPE jvm_gc_max_data_size_bytes gaugejvm_gc_max_data_size_bytes 2.68435456E8# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next# TYPE jvm_gc_memory_allocated_bytes_total counterjvm_gc_memory_allocated_bytes_total 4.95829704E8# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC# TYPE jvm_gc_memory_promoted_bytes_total counterjvm_gc_memory_promoted_bytes_total 7.1289304E7# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]# TYPE jvm_gc_overhead gaugejvm_gc_overhead 0.0# HELP jvm_gc_pause_seconds Time spent in GC pause# TYPE jvm_gc_pause_seconds summaryjvm_gc_pause_seconds_count&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 3jvm_gc_pause_seconds_sum&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.976jvm_gc_pause_seconds_count&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 16jvm_gc_pause_seconds_sum&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 1.047# HELP jvm_gc_pause_seconds_max Time spent in GC pause# TYPE jvm_gc_pause_seconds_max gaugejvm_gc_pause_seconds_max&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.0jvm_gc_pause_seconds_max&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 0.0# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use# TYPE jvm_memory_committed_bytes gaugejvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 5.7081856E7jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 7077888.0jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 1.42364672E8jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 2555904.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5636096.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.572864E7jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6815744.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1707904E7# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management# TYPE jvm_memory_max_bytes gaugejvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 1.0747904E8jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 1.3369344E7jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 2.68435456E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 5828608.0jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 1.22916864E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.22912768E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 1.073741824E9jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; -1.0# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]# TYPE jvm_memory_usage_after_gc gaugejvm_memory_usage_after_gc&#123;area=&quot;heap&quot;,pool=&quot;long-lived&quot;&#125; 0.3310730457305908# HELP jvm_memory_used_bytes The amount of used memory# TYPE jvm_memory_used_bytes gaugejvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 3.3653184E7jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 854168.0jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 8.8871744E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 1349248.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5586048.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.5632E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6518344.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1187048E7# HELP jvm_threads_daemon_threads The current number of live daemon threads# TYPE jvm_threads_daemon_threads gaugejvm_threads_daemon_threads 20.0# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads# TYPE jvm_threads_live_threads gaugejvm_threads_live_threads 24.0# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset# TYPE jvm_threads_peak_threads gaugejvm_threads_peak_threads 214.0# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM# TYPE jvm_threads_started_threads_total counterjvm_threads_started_threads_total 249.0# HELP jvm_threads_states_threads The current number of threads# TYPE jvm_threads_states_threads gaugejvm_threads_states_threads&#123;state=&quot;blocked&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;new&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;runnable&quot;&#125; 7.0jvm_threads_states_threads&#123;state=&quot;terminated&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;timed-waiting&quot;&#125; 6.0jvm_threads_states_threads&#123;state=&quot;waiting&quot;&#125; 11.0# HELP logback_events_total Number of log events that were enabled by the effective log level# TYPE logback_events_total counterlogback_events_total&#123;level=&quot;debug&quot;&#125; 0.0logback_events_total&#123;level=&quot;error&quot;&#125; 0.0logback_events_total&#123;level=&quot;info&quot;&#125; 5.0logback_events_total&#123;level=&quot;trace&quot;&#125; 0.0logback_events_total&#123;level=&quot;warn&quot;&#125; 0.0# HELP process_cpu_time_ns_total The &quot;cpu time&quot; used by the Java Virtual Machine process# TYPE process_cpu_time_ns_total counterprocess_cpu_time_ns_total 1.0813E11# HELP process_cpu_usage The &quot;recent cpu usage&quot; for the Java Virtual Machine process# TYPE process_cpu_usage gaugeprocess_cpu_usage 0.09197856413746172# HELP process_files_max_files The maximum file descriptor count# TYPE process_files_max_files gaugeprocess_files_max_files 1048576.0# HELP process_files_open_files The open file descriptor count# TYPE process_files_open_files gaugeprocess_files_open_files 15.0# HELP process_start_time_seconds Start time of the process since unix epoch.# TYPE process_start_time_seconds gaugeprocess_start_time_seconds 1.752976768479E9# HELP process_uptime_seconds The uptime of the Java virtual machine# TYPE process_uptime_seconds gaugeprocess_uptime_seconds 9948.976# HELP system_cpu_count The number of processors available to the Java virtual machine# TYPE system_cpu_count gaugesystem_cpu_count 1.0# HELP system_cpu_usage The &quot;recent cpu usage&quot; of the system the application is running in# TYPE system_cpu_usage gaugesystem_cpu_usage 0.09208738261313372# HELP system_load_average_1m The sum of the number of runnable entities queued to available processors and the number of runnable entities running on the available processors averaged over a period of time# TYPE system_load_average_1m gaugesystem_load_average_1m 0.08# HELP tomcat_sessions_active_current_sessions  # TYPE tomcat_sessions_active_current_sessions gaugetomcat_sessions_active_current_sessions 0.0# HELP tomcat_sessions_active_max_sessions  # TYPE tomcat_sessions_active_max_sessions gaugetomcat_sessions_active_max_sessions 0.0# HELP tomcat_sessions_alive_max_seconds  # TYPE tomcat_sessions_alive_max_seconds gaugetomcat_sessions_alive_max_seconds 0.0# HELP tomcat_sessions_created_sessions_total  # TYPE tomcat_sessions_created_sessions_total countertomcat_sessions_created_sessions_total 0.0# HELP tomcat_sessions_expired_sessions_total  # TYPE tomcat_sessions_expired_sessions_total countertomcat_sessions_expired_sessions_total 0.0# HELP tomcat_sessions_rejected_sessions_total  # TYPE tomcat_sessions_rejected_sessions_total countertomcat_sessions_rejected_sessions_total 0.0
-
-5.3 Grafana 监控大屏配置5.3.1 监控大屏概览本项目成功配置了多个 Grafana 监控大屏，涵盖了应用性能、网络流量和资源使用等关键指标：
-
-SpringBoot APM Dashboard - 应用性能监控
-Kubernetes &#x2F; Compute Resources &#x2F; Namespace - 集群资源监控  
-网络流量监控面板 - Pod 间通信监控
-
-5.3.2 SpringBoot APM Dashboard 配置面板配置说明：
-&#123;  &quot;dashboard&quot;: &#123;    &quot;title&quot;: &quot;SpringBoot APM Dashboard&quot;,    &quot;panels&quot;: [      &#123;        &quot;title&quot;: &quot;Basic Statistics&quot;,        &quot;type&quot;: &quot;stat&quot;,        &quot;targets&quot;: [          &#123;            &quot;expr&quot;: &quot;process_uptime_seconds&#123;instance=~\&quot;.*prometheus-test-demo.*\&quot;&#125;&quot;,            &quot;legendFormat&quot;: &quot;Uptime&quot;          &#125;,          &#123;            &quot;expr&quot;: &quot;jvm_memory_used_bytes&#123;area=\&quot;heap\&quot;&#125;/jvm_memory_max_bytes&#123;area=\&quot;heap\&quot;&#125;*100&quot;,            &quot;legendFormat&quot;: &quot;Heap Used %&quot;          &#125;        ]      &#125;    ]  &#125;&#125;
-
-关键监控指标：
-
-运行时间: 1.5 天稳定运行
-堆内存使用: 9.4% (健康水平)
-非堆内存使用: 5.2% (正常状态)
-CPU 使用率: 平均 0.577% (系统空闲)
-负载均衡: 0.436 (轻负载)
-
-
-5.3.3 Kubernetes 资源监控配置集群资源监控面板配置：
-CPU 使用率监控：
-# CPU 使用率 (基于请求)rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) * 100# CPU 使用率 (基于限制)  rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;cpu&quot;&#125; * 100
-
-内存使用率监控：
-# 内存使用率 (基于请求)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / container_spec_memory_limit_bytes * 100# 内存使用率 (基于限制)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;memory&quot;&#125; * 100
-
-监控数据分析：
-
-CPU 使用率 (基于请求)
-CPU 使用率 (基于限制) 
-内存使用率 (基于请求) 
-内存使用率 (基于限制)
-
-
-5.3.4 网络流量监控配置网络监控面板配置：
-接收&#x2F;发送字节数监控：
-# 网络接收速率rate(container_network_receive_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 网络发送速率  rate(container_network_transmit_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
-
-网络包监控：
-# 接收包速率rate(container_network_receive_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 发送包速率rate(container_network_transmit_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 丢包率rate(container_network_receive_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])rate(container_network_transmit_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
-
-网络流量分析：
-
-峰值网络吞吐量: ~200 kB&#x2F;s (发送&#x2F;接收)
-峰值包速率: ~2 kp&#x2F;s (接收&#x2F;发送)
-网络活动时间: 05:30 左右出现流量峰值
-丢包情况: 基本无丢包，网络稳定
-
-
-5.3.5 压测时的监控表现压测期间关键指标变化：
-
-CPU 使用率飙升：
-
-压测前: ~0.003 (0.3%)
-压测时: ~0.37 (37%)
-增长倍数: 约 123 倍
-
-
-网络流量激增：
-
-正常时: 几乎无流量 (0-10 kB&#x2F;s)
-压测时: 峰值 200 kB&#x2F;s
-包速率: 峰值 2000 packets&#x2F;s
-
-
-内存使用稳定：
-
-内存使用率保持在合理范围
-未出现内存泄漏现象
-
-
-
-5.3.6 限流效果在监控中的体现限流监控配置：
-# HTTP 请求速率rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 60# 错误率 (限流触发)rate(http_server_requests_seconds_count&#123;exception=&quot;IOException&quot;&#125;[1m]) /rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 100# 连接数监控tomcat_threads_busy_threads / tomcat_threads_config_max_threads * 100
-
-限流效果观察：
-
-✅ 流量控制有效: 网络流量在达到峰值后快速回落
-✅ CPU 保护机制: CPU 使用率未超过危险阈值
-✅ 连接层限流: 通过网络包丢弃实现早期限流
-
-
-6. 压测6.1 压测工具6.1.1 基础压测脚本#!/bin/bashURL=&quot;http://localhost:8998/hello&quot;CONCURRENT=10REQUESTS=100echo &quot;Starting load test...&quot;echo &quot;URL: $URL&quot;echo &quot;Concurrent requests: $CONCURRENT&quot;echo &quot;Total requests: $REQUESTS&quot;for i in $(seq 1 $REQUESTS); do    (        response=$(curl -s -w &quot;%&#123;http_code&#125;,%&#123;time_total&#125;&quot; -o /dev/null $URL)        echo &quot;Request $i: $response&quot;    ) &amp;        # 控制并发数    if (( $i % $CONCURRENT == 0 )); then        wait    fidonewaitecho &quot;Load test completed!&quot;
-
-6.1.2 高频限流测试脚本#!/bin/bash# 颜色定义RED=&#x27;\033[0;31m&#x27;GREEN=&#x27;\033[0;32m&#x27;YELLOW=&#x27;\033[1;33m&#x27;BLUE=&#x27;\033[0;34m&#x27;NC=&#x27;\033[0m&#x27; # No ColorURL=&quot;http://localhost:8998/hello&quot;NAMESPACE=&quot;nju08&quot;echo &quot;=========================================&quot;echo &quot;YYS 项目 - 超高频限流测试脚本&quot;echo &quot;=========================================&quot;# 检查端口转发check_port_forward() &#123;    if ! lsof -i :8998 &gt;/dev/null 2&gt;&amp;1; then        echo -e &quot;$&#123;RED&#125;❌ 端口转发未运行$&#123;NC&#125;&quot;        echo -e &quot;$&#123;YELLOW&#125;请先运行: kubectl port-forward deployment/prometheus-test-demo 8998:8998 -n $NAMESPACE$&#123;NC&#125;&quot;        exit 1    fi    echo -e &quot;$&#123;GREEN&#125;✅ 端口转发正常运行$&#123;NC&#125;&quot;&#125;# 多轮高频测试run_aggressive_test() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;🔥 开始超高频限流测试...$&#123;NC&#125;&quot;    echo &quot;目标: 超过 100 requests/second 限制&quot;    echo &quot;&quot;        # 测试配置    local ROUNDS=3    local REQUESTS_PER_ROUND=150    local MAX_CONCURRENT=100        for round in $(seq 1 $ROUNDS); do        echo -e &quot;$&#123;YELLOW&#125;=== 第 $round 轮测试 ===$&#123;NC&#125;&quot;        echo &quot;发送 $REQUESTS_PER_ROUND 个请求，$MAX_CONCURRENT 并发&quot;                local success_count=0        local rate_limited_count=0        local error_count=0        local timeout_count=0                start_time=$(date +%s.%N)                # 创建临时文件        temp_file=&quot;/tmp/aggressive_test_$&#123;round&#125;_$$&quot;                # 极限并发发送        for i in $(seq 1 $REQUESTS_PER_ROUND); do            &#123;                response=$(timeout 2 curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.3 \                    --max-time 1 \                    --retry 0 \                    --no-keepalive \                    $URL 2&gt;/dev/null)                                exit_code=$?                timestamp=$(date &#x27;+%H:%M:%S.%3N&#x27;)                                if [ $exit_code -eq 124 ]; then                    echo &quot;TIMEOUT,$timestamp&quot; &gt;&gt; $temp_file                elif [ $exit_code -ne 0 ] || [ -z &quot;$response&quot; ]; then                    echo &quot;CONNECTION_FAILED,$timestamp&quot; &gt;&gt; $temp_file                else                    echo &quot;$response,$timestamp&quot; &gt;&gt; $temp_file                fi            &#125; &amp;                        # 减少等待时间，增加并发密度            if (( $i % $MAX_CONCURRENT == 0 )); then                wait            fi        done                wait                end_time=$(date +%s.%N)        duration=$(echo &quot;$end_time - $start_time&quot; | bc 2&gt;/dev/null || echo &quot;1&quot;)        rate=$(echo &quot;scale=2; $REQUESTS_PER_ROUND / $duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)                echo &quot;  持续时间: $&#123;duration&#125;秒&quot;        echo &quot;  实际速率: $&#123;rate&#125; requests/second&quot;                # 统计结果        while IFS=&#x27;,&#x27; read -r status_or_error timestamp; do            case &quot;$status_or_error&quot; in                &quot;200&quot;) ((success_count++)) ;;                &quot;429&quot;|&quot;503&quot;)                     ((rate_limited_count++))                    echo -e &quot;  $&#123;YELLOW&#125;🚫 限流: $timestamp - HTTP $status_or_error$&#123;NC&#125;&quot;                    ;;                &quot;TIMEOUT&quot;)                     ((timeout_count++))                    echo -e &quot;  $&#123;RED&#125;⏰ 超时: $timestamp$&#123;NC&#125;&quot;                    ;;                &quot;CONNECTION_FAILED&quot;|*)                    ((error_count++))                    echo -e &quot;  $&#123;RED&#125;❌ 失败: $timestamp$&#123;NC&#125;&quot;                    ;;            esac        done &lt; $temp_file 2&gt;/dev/null                rm -f $temp_file                echo -e &quot;  结果: ✅$success_count 🚫$rate_limited_count ⏰$timeout_count ❌$error_count&quot;                if [ $rate_limited_count -gt 0 ] || [ $timeout_count -gt 5 ] || [ $error_count -gt 5 ]; then            echo -e &quot;  $&#123;GREEN&#125;🎯 第 $round 轮检测到限流效果!$&#123;NC&#125;&quot;        else            echo -e &quot;  $&#123;YELLOW&#125;⚠️  第 $round 轮未检测到限流$&#123;NC&#125;&quot;        fi                echo &quot;&quot;                # 轮次间短暂休息        if [ $round -lt $ROUNDS ]; then            sleep 1        fi    done&#125;# 连续轰炸测试run_continuous_bombardment() &#123;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试 (30秒内持续发送请求)$&#123;NC&#125;&quot;    echo &quot;&quot;        local duration=30    local concurrent=50    local total_requests=0    local success_count=0    local limited_count=0        start_time=$(date +%s)    end_target=$((start_time + duration))        echo &quot;开始时间: $(date)&quot;    echo &quot;目标持续: $&#123;duration&#125;秒&quot;    echo &quot;并发数: $concurrent&quot;    echo &quot;&quot;        while [ $(date +%s) -lt $end_target ]; do        # 每次发送一批请求        for i in $(seq 1 $concurrent); do            &#123;                response=$(curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.2 \                    --max-time 0.5 \                    $URL 2&gt;/dev/null)                                ((total_requests++))                                if [ &quot;$response&quot; = &quot;200&quot; ]; then                    ((success_count++))                elif [ &quot;$response&quot; = &quot;429&quot; ] || [ &quot;$response&quot; = &quot;503&quot; ]; then                    ((limited_count++))                    echo -e &quot;$&#123;YELLOW&#125;🚫 限流触发! HTTP $response at $(date &#x27;+%H:%M:%S&#x27;)$&#123;NC&#125;&quot;                fi            &#125; &amp;        done                # 短暂等待后继续        sleep 0.1    done        wait        actual_duration=$(($(date +%s) - start_time))    actual_rate=$(echo &quot;scale=2; $total_requests / $actual_duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)        echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试结果$&#123;NC&#125;&quot;    echo &quot;实际持续时间: $&#123;actual_duration&#125;秒&quot;    echo &quot;总请求数: $total_requests&quot;    echo &quot;平均速率: $&#123;actual_rate&#125; requests/second&quot;    echo &quot;成功请求: $success_count&quot;    echo &quot;限流触发: $limited_count&quot;        if [ $limited_count -gt 0 ]; then        echo -e &quot;$&#123;GREEN&#125;🎯 连续轰炸成功触发限流!$&#123;NC&#125;&quot;    else        echo -e &quot;$&#123;YELLOW&#125;⚠️  连续轰炸未触发限流$&#123;NC&#125;&quot;    fi&#125;# Apache Bench 测试 (如果可用)run_ab_test() &#123;    if command -v ab &amp;&gt; /dev/null; then        echo &quot;&quot;        echo -e &quot;$&#123;BLUE&#125;⚡ Apache Bench 高性能测试$&#123;NC&#125;&quot;        echo &quot;&quot;                echo &quot;测试1: 500个请求，200并发&quot;        ab -n 500 -c 200 $URL                echo &quot;&quot;        echo &quot;测试2: 2秒内尽可能多的请求，300并发&quot;        ab -t 2 -c 300 $URL            else        echo &quot;&quot;        echo -e &quot;$&#123;YELLOW&#125;💡 建议安装 Apache Bench 进行更高性能的测试:$&#123;NC&#125;&quot;        echo &quot;  sudo apt-get install apache2-utils&quot;        echo &quot;  然后运行: ab -n 1000 -c 300 $URL&quot;    fi&#125;# 检查限流配置check_rate_limit_config() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;⚙️ 检查当前限流配置$&#123;NC&#125;&quot;        # 检查 Redis 中的令牌桶状态    echo &quot;Redis 限流键:&quot;    kubectl exec deployment/redis -n $NAMESPACE -- redis-cli keys &quot;*rate*&quot; 2&gt;/dev/null || echo &quot;无法访问Redis&quot;        # 尝试获取桶的状态 (这个可能需要特殊的命令)    echo &quot;&quot;    echo &quot;当前应用配置:&quot;    echo &quot;- 限流阈值: 100 requests/second&quot;    echo &quot;- 令牌桶容量: 100&quot;    echo &quot;- 补充速率: 100 tokens/second&quot;    echo &quot;- 限流键: global-rate-limit-key&quot;&#125;# 主执行流程main() &#123;    check_port_forward    check_rate_limit_config    run_aggressive_test    run_continuous_bombardment    run_ab_test        echo &quot;&quot;    echo -e &quot;$&#123;GREEN&#125;🏁 超高频限流测试完成!$&#123;NC&#125;&quot;&#125;# 执行主函数main &quot;$@&quot;
-
-
-
-
-
-6.2 压测结果压测结果截图：
-
-未触发限流：  
-触发限流：    
-其中在限流之后转发的进程这边显示如下信息，说明超出阈值的request直接在tcp层被拒绝。
-
-
-HTTP 000 状态码说明：
-
-
-状态码 000 表示连接在 TCP 层被拒绝
-这证明了限流系统在连接层面起到了保护作用
-比 HTTP 429 更早介入，资源保护更彻底
-
-7. 项目总结与技术亮点7.1 技术架构亮点
-多层限流防护：
-
-应用层：Bucket4j 令牌桶算法精确控制
-连接层：Tomcat 连接池快速保护
-网络层：K8s 网络策略综合防护
-
-
-分布式限流设计：
-
-基于 Redis 的分布式令牌桶
-支持水平扩展和高可用
-保证多实例间限流一致性
-
-
-云原生最佳实践：
-
-容器化部署
-K8s 声明式配置
-微服务架构设计
-
-
-
-7.2 监控与运维亮点
-全方位监控：
-
-应用性能监控 (APM)
-基础设施监控
-业务指标监控
-
-
-自动化运维：
-
-CI&#x2F;CD 流水线自动化
-健康检查和自愈能力
-可观测性最佳实践
-
-
-
-7.3 压测验证成果
-限流功能验证：
-
-成功验证 100 req&#x2F;s 限流阈值
-确认多层限流机制有效性
-系统保护能力得到验证
-
-
-扩容能力验证：
-
-K8s 水平扩容功能正常
-负载均衡分发有效
-性能线性提升明显
-
-
-
-7.4 项目创新点
-连接层限流策略：
-
-在 TCP 连接层就实现流量控制
-比传统 HTTP 层限流更高效
-资源保护更彻底
-
-
-压测工具定制化：
-
-针对限流场景设计专用测试脚本
-能够有效触发和验证限流机制
-提供详细的测试报告和分析
-
-
-监控体系完整性：
-
-从基础设施到应用层的全栈监控
-限流专用监控面板设计
-智能告警和故障预警
-
-
-
-7.5 学习收获与心得通过本项目的实践，深入理解了：
-
-云原生技术栈：
-
-Docker 容器化技术
-Kubernetes 容器编排
-微服务架构设计原则
-
-
-限流算法与实现：
-
-令牌桶算法的原理和应用
-分布式限流的挑战和解决方案
-多层限流策略的设计思路
-
-
-DevOps 最佳实践：
-
-CI&#x2F;CD 流水线设计
-监控体系建设
-自动化测试和部署
-
-
-性能测试与调优：
-
-压测工具的选择和使用
-性能瓶颈的识别和优化
-系统扩容策略的验证
-
-
-
-
-8. 附录8.1 项目文件结构yys/├── src/                                    # 源代码目录│   ├── main/java/com/hello/hello/│   │   ├── config/                        # 配置类│   │   │   ├── RateLimitConfig.java      # 限流配置│   │   │   ├── RedisConfig.java          # Redis配置│   │   │   └── WebMvcConfig.java         # Web配置│   │   ├── controller/│   │   │   └── HelloController.java      # 控制器│   │   ├── interceptor/│   │   │   └── RateLimitInterceptor.java # 限流拦截器│   │   ├── service/│   │   │   └── RateLimiterService.java   # 限流服务│   │   └── HelloApplication.java         # 启动类│   └── main/resources/│       └── application.properties        # 应用配置├── jenkins/scripts/                       # K8s部署文件│   ├── prometheus-test-demo.yaml│   └── prometheus-test-serviceMonitor.yaml├── Dockerfile                            # Docker构建文件├── Jenkinsfile                          # Jenkins流水线├── pom.xml                              # Maven配置└── README.md                            # 项目说明文档
-
-8.2 相关技术栈版本
-Java: 17
-Spring Boot: 3.5.3
-Bucket4j: 8.10.1
-Redis: 7-alpine
-Kubernetes: 1.20+
-Docker: 20.10+
-Jenkins: 2.400+
-Prometheus: 2.40+
-Grafana: 9.0+
-
-
-报告完成时间: 2025年7月20日项目代码仓库: https://github.com/231220075/yys分支: hpa
-
-感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
-]]></content>
-      <categories>
-        <category>学习记录</category>
-      </categories>
-      <tags>
-        <tag>学习</tag>
-      </tags>
   </entry>
   <entry>
     <title>csnet 期末周复习</title>
@@ -2074,6 +1883,488 @@ ECN
       </categories>
       <tags>
         <tag>学习，笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>云原生结课project</title>
+    <url>/2025/08/12/%E4%BA%91%E5%8E%9F%E7%94%9F%E7%BB%93%E8%AF%BEproject/</url>
+    <content><![CDATA[📝 云原生结课project
+顺手上传暑课项目
+
+1. 项目组员信息
+
+
+姓名
+学号
+个人贡献
+
+
+
+黄睿智
+231220075
+part3 + 文档编写
+
+
+白子敬
+231220077
+part1
+
+
+陈翔宇
+231220088
+part2
+
+
+
+2. 限流功能相关的关键代码和说明2.1 限流系统架构概述本项目采用基于 Bucket4j + Redis 的分布式限流方案，实现了多层次的流量控制机制：
+
+应用层限流：使用 Bucket4j 令牌桶算法
+连接层限流：Spring Boot Tomcat 连接池限制
+网络层限流：Kubernetes 网络策略和端口转发限制
+
+2.2 核心限流组件限流配置类 (RateLimitConfig.java)@Configurationpublic class RedisConfig &#123;        @Value(&quot;$&#123;REDIS_HOST:$&#123;spring.redis.host:localhost&#125;&#125;&quot;)    private String redisHost;        @Value(&quot;$&#123;REDIS_PORT:$&#123;spring.redis.port:6379&#125;&#125;&quot;)    private int redisPort;        @Bean    @Primary    public RedisConnectionFactory redisConnectionFactory() &#123;        // 直接从环境变量读取        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Spring Data Redis connecting to: &quot; + host + &quot;:&quot; + port);                RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();        config.setHostName(host);        config.setPort(port);                JedisConnectionFactory factory = new JedisConnectionFactory(config);        return factory;    &#125;        @Bean    public RedisTemplate&lt;String, Object&gt; redisTemplate(RedisConnectionFactory connectionFactory) &#123;        RedisTemplate&lt;String, Object&gt; template = new RedisTemplate&lt;&gt;();        template.setConnectionFactory(connectionFactory);        return template;    &#125;        @Bean    public JedisPool jedisPool() &#123;        // 直接从环境变量读取，如果为空则使用配置文件        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Jedis Pool connecting to: &quot; + host + &quot;:&quot; + port);                JedisPoolConfig config = new JedisPoolConfig();        config.setMaxTotal(8);        config.setMaxIdle(8);        config.setMinIdle(0);        config.setTestOnBorrow(true);        config.setTestOnReturn(true);        config.setTestWhileIdle(true);        return new JedisPool(config, host, port);    &#125;&#125;
+
+限流服务类 (RateLimiterService.java)@Servicepublic class RateLimiterService &#123;    private final ProxyManager&lt;byte[]&gt; buckets;    private static final byte[] KEY = &quot;global-rate-limit-key&quot;.getBytes();    @Autowired    public RateLimiterService(ProxyManager&lt;byte[]&gt; buckets) &#123;        this.buckets = buckets;    &#125;    public Bucket resolveBucket() &#123;        return buckets.builder().build(KEY, getConfigSupplier());    &#125;    private Supplier&lt;BucketConfiguration&gt; getConfigSupplier() &#123;        return () -&gt; BucketConfiguration.builder()                .addLimit(Bandwidth.classic(                    100,                     Refill.greedy(100, Duration.ofSeconds(1)))                )                .build();    &#125;&#125;
+
+限流拦截器 (RateLimitInterceptor.java)@Componentpublic class RateLimitInterceptor implements HandlerInterceptor &#123;    @Autowired    private RateLimiterService rateLimiterService;    @Override    public boolean preHandle(HttpServletRequest request,                             HttpServletResponse response,                             Object handler) throws Exception &#123;        Bucket bucket = rateLimiterService.resolveBucket();        if (bucket.tryConsume(1)) &#123;            return true;        &#125; else &#123;            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());            response.getWriter().write(&quot;Too many requests&quot;);            return false;        &#125;    &#125;&#125;
+
+Web 配置类 (WebMvcConfig.java)@Configurationpublic class WebMvcConfig implements WebMvcConfigurer &#123;    @Autowired    private RateLimitInterceptor rateLimitInterceptor;    @Override    public void addInterceptors(InterceptorRegistry registry) &#123;        // 注册限流拦截器并指定拦截路径        registry.addInterceptor(rateLimitInterceptor)                .addPathPatterns(&quot;/hello&quot;)  // 只拦截/hello路径                .order(0);    &#125;&#125;
+
+2.3 应用配置application.properties 限流相关配置spring.application.name=prometheus-test-demo# 统一使用8998端口server.port=8998# Redis 配置 - 直接使用环境变量spring.redis.host=$&#123;REDIS_HOST:localhost&#125;spring.redis.port=$&#123;REDIS_PORT:6379&#125;spring.redis.timeout=2000ms# 强制使用 Jedis 客户端spring.redis.jedis.pool.enabled=truespring.redis.lettuce.pool.enabled=false# Actuator 配置management.endpoints.web.exposure.include=health,info,prometheus,metricsmanagement.endpoint.health.show-details=always# 限流相关配置rate.limit.enabled=truerate.limit.global.key=global-rate-limit-keyrate.limit.capacity=100rate.limit.refill.tokens=100rate.limit.refill.period=1s
+
+2.4 限流工作流程用户请求 → Spring MVC → RateLimitInterceptor → RateLimiterService                                ↓                          检查 Redis 令牌桶                                ↓                    有令牌？─── YES ──→ 继续处理 → HelloController                        │                        NO                        ↓                  返回 HTTP 429 错误
+
+2.5 限流算法说明令牌桶算法 (Token Bucket Algorithm)：
+
+初始化：创建容量为100的令牌桶
+令牌补充：每秒向桶中添加100个令牌
+请求处理：每个请求尝试消费1个令牌
+限流判断：
+有令牌：允许请求，消费令牌
+无令牌：拒绝请求，返回429状态码
+
+
+
+
+3. Dockerfile及K8s 编排文件3.1 Dockerfile# 第一阶段：构建阶段 - 统一使用Java 11FROM maven:3.9.6-eclipse-temurin-17 AS builder# 设置工作目录WORKDIR /usr/src/mymaven# 复制 Maven 配置文件RUN mkdir -p /root/.m2COPY settings.xml /root/.m2/settings.xml# 复制pom.xml和源代码COPY pom.xml .COPY src ./src# 构建项目RUN mvn -B  clean package# 第二阶段：运行阶段FROM eclipse-temurin:17-jre-centos7# 设置时区RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtimeRUN echo &#x27;Asia/Shanghai&#x27; &gt;/etc/timezone# 设置环境变量ENV JAVA_OPTS &#x27;&#x27;# 设置工作目录WORKDIR /app# 从构建阶段复制构建结果COPY --from=builder /usr/src/mymaven/target/prometheus-test-demo-0.0.1-SNAPSHOT.jar ./prometheus-test-demo-0.0.1-SNAPSHOT.jar# 启动命令 - 使用Java 11兼容的JVM参数ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;set -e &amp;&amp; java -XX:+PrintFlagsFinal \                                           -XX:+HeapDumpOnOutOfMemoryError \                                           -XX:HeapDumpPath=/heapdump/heapdump.hprof \                                           -XX:+UseContainerSupport \                                           -XX:MaxRAMPercentage=75.0 \                                           -Djava.security.egd=file:/dev/./urandom \                                           $JAVA_OPTS -jar prometheus-test-demo-0.0.1-SNAPSHOT.jar&quot;]
+
+Dockerfile 设计说明：
+
+构建项目时删去原demo的 -DskipTests 参数，直接运行测试样例，因此在 Jenkinsfile 中不再执行test。
+下图为测试运行结果
+
+
+3.2 Kubernetes 部署文件 (prometheus-test-demo.yaml)apiVersion: apps/v1kind: Deploymentmetadata:  labels:    app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  replicas: 1  selector:    matchLabels:      app: prometheus-test-demo  template:    metadata:      annotations:        prometheus.io/path: /actuator/prometheus        prometheus.io/port: &quot;8998&quot;        prometheus.io/scheme: http        prometheus.io/scrape: &quot;true&quot;      labels:        app: prometheus-test-demo    spec:      initContainers:      - name: wait-for-redis        ../photos/posts/yys/image: busybox:1.36        command: [&#x27;sh&#x27;, &#x27;-c&#x27;]        args:        - |          until nc -z redis-service 6379; do            echo &quot;Waiting for Redis to be ready...&quot;            sleep 2          done          echo &quot;Redis is ready!&quot;      containers:        - ../photos/posts/yys/image: 172.22.83.19:30003/nju08/prometheus-test-demo:&#123;VERSION&#125;          name: prometheus-test-demo          ports:          - containerPort: 8998          env:          - name: REDIS_HOST            value: &quot;redis-service&quot;          - name: REDIS_PORT            value: &quot;6379&quot;          resources:            requests:              memory: &quot;128Mi&quot;                  cpu: &quot;100m&quot;                    limits:              memory: &quot;512Mi&quot;                  cpu: &quot;500m&quot;                  livenessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 120            periodSeconds: 30            timeoutSeconds: 10            failureThreshold: 3          readinessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 90            periodSeconds: 10            timeoutSeconds: 5            failureThreshold: 5---apiVersion: apps/v1kind: Deploymentmetadata:  name: redis  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  replicas: 1  selector:    matchLabels:      app: redis  template:    metadata:      labels:        app: redis    spec:      containers:      - name: redis        ../photos/posts/yys/image: redis:7-alpine        ports:        - containerPort: 6379        resources:          requests:            memory: &quot;64Mi&quot;            cpu: &quot;50m&quot;          limits:            memory: &quot;128Mi&quot;            cpu: &quot;100m&quot;        args:        - redis-server        - --appendonly        - &quot;yes&quot;        volumeMounts:        - name: redis-data          mountPath: /data      volumes:      - name: redis-data        emptyDir: &#123;&#125;---apiVersion: v1kind: Servicemetadata:  name: redis-service  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  selector:    app: redis  ports:  - name: redis    port: 6379    targetPort: 6379  type: ClusterIP---apiVersion: v1kind: Servicemetadata:  name: prometheus-test-demo  labels:    app: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  type: NodePort  selector:    app: prometheus-test-demo  ports:    - name: management-port      protocol: TCP      port: 8998      targetPort: 8998
+
+K8s 配置说明：
+
+使用 InitContainer 确保 Redis 先启动
+配置了资源限制防止资源耗尽
+设置了健康检查确保服务可用
+
+3.3 ServiceMonitor 配置 (prometheus-test-serviceMonitor.yaml)apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
+
+
+4. Jenkins 持续集成、持续部署、持续测试配置文件与说明4.1 Jenkinsfile 完整配置pipeline &#123;    agent none        // 环境变量管理    environment &#123;        HARBOR_REGISTRY = &#x27;172.22.83.19:30003&#x27;        IMAGE_NAME = &#x27;nju08/prometheus-test-demo&#x27;        GIT_REPO = &#x27;https://gitee.com/grissom_sh/prometheus-test-demo.git&#x27;        NAMESPACE = &#x27;nju08&#x27;        MONITOR_NAMESPACE = &#x27;nju08&#x27;        HARBOR_USER = &#x27;nju08&#x27;    &#125;        parameters &#123;        string(name: &#x27;HARBOR_PASS&#x27;, defaultValue: &#x27;&#x27;, description: &#x27;Harbor login password&#x27;)    &#125;        stages &#123;        stage(&#x27;Clone Code&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;1.Git Clone Code&quot;                script &#123;                    try &#123;                        git url: &quot;$&#123;env.GIT_REPO&#125;&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Git clone failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                stage(&#x27;Image Build&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;2.Image Build Stage (包含 Maven 构建)&quot;                timeout(time: 30, unit: &#x27;MINUTES&#x27;) &#123;                    script &#123;                        retry(3) &#123;                            try &#123;                                // 使用 Dockerfile 多阶段构建，包含 Maven 构建和镜像构建                                sh &quot;docker build --cache-from $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest .&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Docker build attempt failed: $&#123;e.getMessage()&#125;&quot;                                throw e                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;        stage(&#x27;Push&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;3.Push Docker Image Stage&quot;                script &#123;                    try &#123;                        sh &quot;echo &#x27;$&#123;HARBOR_PASS&#125;&#x27; | docker login --username=$&#123;HARBOR_USER&#125; --password-stdin $&#123;env.HARBOR_REGISTRY&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Docker push failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                        stage(&#x27;Deploy to Kubernetes&#x27;) &#123;            agent &#123;                label &#x27;slave&#x27;            &#125;            steps &#123;                container(&#x27;jnlp-kubectl&#x27;) &#123;                    script &#123;                        stage(&#x27;Clone YAML&#x27;) &#123;                            echo &quot;4. Git Clone YAML To Slave&quot;                            try &#123;                                // 使用 checkout scm 获取当前流水线的源代码                                checkout scm                            &#125; catch (Exception e) &#123;                                error &quot;Git clone on slave failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Config YAML&#x27;) &#123;                            echo &quot;5. Change YAML File Stage&quot;                            sh &#x27;sed -i &quot;s/&#123;VERSION&#125;/$&#123;BUILD_NUMBER&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;MONITOR_NAMESPACE&#125;/$&#123;MONITOR_NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo&#x27;) &#123;                            echo &quot;6. Deploy To K8s Stage&quot;                            sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                        &#125;                                                stage(&#x27;Wait for Redis&#x27;) &#123;                            echo &quot;6.5. Wait for Redis to be ready&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=redis -n $&#123;NAMESPACE&#125; --timeout=120s&quot;                                echo &quot;Redis is ready!&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Redis readiness check failed, but continuing: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo ServiceMonitor&#x27;) &#123;                            echo &quot;7. Deploy ServiceMonitor To K8s Stage&quot;                            try &#123;                                sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            &#125; catch (Exception e) &#123;                                error &quot;ServiceMonitor deployment failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Health Check&#x27;) &#123;                            echo &quot;8. Health Check Stage&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=prometheus-test-demo -n $&#123;NAMESPACE&#125; --timeout=300s&quot;                                echo &quot;Application is healthy and ready!&quot;                            &#125; catch (Exception e) &#123;                                error &quot;Health check failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;    &#125;        // 通知机制和清理    post &#123;        success &#123;            echo &#x27;🎉 Pipeline succeeded! Application deployed successfully.&#x27;            script &#123;                echo &quot;✅ Deployment Summary:&quot;                echo &quot;   - Image: $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                echo &quot;   - Namespace: $&#123;NAMESPACE&#125;&quot;                echo &quot;   - Monitor Namespace: $&#123;MONITOR_NAMESPACE&#125;&quot;            &#125;        &#125;        failure &#123;            echo &#x27;❌ Pipeline failed! Please check the logs for details.&#x27;        &#125;        always &#123;            echo &#x27;🔄 Pipeline execution completed.&#x27;            // 清理本地镜像以节省磁盘空间            script &#123;                try &#123;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; || true&quot;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest || true&quot;                    sh &quot;docker system prune -f || true&quot;                &#125; catch (Exception e) &#123;                    echo &quot;Image cleanup failed: $&#123;e.getMessage()&#125;&quot;                &#125;            &#125;        &#125;    &#125;&#125;
+
+4.2 Jenkins 流水线说明流水线各阶段详解：
+
+Checkout 阶段：
+
+拉取源代码
+生成构建版本号
+
+
+Build 阶段：
+
+Maven 编译和测试
+生成构建产物
+
+
+Docker Build &amp; Push 阶段：
+
+构建容器镜像
+推送到镜像仓库
+
+
+Deploy to Kubernetes 阶段：
+
+配置 K8s 部署文件
+部署应用和依赖服务
+健康检查
+
+
+
+4.3 CI&#x2F;CD 流程验证截图位置镜像构建截图：
+构建成功截图：
+部署成功截图：
+
+5. 监控指标采集的配置及说明；Grafana 监控大屏截图5.1 Prometheus 监控配置5.1.1 应用监控注解配置应用 Pod 配置了 Prometheus 自动发现注解：
+annotations:  prometheus.io/path: /actuator/prometheus    # 指标采集路径  prometheus.io/port: &quot;8998&quot;                  # 监控端口  prometheus.io/scheme: http                  # 协议  prometheus.io/scrape: &quot;true&quot;               # 启用自动发现
+
+5.1.2 ServiceMonitor 配置apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
+
+5.2 关键监控指标5.2.1 应用性能指标
+HTTP 请求指标：
+
+http_server_requests_seconds_count - 请求总数
+http_server_requests_seconds_sum - 请求总耗时
+http_server_requests_seconds_max - 最大响应时间
+
+
+JVM 指标：
+
+jvm_memory_used_bytes - JVM 内存使用
+jvm_gc_pause_seconds - GC 暂停时间
+jvm_threads_live_threads - 活跃线程数
+
+
+
+5.2.2 限流相关指标
+Bucket4j 指标（如果配置了 Micrometer 集成）：
+
+bucket4j_consumed_tokens_total - 消费的令牌总数
+bucket4j_rejected_requests_total - 被拒绝的请求数
+bucket4j_available_tokens - 可用令牌数
+
+
+Tomcat 连接池指标：
+
+tomcat_sessions_active_current - 活跃会话数
+tomcat_threads_busy_threads - 繁忙线程数
+tomcat_threads_config_max_threads - 最大线程数
+
+
+指标监测：
+
+端口转发之后 curl http://localhost:8998/actuator/prometheus，得到详细数据。
+
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests# TYPE application_ready_time_seconds gaugeapplication_ready_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.994# HELP application_started_time_seconds Time taken to start the application# TYPE application_started_time_seconds gaugeapplication_started_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.787# HELP disk_free_bytes Usable space for path# TYPE disk_free_bytes gaugedisk_free_bytes&#123;path=&quot;/app/.&quot;&#125; 4.1373339648E10# HELP disk_total_bytes Total space for path# TYPE disk_total_bytes gaugedisk_total_bytes&#123;path=&quot;/app/.&quot;&#125; 5.36608768E10# HELP executor_active_threads The approximate number of threads that are actively executing tasks# TYPE executor_active_threads gaugeexecutor_active_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution# TYPE executor_completed_tasks_total counterexecutor_completed_tasks_total&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_pool_core_threads The core number of threads for the pool# TYPE executor_pool_core_threads gaugeexecutor_pool_core_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 8.0# HELP executor_pool_max_threads The maximum allowed number of threads in the pool# TYPE executor_pool_max_threads gaugeexecutor_pool_max_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_pool_size_threads The current number of threads in the pool# TYPE executor_pool_size_threads gaugeexecutor_pool_size_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_queue_remaining_tasks The number of additional elements that this queue can ideally accept without blocking# TYPE executor_queue_remaining_tasks gaugeexecutor_queue_remaining_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_queued_tasks The approximate number of tasks that are queued for execution# TYPE executor_queued_tasks gaugeexecutor_queued_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP http_server_requests_active_seconds  # TYPE http_server_requests_active_seconds summaryhttp_server_requests_active_seconds_count&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 1http_server_requests_active_seconds_sum&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.194124977# HELP http_server_requests_active_seconds_max  # TYPE http_server_requests_active_seconds_max gaugehttp_server_requests_active_seconds_max&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.262306658# HELP http_server_requests_seconds  # TYPE http_server_requests_seconds summaryhttp_server_requests_seconds_count&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 77http_server_requests_seconds_sum&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 588.946979862http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 1314http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 8.224338786http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 4708http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 15666.990410086# HELP http_server_requests_seconds_max  # TYPE http_server_requests_seconds_max gaugehttp_server_requests_seconds_max&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 0.003561359http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0# HELP jvm_info JVM version info# TYPE jvm_info gaugejvm_info&#123;runtime=&quot;OpenJDK Runtime Environment&quot;,vendor=&quot;Eclipse Adoptium&quot;,version=&quot;17.0.11+9&quot;&#125; 1# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool# TYPE jvm_buffer_count_buffers gaugejvm_buffer_count_buffers&#123;id=&quot;direct&quot;&#125; 12.0jvm_buffer_count_buffers&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_count_buffers&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool# TYPE jvm_buffer_memory_used_bytes gaugejvm_buffer_memory_used_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool# TYPE jvm_buffer_total_capacity_bytes gaugejvm_buffer_total_capacity_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine# TYPE jvm_classes_loaded_classes gaugejvm_classes_loaded_classes 10568.0# HELP jvm_classes_unloaded_classes_total The number of classes unloaded in the Java virtual machine# TYPE jvm_classes_unloaded_classes_total counterjvm_classes_unloaded_classes_total 80.0# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation# TYPE jvm_compilation_time_ms_total counterjvm_compilation_time_ms_total&#123;compiler=&quot;HotSpot 64-Bit Tiered Compilers&quot;&#125; 218885.0# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation# TYPE jvm_gc_live_data_size_bytes gaugejvm_gc_live_data_size_bytes 8.5416936E7# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool# TYPE jvm_gc_max_data_size_bytes gaugejvm_gc_max_data_size_bytes 2.68435456E8# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next# TYPE jvm_gc_memory_allocated_bytes_total counterjvm_gc_memory_allocated_bytes_total 4.95829704E8# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC# TYPE jvm_gc_memory_promoted_bytes_total counterjvm_gc_memory_promoted_bytes_total 7.1289304E7# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]# TYPE jvm_gc_overhead gaugejvm_gc_overhead 0.0# HELP jvm_gc_pause_seconds Time spent in GC pause# TYPE jvm_gc_pause_seconds summaryjvm_gc_pause_seconds_count&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 3jvm_gc_pause_seconds_sum&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.976jvm_gc_pause_seconds_count&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 16jvm_gc_pause_seconds_sum&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 1.047# HELP jvm_gc_pause_seconds_max Time spent in GC pause# TYPE jvm_gc_pause_seconds_max gaugejvm_gc_pause_seconds_max&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.0jvm_gc_pause_seconds_max&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 0.0# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use# TYPE jvm_memory_committed_bytes gaugejvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 5.7081856E7jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 7077888.0jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 1.42364672E8jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 2555904.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5636096.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.572864E7jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6815744.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1707904E7# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management# TYPE jvm_memory_max_bytes gaugejvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 1.0747904E8jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 1.3369344E7jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 2.68435456E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 5828608.0jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 1.22916864E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.22912768E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 1.073741824E9jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; -1.0# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]# TYPE jvm_memory_usage_after_gc gaugejvm_memory_usage_after_gc&#123;area=&quot;heap&quot;,pool=&quot;long-lived&quot;&#125; 0.3310730457305908# HELP jvm_memory_used_bytes The amount of used memory# TYPE jvm_memory_used_bytes gaugejvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 3.3653184E7jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 854168.0jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 8.8871744E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 1349248.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5586048.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.5632E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6518344.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1187048E7# HELP jvm_threads_daemon_threads The current number of live daemon threads# TYPE jvm_threads_daemon_threads gaugejvm_threads_daemon_threads 20.0# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads# TYPE jvm_threads_live_threads gaugejvm_threads_live_threads 24.0# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset# TYPE jvm_threads_peak_threads gaugejvm_threads_peak_threads 214.0# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM# TYPE jvm_threads_started_threads_total counterjvm_threads_started_threads_total 249.0# HELP jvm_threads_states_threads The current number of threads# TYPE jvm_threads_states_threads gaugejvm_threads_states_threads&#123;state=&quot;blocked&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;new&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;runnable&quot;&#125; 7.0jvm_threads_states_threads&#123;state=&quot;terminated&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;timed-waiting&quot;&#125; 6.0jvm_threads_states_threads&#123;state=&quot;waiting&quot;&#125; 11.0# HELP logback_events_total Number of log events that were enabled by the effective log level# TYPE logback_events_total counterlogback_events_total&#123;level=&quot;debug&quot;&#125; 0.0logback_events_total&#123;level=&quot;error&quot;&#125; 0.0logback_events_total&#123;level=&quot;info&quot;&#125; 5.0logback_events_total&#123;level=&quot;trace&quot;&#125; 0.0logback_events_total&#123;level=&quot;warn&quot;&#125; 0.0# HELP process_cpu_time_ns_total The &quot;cpu time&quot; used by the Java Virtual Machine process# TYPE process_cpu_time_ns_total counterprocess_cpu_time_ns_total 1.0813E11# HELP process_cpu_usage The &quot;recent cpu usage&quot; for the Java Virtual Machine process# TYPE process_cpu_usage gaugeprocess_cpu_usage 0.09197856413746172# HELP process_files_max_files The maximum file descriptor count# TYPE process_files_max_files gaugeprocess_files_max_files 1048576.0# HELP process_files_open_files The open file descriptor count# TYPE process_files_open_files gaugeprocess_files_open_files 15.0# HELP process_start_time_seconds Start time of the process since unix epoch.# TYPE process_start_time_seconds gaugeprocess_start_time_seconds 1.752976768479E9# HELP process_uptime_seconds The uptime of the Java virtual machine# TYPE process_uptime_seconds gaugeprocess_uptime_seconds 9948.976# HELP system_cpu_count The number of processors available to the Java virtual machine# TYPE system_cpu_count gaugesystem_cpu_count 1.0# HELP system_cpu_usage The &quot;recent cpu usage&quot; of the system the application is running in# TYPE system_cpu_usage gaugesystem_cpu_usage 0.09208738261313372# HELP system_load_average_1m The sum of the number of runnable entities queued to available processors and the number of runnable entities running on the available processors averaged over a period of time# TYPE system_load_average_1m gaugesystem_load_average_1m 0.08# HELP tomcat_sessions_active_current_sessions  # TYPE tomcat_sessions_active_current_sessions gaugetomcat_sessions_active_current_sessions 0.0# HELP tomcat_sessions_active_max_sessions  # TYPE tomcat_sessions_active_max_sessions gaugetomcat_sessions_active_max_sessions 0.0# HELP tomcat_sessions_alive_max_seconds  # TYPE tomcat_sessions_alive_max_seconds gaugetomcat_sessions_alive_max_seconds 0.0# HELP tomcat_sessions_created_sessions_total  # TYPE tomcat_sessions_created_sessions_total countertomcat_sessions_created_sessions_total 0.0# HELP tomcat_sessions_expired_sessions_total  # TYPE tomcat_sessions_expired_sessions_total countertomcat_sessions_expired_sessions_total 0.0# HELP tomcat_sessions_rejected_sessions_total  # TYPE tomcat_sessions_rejected_sessions_total countertomcat_sessions_rejected_sessions_total 0.0
+
+5.3 Grafana 监控大屏配置5.3.1 监控大屏概览本项目成功配置了多个 Grafana 监控大屏，涵盖了应用性能、网络流量和资源使用等关键指标：
+
+SpringBoot APM Dashboard - 应用性能监控
+Kubernetes &#x2F; Compute Resources &#x2F; Namespace - 集群资源监控  
+网络流量监控面板 - Pod 间通信监控
+
+5.3.2 SpringBoot APM Dashboard 配置面板配置说明：
+&#123;  &quot;dashboard&quot;: &#123;    &quot;title&quot;: &quot;SpringBoot APM Dashboard&quot;,    &quot;panels&quot;: [      &#123;        &quot;title&quot;: &quot;Basic Statistics&quot;,        &quot;type&quot;: &quot;stat&quot;,        &quot;targets&quot;: [          &#123;            &quot;expr&quot;: &quot;process_uptime_seconds&#123;instance=~\&quot;.*prometheus-test-demo.*\&quot;&#125;&quot;,            &quot;legendFormat&quot;: &quot;Uptime&quot;          &#125;,          &#123;            &quot;expr&quot;: &quot;jvm_memory_used_bytes&#123;area=\&quot;heap\&quot;&#125;/jvm_memory_max_bytes&#123;area=\&quot;heap\&quot;&#125;*100&quot;,            &quot;legendFormat&quot;: &quot;Heap Used %&quot;          &#125;        ]      &#125;    ]  &#125;&#125;
+
+关键监控指标：
+
+运行时间: 1.5 天稳定运行
+堆内存使用: 9.4% (健康水平)
+非堆内存使用: 5.2% (正常状态)
+CPU 使用率: 平均 0.577% (系统空闲)
+负载均衡: 0.436 (轻负载)
+
+
+5.3.3 Kubernetes 资源监控配置集群资源监控面板配置：
+CPU 使用率监控：
+# CPU 使用率 (基于请求)rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) * 100# CPU 使用率 (基于限制)  rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;cpu&quot;&#125; * 100
+
+内存使用率监控：
+# 内存使用率 (基于请求)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / container_spec_memory_limit_bytes * 100# 内存使用率 (基于限制)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;memory&quot;&#125; * 100
+
+监控数据分析：
+
+CPU 使用率 (基于请求)
+CPU 使用率 (基于限制) 
+内存使用率 (基于请求) 
+内存使用率 (基于限制)
+
+
+5.3.4 网络流量监控配置网络监控面板配置：
+接收&#x2F;发送字节数监控：
+# 网络接收速率rate(container_network_receive_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 网络发送速率  rate(container_network_transmit_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
+
+网络包监控：
+# 接收包速率rate(container_network_receive_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 发送包速率rate(container_network_transmit_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 丢包率rate(container_network_receive_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])rate(container_network_transmit_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
+
+网络流量分析：
+
+峰值网络吞吐量: ~200 kB&#x2F;s (发送&#x2F;接收)
+峰值包速率: ~2 kp&#x2F;s (接收&#x2F;发送)
+网络活动时间: 05:30 左右出现流量峰值
+丢包情况: 基本无丢包，网络稳定
+
+
+5.3.5 压测时的监控表现压测期间关键指标变化：
+
+CPU 使用率飙升：
+
+压测前: ~0.003 (0.3%)
+压测时: ~0.37 (37%)
+增长倍数: 约 123 倍
+
+
+网络流量激增：
+
+正常时: 几乎无流量 (0-10 kB&#x2F;s)
+压测时: 峰值 200 kB&#x2F;s
+包速率: 峰值 2000 packets&#x2F;s
+
+
+内存使用稳定：
+
+内存使用率保持在合理范围
+未出现内存泄漏现象
+
+
+
+5.3.6 限流效果在监控中的体现限流监控配置：
+# HTTP 请求速率rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 60# 错误率 (限流触发)rate(http_server_requests_seconds_count&#123;exception=&quot;IOException&quot;&#125;[1m]) /rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 100# 连接数监控tomcat_threads_busy_threads / tomcat_threads_config_max_threads * 100
+
+限流效果观察：
+
+✅ 流量控制有效: 网络流量在达到峰值后快速回落
+✅ CPU 保护机制: CPU 使用率未超过危险阈值
+✅ 连接层限流: 通过网络包丢弃实现早期限流
+
+
+6. 压测6.1 压测工具6.1.1 基础压测脚本#!/bin/bashURL=&quot;http://localhost:8998/hello&quot;CONCURRENT=10REQUESTS=100echo &quot;Starting load test...&quot;echo &quot;URL: $URL&quot;echo &quot;Concurrent requests: $CONCURRENT&quot;echo &quot;Total requests: $REQUESTS&quot;for i in $(seq 1 $REQUESTS); do    (        response=$(curl -s -w &quot;%&#123;http_code&#125;,%&#123;time_total&#125;&quot; -o /dev/null $URL)        echo &quot;Request $i: $response&quot;    ) &amp;        # 控制并发数    if (( $i % $CONCURRENT == 0 )); then        wait    fidonewaitecho &quot;Load test completed!&quot;
+
+6.1.2 高频限流测试脚本#!/bin/bash# 颜色定义RED=&#x27;\033[0;31m&#x27;GREEN=&#x27;\033[0;32m&#x27;YELLOW=&#x27;\033[1;33m&#x27;BLUE=&#x27;\033[0;34m&#x27;NC=&#x27;\033[0m&#x27; # No ColorURL=&quot;http://localhost:8998/hello&quot;NAMESPACE=&quot;nju08&quot;echo &quot;=========================================&quot;echo &quot;YYS 项目 - 超高频限流测试脚本&quot;echo &quot;=========================================&quot;# 检查端口转发check_port_forward() &#123;    if ! lsof -i :8998 &gt;/dev/null 2&gt;&amp;1; then        echo -e &quot;$&#123;RED&#125;❌ 端口转发未运行$&#123;NC&#125;&quot;        echo -e &quot;$&#123;YELLOW&#125;请先运行: kubectl port-forward deployment/prometheus-test-demo 8998:8998 -n $NAMESPACE$&#123;NC&#125;&quot;        exit 1    fi    echo -e &quot;$&#123;GREEN&#125;✅ 端口转发正常运行$&#123;NC&#125;&quot;&#125;# 多轮高频测试run_aggressive_test() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;🔥 开始超高频限流测试...$&#123;NC&#125;&quot;    echo &quot;目标: 超过 100 requests/second 限制&quot;    echo &quot;&quot;        # 测试配置    local ROUNDS=3    local REQUESTS_PER_ROUND=150    local MAX_CONCURRENT=100        for round in $(seq 1 $ROUNDS); do        echo -e &quot;$&#123;YELLOW&#125;=== 第 $round 轮测试 ===$&#123;NC&#125;&quot;        echo &quot;发送 $REQUESTS_PER_ROUND 个请求，$MAX_CONCURRENT 并发&quot;                local success_count=0        local rate_limited_count=0        local error_count=0        local timeout_count=0                start_time=$(date +%s.%N)                # 创建临时文件        temp_file=&quot;/tmp/aggressive_test_$&#123;round&#125;_$$&quot;                # 极限并发发送        for i in $(seq 1 $REQUESTS_PER_ROUND); do            &#123;                response=$(timeout 2 curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.3 \                    --max-time 1 \                    --retry 0 \                    --no-keepalive \                    $URL 2&gt;/dev/null)                                exit_code=$?                timestamp=$(date &#x27;+%H:%M:%S.%3N&#x27;)                                if [ $exit_code -eq 124 ]; then                    echo &quot;TIMEOUT,$timestamp&quot; &gt;&gt; $temp_file                elif [ $exit_code -ne 0 ] || [ -z &quot;$response&quot; ]; then                    echo &quot;CONNECTION_FAILED,$timestamp&quot; &gt;&gt; $temp_file                else                    echo &quot;$response,$timestamp&quot; &gt;&gt; $temp_file                fi            &#125; &amp;                        # 减少等待时间，增加并发密度            if (( $i % $MAX_CONCURRENT == 0 )); then                wait            fi        done                wait                end_time=$(date +%s.%N)        duration=$(echo &quot;$end_time - $start_time&quot; | bc 2&gt;/dev/null || echo &quot;1&quot;)        rate=$(echo &quot;scale=2; $REQUESTS_PER_ROUND / $duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)                echo &quot;  持续时间: $&#123;duration&#125;秒&quot;        echo &quot;  实际速率: $&#123;rate&#125; requests/second&quot;                # 统计结果        while IFS=&#x27;,&#x27; read -r status_or_error timestamp; do            case &quot;$status_or_error&quot; in                &quot;200&quot;) ((success_count++)) ;;                &quot;429&quot;|&quot;503&quot;)                     ((rate_limited_count++))                    echo -e &quot;  $&#123;YELLOW&#125;🚫 限流: $timestamp - HTTP $status_or_error$&#123;NC&#125;&quot;                    ;;                &quot;TIMEOUT&quot;)                     ((timeout_count++))                    echo -e &quot;  $&#123;RED&#125;⏰ 超时: $timestamp$&#123;NC&#125;&quot;                    ;;                &quot;CONNECTION_FAILED&quot;|*)                    ((error_count++))                    echo -e &quot;  $&#123;RED&#125;❌ 失败: $timestamp$&#123;NC&#125;&quot;                    ;;            esac        done &lt; $temp_file 2&gt;/dev/null                rm -f $temp_file                echo -e &quot;  结果: ✅$success_count 🚫$rate_limited_count ⏰$timeout_count ❌$error_count&quot;                if [ $rate_limited_count -gt 0 ] || [ $timeout_count -gt 5 ] || [ $error_count -gt 5 ]; then            echo -e &quot;  $&#123;GREEN&#125;🎯 第 $round 轮检测到限流效果!$&#123;NC&#125;&quot;        else            echo -e &quot;  $&#123;YELLOW&#125;⚠️  第 $round 轮未检测到限流$&#123;NC&#125;&quot;        fi                echo &quot;&quot;                # 轮次间短暂休息        if [ $round -lt $ROUNDS ]; then            sleep 1        fi    done&#125;# 连续轰炸测试run_continuous_bombardment() &#123;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试 (30秒内持续发送请求)$&#123;NC&#125;&quot;    echo &quot;&quot;        local duration=30    local concurrent=50    local total_requests=0    local success_count=0    local limited_count=0        start_time=$(date +%s)    end_target=$((start_time + duration))        echo &quot;开始时间: $(date)&quot;    echo &quot;目标持续: $&#123;duration&#125;秒&quot;    echo &quot;并发数: $concurrent&quot;    echo &quot;&quot;        while [ $(date +%s) -lt $end_target ]; do        # 每次发送一批请求        for i in $(seq 1 $concurrent); do            &#123;                response=$(curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.2 \                    --max-time 0.5 \                    $URL 2&gt;/dev/null)                                ((total_requests++))                                if [ &quot;$response&quot; = &quot;200&quot; ]; then                    ((success_count++))                elif [ &quot;$response&quot; = &quot;429&quot; ] || [ &quot;$response&quot; = &quot;503&quot; ]; then                    ((limited_count++))                    echo -e &quot;$&#123;YELLOW&#125;🚫 限流触发! HTTP $response at $(date &#x27;+%H:%M:%S&#x27;)$&#123;NC&#125;&quot;                fi            &#125; &amp;        done                # 短暂等待后继续        sleep 0.1    done        wait        actual_duration=$(($(date +%s) - start_time))    actual_rate=$(echo &quot;scale=2; $total_requests / $actual_duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)        echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试结果$&#123;NC&#125;&quot;    echo &quot;实际持续时间: $&#123;actual_duration&#125;秒&quot;    echo &quot;总请求数: $total_requests&quot;    echo &quot;平均速率: $&#123;actual_rate&#125; requests/second&quot;    echo &quot;成功请求: $success_count&quot;    echo &quot;限流触发: $limited_count&quot;        if [ $limited_count -gt 0 ]; then        echo -e &quot;$&#123;GREEN&#125;🎯 连续轰炸成功触发限流!$&#123;NC&#125;&quot;    else        echo -e &quot;$&#123;YELLOW&#125;⚠️  连续轰炸未触发限流$&#123;NC&#125;&quot;    fi&#125;# Apache Bench 测试 (如果可用)run_ab_test() &#123;    if command -v ab &amp;&gt; /dev/null; then        echo &quot;&quot;        echo -e &quot;$&#123;BLUE&#125;⚡ Apache Bench 高性能测试$&#123;NC&#125;&quot;        echo &quot;&quot;                echo &quot;测试1: 500个请求，200并发&quot;        ab -n 500 -c 200 $URL                echo &quot;&quot;        echo &quot;测试2: 2秒内尽可能多的请求，300并发&quot;        ab -t 2 -c 300 $URL            else        echo &quot;&quot;        echo -e &quot;$&#123;YELLOW&#125;💡 建议安装 Apache Bench 进行更高性能的测试:$&#123;NC&#125;&quot;        echo &quot;  sudo apt-get install apache2-utils&quot;        echo &quot;  然后运行: ab -n 1000 -c 300 $URL&quot;    fi&#125;# 检查限流配置check_rate_limit_config() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;⚙️ 检查当前限流配置$&#123;NC&#125;&quot;        # 检查 Redis 中的令牌桶状态    echo &quot;Redis 限流键:&quot;    kubectl exec deployment/redis -n $NAMESPACE -- redis-cli keys &quot;*rate*&quot; 2&gt;/dev/null || echo &quot;无法访问Redis&quot;        # 尝试获取桶的状态 (这个可能需要特殊的命令)    echo &quot;&quot;    echo &quot;当前应用配置:&quot;    echo &quot;- 限流阈值: 100 requests/second&quot;    echo &quot;- 令牌桶容量: 100&quot;    echo &quot;- 补充速率: 100 tokens/second&quot;    echo &quot;- 限流键: global-rate-limit-key&quot;&#125;# 主执行流程main() &#123;    check_port_forward    check_rate_limit_config    run_aggressive_test    run_continuous_bombardment    run_ab_test        echo &quot;&quot;    echo -e &quot;$&#123;GREEN&#125;🏁 超高频限流测试完成!$&#123;NC&#125;&quot;&#125;# 执行主函数main &quot;$@&quot;
+
+
+
+
+
+6.2 压测结果压测结果截图：
+
+未触发限流：  
+触发限流：    
+其中在限流之后转发的进程这边显示如下信息，说明超出阈值的request直接在tcp层被拒绝。
+
+
+HTTP 000 状态码说明：
+
+
+状态码 000 表示连接在 TCP 层被拒绝
+这证明了限流系统在连接层面起到了保护作用
+比 HTTP 429 更早介入，资源保护更彻底
+
+7. 项目总结与技术亮点7.1 技术架构亮点
+多层限流防护：
+
+应用层：Bucket4j 令牌桶算法精确控制
+连接层：Tomcat 连接池快速保护
+网络层：K8s 网络策略综合防护
+
+
+分布式限流设计：
+
+基于 Redis 的分布式令牌桶
+支持水平扩展和高可用
+保证多实例间限流一致性
+
+
+云原生最佳实践：
+
+容器化部署
+K8s 声明式配置
+微服务架构设计
+
+
+
+7.2 监控与运维亮点
+全方位监控：
+
+应用性能监控 (APM)
+基础设施监控
+业务指标监控
+
+
+自动化运维：
+
+CI&#x2F;CD 流水线自动化
+健康检查和自愈能力
+可观测性最佳实践
+
+
+
+7.3 压测验证成果
+限流功能验证：
+
+成功验证 100 req&#x2F;s 限流阈值
+确认多层限流机制有效性
+系统保护能力得到验证
+
+
+扩容能力验证：
+
+K8s 水平扩容功能正常
+负载均衡分发有效
+性能线性提升明显
+
+
+
+7.4 项目创新点
+连接层限流策略：
+
+在 TCP 连接层就实现流量控制
+比传统 HTTP 层限流更高效
+资源保护更彻底
+
+
+压测工具定制化：
+
+针对限流场景设计专用测试脚本
+能够有效触发和验证限流机制
+提供详细的测试报告和分析
+
+
+监控体系完整性：
+
+从基础设施到应用层的全栈监控
+限流专用监控面板设计
+智能告警和故障预警
+
+
+
+7.5 学习收获与心得通过本项目的实践，深入理解了：
+
+云原生技术栈：
+
+Docker 容器化技术
+Kubernetes 容器编排
+微服务架构设计原则
+
+
+限流算法与实现：
+
+令牌桶算法的原理和应用
+分布式限流的挑战和解决方案
+多层限流策略的设计思路
+
+
+DevOps 最佳实践：
+
+CI&#x2F;CD 流水线设计
+监控体系建设
+自动化测试和部署
+
+
+性能测试与调优：
+
+压测工具的选择和使用
+性能瓶颈的识别和优化
+系统扩容策略的验证
+
+
+
+
+8. 附录8.1 项目文件结构yys/├── src/                                    # 源代码目录│   ├── main/java/com/hello/hello/│   │   ├── config/                        # 配置类│   │   │   ├── RateLimitConfig.java      # 限流配置│   │   │   ├── RedisConfig.java          # Redis配置│   │   │   └── WebMvcConfig.java         # Web配置│   │   ├── controller/│   │   │   └── HelloController.java      # 控制器│   │   ├── interceptor/│   │   │   └── RateLimitInterceptor.java # 限流拦截器│   │   ├── service/│   │   │   └── RateLimiterService.java   # 限流服务│   │   └── HelloApplication.java         # 启动类│   └── main/resources/│       └── application.properties        # 应用配置├── jenkins/scripts/                       # K8s部署文件│   ├── prometheus-test-demo.yaml│   └── prometheus-test-serviceMonitor.yaml├── Dockerfile                            # Docker构建文件├── Jenkinsfile                          # Jenkins流水线├── pom.xml                              # Maven配置└── README.md                            # 项目说明文档
+
+8.2 相关技术栈版本
+Java: 17
+Spring Boot: 3.5.3
+Bucket4j: 8.10.1
+Redis: 7-alpine
+Kubernetes: 1.20+
+Docker: 20.10+
+Jenkins: 2.400+
+Prometheus: 2.40+
+Grafana: 9.0+
+
+
+报告完成时间: 2025年7月20日项目代码仓库: https://github.com/231220075/yys分支: hpa
+
+感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+]]></content>
+      <categories>
+        <category>学习记录</category>
+      </categories>
+      <tags>
+        <tag>学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>归去来</title>
+    <url>/2025/08/09/%E5%BD%92%E5%8E%BB%E6%9D%A5/</url>
+    <content><![CDATA[📝 归去来
+回看一年前的随笔，情更切。pyq发文，如今补上，仅供纪念。
+
+还是感觉以后回村里隐居也挺好。
+​这里只是晋东南群山中的一个小村落，我知道上一次回来是去年暑假，却不知道下一次要到什么时候了。一条马路将村子分成两片，也连接此处与县城，其上来往的公交车司机也成了姥姥姥爷的老熟人。曾几何时公交车并不像现在一样一元通全线，但在这数不清多少年的时间里唯一改变的也只是票价，始终是两位老人入城的主要交通工具。这条公交线很慢，小时候印象里的从村到城1小时至今不变。
+​往前回倒十几年，回到村里还没修水泥路，回到一些老人离开之前，印象比较深刻的是那时日常用水还是靠担的。记忆里的三处水井现在只能找到两处，一处后山，一处水库旁，现在自然是荒废了。只有我妈体验过担水，还没等我长大就舍弃了这种原始方式，不过担子倒还留存着，也是某种历史的见证了。​​前几天和姥爷下镇里理发，临返程时正巧下雨，我们俩冒着雨骑摩托车在山路上冲刺，感觉姥爷像施了避雨咒一样，结合我下雨时骑摩托被遮挡视线的经历，简直不可思议。返程之前路人还调侃老人带年轻人，只是这位朋友不明其中缘由，这辆摩托车比我年龄还大，借我姥姥的话，这玩意只有我姥爷驾驭得了。多少年过去了，自从地开始荒废之后拖拉机就不怎么开了，但摩托车仍是姥爷的得力干将，只是不知道他还想骑多少年，又能骑多少年。​​从我有记忆开始两位老人就主要靠种地和养蚕为主要收入，以至于我来到晋北看到那里的农家人甚至没见过蚕时感到惊讶。种地自然没什么好说的，主要就是小麦、玉米、土豆、高粱之类的经济作物，除去自己留一些磨成面和自给，其余便卖作收入。而房子周围两位老人也开垦了数小块土地，种一些萝卜、西红柿、豆角之类的果蔬，省去了天天去镇里买菜了。甚至后来表妹想吃草莓的时候，姥爷也真能在房子背后那片难以称得上是肥沃的土地上给她变出草莓，真的很神奇吧。除了种的田，他们还会打核桃、摘柿子和山楂，甚至会摘桑椹。不知道现在还有多少人知道核桃最外层是青皮的，去皮之后洗净才是棕色的壳。姥姥曾多次念叨村里人都觉得核桃不值钱，而城里人却愿意花较贵的钱去超市称，她表示相当不理解。而摘下的柿子除去现吃的，为了方便保存往往会做成柿饼，至今仍是；山楂则去核做成红果罐头，估计是山楂树虽着地一起荒了，我也已经记不得上一次吃红果罐头是什么时候了。​​不论病逝还是进城，在一些老人没离开前，整个村子都会养蚕。养蚕以季为周期，分春夏秋冬蚕。村里人先统计各家各户的养殖量，以张为单位，那是因为一开始拿回来的蚕籽在粘板上。从一个个小黑点长成白蚕再到结茧，喂桑叶从切成细碎到整叶铺盖，它们的住处也从粘板到数个木篓子，直到喷上药，将它们移到网格栅上，静待结茧。随着不少老人的离开，养蚕人越来越少，在前些年姥姥姥爷也因身体原因不在养蚕，网格栅也终于收进了牛圈，恐怕再无可用之日。​​如今，除了种少许地，姥爷还常常骑车上山采摘连翘（P3）。实际上近些年十里八乡的老年男女都在采这种药来卖钱，以6到9月最为频繁，但价格偏低，几元到十几元一斤上下浮动；冬天的干连翘价高，往往在五六十元一斤，但却难寻。采药人早八晚六地摘，一天下来好的话人均十几斤，不好则只有六七斤。姥姥也常会开玩笑说，今天出去吃顿饭又把姥爷一天的采药钱吃没了，我笑罢只觉得苦涩，但也知道老人是闲不住的。采药人采回药后也要观察行情，但又因为连翘不经放所以也要尽快出手，和各地收药人的搏弈始终存在，但不幸的是今年夏天我姥爷总是在涨价前出手，只能在吃饭时骂几句收药人罢了。今天的采摘量为九斤，行情为十二元每斤，在此记录一下。​​我还是会吐槽两位老人生活的地方：房子都是上个世纪的产物，到冬天特别冷；一把铁勺子从姥姥的母亲传到现在；在村里夏天要时刻盯防蚊子，尤其是上厕所qwq；种几块地还要提防野猪，也总会被拱得粮食减产；现在的日常用水每隔五天统一供应，日常囤水；村子里的人越来越少，现在凑桌麻将都难；不时还有蝎子和蛇出没（前几天我就被蝎子咬了(⁄ ⁄•⁄ω⁄•⁄ ⁄)）。但他们俩丝毫不在意。昨天又谈到我想让他们俩彻底离开这里，常住县城，给小姨做饭带娃，但姥姥仍是不在意。我说你们俩总有干不动的时候，早点下城里享受不好呗，姥姥执意说春夏之际凉快。我又说城里有空调不比村里凉快？她又提到费电了。对，这两位就是这么节俭，省了一辈子，处处细打算，却在两位女儿买房时拿出好几万，每次我回来都去超市割肉买菜，在离开的时候以前是塞钱，现在是转账，也只会告诫我好好学习……​​千反田用来形容她家乡的话也正是这个村子的现状，”这里是我的故乡，只有水和土地，人们也在渐渐衰老，失去活力”。我并不觉得这里是最美的地方，也并不觉得这里充满可能性，但是，我愿意讲述这里过往的点滴。可以预见以姥姥姥爷为代表的一代老人也离开这里后，在未来的三十年间这个村子终将荒无人烟。我不知道其他户人家的后代怎么看，我想我还会回到这里，去寻访过往踪迹。​​写在即将启程却不知何时归来之际。
+感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+]]></content>
+      <categories>
+        <category>生活随想</category>
+      </categories>
+      <tags>
+        <tag>乡愁</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>我的博客重新开始</title>
+    <url>/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/</url>
+    <content><![CDATA[🌟 我的博客重新开始大家好！我是 forever，欢迎来到我重新搭建的博客 “Summer Flower”。
+📝 为什么重新开始？经过一段时间的思考，我决定重新整理我的博客，主要原因包括：
+
+更好的技术栈: 使用 Hexo + Butterfly 主题，提供更好的阅读体验
+规范的内容管理: 建立更完善的写作和发布流程
+专注的内容方向: 
+💻 技术学习心得
+📸 摄影作品分享
+🎓 计算机科学学习记录
+🌱 日常生活感悟
+
+
+
+🛠️ 技术栈介绍这个博客使用的技术栈：
+
+静态网站生成器: Hexo 7.3.0
+主题: Butterfly 5.3.3
+部署平台: GitHub Pages
+域名: 华为云自定义域名
+评论系统: Gitalk
+统计分析: Google Analytics + 不蒜子
+
+🎯 未来计划接下来我计划在这里分享：
+技术内容
+Rust 编程学习心得
+Git 深度使用技巧
+前端开发经验
+计算机科学课程笔记
+
+生活分享
+摄影作品和技巧
+读书心得体会
+旅行见闻
+日常思考
+
+项目展示
+GitHub 开源项目介绍
+个人项目经验分享
+课程作业总结
+
+💡 写作理念我希望这个博客能够：
+
+记录成长: 记录学习和生活中的点点滴滴
+分享经验: 把学到的知识和经验分享给大家
+交流互动: 通过博客认识更多志同道合的朋友
+持续学习: 通过写作来深化自己的理解
+
+🤝 联系方式如果你对我的文章有任何想法或建议，欢迎通过以下方式联系我：
+
+📧 Email: 231220075@smail.nju.edu.cn
+🐙 GitHub: @231220075
+💬 评论区: 每篇文章下方都可以留言
+
+🎉 结语感谢你阅读到这里！希望我的博客能为你带来一些有价值的内容。
+让我们一起在这个夏日花园里，记录美好，分享成长！🌸
+
+“每一次重新开始，都是向更好的自己迈进一步。”
+]]></content>
+      <categories>
+        <category>生活随想</category>
+      </categories>
+      <tags>
+        <tag>博客</tag>
+        <tag>新开始</tag>
+        <tag>Hexo</tag>
       </tags>
   </entry>
   <entry>
