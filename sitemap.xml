@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://summer-flower.com/2025/08/12/%E4%BA%91%E5%8E%9F%E7%94%9F%E7%BB%93%E8%AF%BEproject/</loc>
+    
+    <lastmod>2025-08-12</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://summer-flower.com/2025/08/12/csnet%20%E6%9C%9F%E6%9C%AB%E5%91%A8%E5%A4%8D%E4%B9%A0/</loc>
     
     <lastmod>2025-08-12</lastmod>
@@ -137,6 +146,13 @@
   
   <url>
     <loc>http://summer-flower.com/tags/%E9%BB%98%E8%AE%A4/</loc>
+    <lastmod>2025-08-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://summer-flower.com/tags/%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2025-08-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
