@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://summer-flower.com/404.html</loc>
+    
+    <lastmod>2025-08-15</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://summer-flower.com/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/</loc>
     
     <lastmod>2025-08-15</lastmod>
@@ -194,14 +203,14 @@
   </url>
   
   <url>
-    <loc>http://summer-flower.com/tags/JAVA/</loc>
+    <loc>http://summer-flower.com/tags/%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2025-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://summer-flower.com/tags/%E5%AD%A6%E4%B9%A0/</loc>
+    <loc>http://summer-flower.com/tags/JAVA/</loc>
     <lastmod>2025-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -243,6 +252,13 @@
   </url>
   
   <url>
+    <loc>http://summer-flower.com/tags/start/</loc>
+    <lastmod>2025-08-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>http://summer-flower.com/tags/rust/</loc>
     <lastmod>2025-08-15</lastmod>
     <changefreq>weekly</changefreq>
@@ -251,13 +267,6 @@
   
   <url>
     <loc>http://summer-flower.com/tags/git/</loc>
-    <lastmod>2025-08-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://summer-flower.com/tags/start/</loc>
     <lastmod>2025-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -287,14 +296,14 @@
   </url>
   
   <url>
-    <loc>http://summer-flower.com/categories/%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/</loc>
+    <loc>http://summer-flower.com/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</loc>
     <lastmod>2025-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>http://summer-flower.com/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</loc>
+    <loc>http://summer-flower.com/categories/%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2025-08-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
