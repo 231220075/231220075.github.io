@@ -1,6 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>React vs. Vue：前端框架的深度对决</title>
+    <url>/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/</url>
+    <content><![CDATA[在当今前端开发领域，React 和 Vue 无疑是两座无法绕开的高峰。它们都拥有庞大的社区、丰富的生态和出色的性能，但其设计哲学和开发体验却大相径庭。作为开发者，理解它们的核心差异，才能在项目选型时做出最明智的决策。本文将从专业角度，对这两个框架进行一次深度对比。
+概览
+
+
+特性
+React
+Vue
+
+
+
+类型
+用于构建用户界面的 JavaScript 库
+渐进式 JavaScript 框架
+
+
+核心思想
+一切皆是 JavaScript，拥抱函数式编程
+拥抱传统 Web，HTML&#x2F;CSS&#x2F;JS 分离
+
+
+创建者
+Meta (Facebook)
+尤雨溪 (前 Google 工程师)
+
+
+上手难度
+较陡峭，需要深入理解 JS 和 JSX
+相对平缓，对新手更友好
+
+
+灵活性
+极高，生态系统庞大，选择多样
+较高，官方提供全家桶，开箱即用
+
+
+数据流
+单向数据流
+支持单向和双向数据绑定
+
+
+状态管理
+Context API, Redux, MobX, Zustand
+Pinia (官方推荐), Vuex
+
+
+路由
+React Router
+Vue Router (官方)
+
+
+构建工具
+Create React App, Vite, Next.js
+Vue CLI, Vite, Nuxt.js
+
+
+市场份额
+更大，尤其在欧美和大型企业
+快速增长，在亚洲和初创公司中非常流行
+
+
+
+1. 核心理念与设计哲学React：更像一个“库”，专注 UI
+React 的核心定位是一个用于构建用户界面（UI）的 JavaScript 库。它本身只关心视图层（MVC 中的 V）。这意味着 React 只提供构建 UI 组件的核心功能。至于路由、状态管理、HTTP 请求等，你需要自己选择并集成第三方库。
+
+All in JS：React 的一个核心哲学是“All in JS”。它认为模板逻辑和渲染逻辑本质上是耦合的，因此发明了 JSX（JavaScript XML），让你可以在 JavaScript 代码中直接编写类似 HTML 的结构。这提供了极大的灵活性和编程能力，因为你可以使用 JavaScript 的全部功能（如 map, filter）来构建 UI。
+单向数据流：数据总是从父组件通过 props 流向子组件。子组件不能直接修改父组件的数据，需要通过调用父组件传递的回调函数来通知父组件进行更新。这种模式使得数据流向清晰可控，在大型应用中更容易追踪和调试。
+
+Vue：一个“渐进式框架”
+Vue 的定位是一个渐进式框架。这意味着你可以从一个简单的功能（比如只用它来处理页面上的一小块交互）开始，然后根据需求逐渐引入路由（Vue Router）、状态管理（Pinia）等功能，最终构建一个功能完整的单页应用（SPA）。
+
+拥抱传统 Web：Vue 的设计对有传统 HTML&#x2F;CSS&#x2F;JS 背景的开发者非常友好。它的单文件组件 (SFC - Single File Component) 将一个组件的模板 (&lt;template&gt;)、脚本 (&lt;script&gt;) 和样式 (&lt;style&gt;) 封装在同一个 .vue 文件中。这种结构清晰，关注点分离，非常直观。
+灵活的数据绑定：Vue 同时支持单向数据流和双向数据绑定。通过 v-model 指令，可以轻松实现表单输入和状态之间的双向绑定，这在处理表单时大大简化了代码。
+
+
+2. 组件化开发两者都采用组件化思想，但实现方式不同。
+React 组件：函数与 Hooks
+现代 React 开发主要使用函数式组件和 Hooks。
+// React Functional Component with Hooksimport React, &#123; useState, useEffect &#125; from &#x27;react&#x27;;function MyComponent(&#123; initialCount &#125;) &#123;  const [count, setCount] = useState(initialCount); // 状态 Hook  const [data, setData] = useState(null);  // 副作用 Hook，类似生命周期函数  useEffect(() =&gt; &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(setData);  &#125;, []); // 空依赖数组表示只在组件挂载时运行一次  return (    &lt;div&gt;      &lt;p&gt;Count: &#123;count&#125;&lt;/p&gt;      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;Increment&lt;/button&gt;    &lt;/div&gt;  );&#125;
+
+
+优点：JSX 提供了无与伦比的灵活性。Hooks（如 useState, useEffect）让函数式组件也能拥有状态和生命周期逻辑，代码更简洁、复用性更强。
+挑战：需要对 JavaScript 的闭包、this 指向（在类组件中）有深刻理解。JSX 的学习曲线对初学者来说可能稍高。
+
+Vue 组件：选项式 API 与组合式 API
+Vue 提供了两种组件 API 风格。
+
+选项式 API (Options API)：对新手友好，结构清晰。
+&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;export default &#123;  props: [&#x27;initialCount&#x27;],  data() &#123;    return &#123;      count: this.initialCount,      data: null    &#125;;  &#125;,  methods: &#123;    increment() &#123;      this.count++;    &#125;  &#125;,  mounted() &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(data =&gt; this.data = data);  &#125;&#125;&lt;/script&gt;
+
+组合式 API (Composition API)：受 React Hooks 启发，更适合大型复杂项目，逻辑组织更灵活。
+&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script setup&gt;import &#123; ref, onMounted &#125; from &#x27;vue&#x27;;const props = defineProps([&#x27;initialCount&#x27;]);const count = ref(props.initialCount); // 响应式状态const data = ref(null);function increment() &#123;  count.value++;&#125;onMounted(async () =&gt; &#123;  data.value = await (await fetch(&#x27;https://api.example.com/data&#x27;)).json();&#125;);&lt;/script&gt;
+
+
+优点：.vue 文件结构清晰，模板语法更接近原生 HTML。组合式 API 解决了选项式 API 在大型组件中逻辑分散的问题，代码组织更灵活。
+挑战：在组合式 API 中需要理解 ref 和 reactive 的区别。
+
+
+3. 生态系统与状态管理React：庞大而分散，选择自由
+
+状态管理：
+简单场景：使用 useState 和 useReducer 配合 Context API。
+复杂应用：Redux 是事实上的标准，功能强大，但以学习曲线陡峭和模板代码多而闻名。近年来，Zustand 和 MobX 等更轻量、更现代的方案越来越受欢迎。
+
+
+生态：React 的生态系统是其最大的优势之一。几乎任何你能想到的功能都有成熟的第三方库支持。但也意味着你需要花时间去评估和选择技术栈，这被称为“选择疲劳症”。Next.js 框架的出现极大地改变了这一局面，它为 React 提供了一个强大的、带有一系列最佳实践的全栈开发骨架。
+
+Vue：官方维护，集成度高
+
+状态管理：
+Pinia 是 Vue 3 的官方推荐方案（取代了 Vuex）。它设计极其简洁、类型友好，并且没有 mutations 的概念，上手非常快。
+
+
+生态：Vue 的核心库（如 vue-router for routing, pinia for state management）都由官方团队维护。这保证了它们之间的高度协同和一致性。开发者不需要在众多选项中纠lge，可以快速开始。Nuxt.js 是 Vue 生态的“Next.js”，提供了服务端渲染（SSR）、静态站点生成（SSG）等高级功能。
+
+
+4. 性能两者都使用了虚拟 DOM (Virtual DOM)，性能都非常出色，足以应对绝大多数应用场景。
+
+React：通过 Fiber 架构实现了可中断的异步渲染，为将来的并发模式等高级功能铺平了道路。
+Vue：在编译时进行了更多优化。它会静态分析模板，找出动态部分和静态部分，从而在更新时只对比动态节点，减少了虚拟 DOM diff 的开销。
+
+在实际应用中，性能瓶颈更多地来自于应用本身的逻辑（如巨大的列表、频繁的非必要更新），而不是框架本身。
+
+总结与选择建议
+选择 React 的理由：
+
+大型项目和团队：React 的单向数据流和庞大的生态系统非常适合构建复杂、可维护的大型企业级应用。
+招聘市场：React 的岗位需求量目前是最大的，如果你想最大化就业机会，React 是一个稳妥的选择。
+追求极致灵活性：如果你想完全掌控你的技术栈，自由组合各种库来构建应用，React 提供了这种自由。
+跨平台开发：React Native 允许你使用 React 的知识来构建原生移动应用（iOS&#x2F;Android），这是一个巨大的加分项。
+
+
+选择 Vue 的理由：
+
+快速开发和上手：Vue 的学习曲线更平缓，文档极其出色，官方工具链开箱即用，非常适合初创公司、中小型项目和追求开发效率的场景。
+对传统开发者友好：如果你有扎实的 HTML&#x2F;CSS&#x2F;JS 基础，Vue 的模板语法会让你感到非常亲切。
+无缝集成：官方提供的路由和状态管理库与核心库无缝集成，减少了决策成本和集成问题。
+性能：开箱即用的性能表现非常优秀，心智负担小。
+
+
+
+最终，React 和 Vue 都是顶级的框架，没有绝对的好坏之分，只有“更适合”的选择。 最好的方式是都尝试一下，构建一个小项目，亲身感受它们的开发体验，然后根据你的项目需求和个人偏好做出决定。
+]]></content>
+      <categories>
+        <category>技术分享</category>
+      </categories>
+      <tags>
+        <tag>React</tag>
+        <tag>Vue</tag>
+        <tag>前端</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Java 注解</title>
     <url>/2025/08/12/Java%20%E6%B3%A8%E8%A7%A3/</url>
     <content><![CDATA[📝 Java 注解完全指南
@@ -296,160 +450,6 @@ Web层测试/** * @WebMvcTest: 只加载Web层组件（Controller、Filter、Web
     <url>/2025/02/28/hello-world/</url>
     <content><![CDATA[this is my first articletest文件，梦开始的地方
 ]]></content>
-  </entry>
-  <entry>
-    <title>React vs. Vue：前端框架的深度对决</title>
-    <url>/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/</url>
-    <content><![CDATA[在当今前端开发领域，React 和 Vue 无疑是两座无法绕开的高峰。它们都拥有庞大的社区、丰富的生态和出色的性能，但其设计哲学和开发体验却大相径庭。作为开发者，理解它们的核心差异，才能在项目选型时做出最明智的决策。本文将从专业角度，对这两个框架进行一次深度对比。
-概览
-
-
-特性
-React
-Vue
-
-
-
-类型
-用于构建用户界面的 JavaScript 库
-渐进式 JavaScript 框架
-
-
-核心思想
-一切皆是 JavaScript，拥抱函数式编程
-拥抱传统 Web，HTML&#x2F;CSS&#x2F;JS 分离
-
-
-创建者
-Meta (Facebook)
-尤雨溪 (前 Google 工程师)
-
-
-上手难度
-较陡峭，需要深入理解 JS 和 JSX
-相对平缓，对新手更友好
-
-
-灵活性
-极高，生态系统庞大，选择多样
-较高，官方提供全家桶，开箱即用
-
-
-数据流
-单向数据流
-支持单向和双向数据绑定
-
-
-状态管理
-Context API, Redux, MobX, Zustand
-Pinia (官方推荐), Vuex
-
-
-路由
-React Router
-Vue Router (官方)
-
-
-构建工具
-Create React App, Vite, Next.js
-Vue CLI, Vite, Nuxt.js
-
-
-市场份额
-更大，尤其在欧美和大型企业
-快速增长，在亚洲和初创公司中非常流行
-
-
-
-1. 核心理念与设计哲学React：更像一个“库”，专注 UI
-React 的核心定位是一个用于构建用户界面（UI）的 JavaScript 库。它本身只关心视图层（MVC 中的 V）。这意味着 React 只提供构建 UI 组件的核心功能。至于路由、状态管理、HTTP 请求等，你需要自己选择并集成第三方库。
-
-All in JS：React 的一个核心哲学是“All in JS”。它认为模板逻辑和渲染逻辑本质上是耦合的，因此发明了 JSX（JavaScript XML），让你可以在 JavaScript 代码中直接编写类似 HTML 的结构。这提供了极大的灵活性和编程能力，因为你可以使用 JavaScript 的全部功能（如 map, filter）来构建 UI。
-单向数据流：数据总是从父组件通过 props 流向子组件。子组件不能直接修改父组件的数据，需要通过调用父组件传递的回调函数来通知父组件进行更新。这种模式使得数据流向清晰可控，在大型应用中更容易追踪和调试。
-
-Vue：一个“渐进式框架”
-Vue 的定位是一个渐进式框架。这意味着你可以从一个简单的功能（比如只用它来处理页面上的一小块交互）开始，然后根据需求逐渐引入路由（Vue Router）、状态管理（Pinia）等功能，最终构建一个功能完整的单页应用（SPA）。
-
-拥抱传统 Web：Vue 的设计对有传统 HTML&#x2F;CSS&#x2F;JS 背景的开发者非常友好。它的单文件组件 (SFC - Single File Component) 将一个组件的模板 (&lt;template&gt;)、脚本 (&lt;script&gt;) 和样式 (&lt;style&gt;) 封装在同一个 .vue 文件中。这种结构清晰，关注点分离，非常直观。
-灵活的数据绑定：Vue 同时支持单向数据流和双向数据绑定。通过 v-model 指令，可以轻松实现表单输入和状态之间的双向绑定，这在处理表单时大大简化了代码。
-
-
-2. 组件化开发两者都采用组件化思想，但实现方式不同。
-React 组件：函数与 Hooks
-现代 React 开发主要使用函数式组件和 Hooks。
-// React Functional Component with Hooksimport React, &#123; useState, useEffect &#125; from &#x27;react&#x27;;function MyComponent(&#123; initialCount &#125;) &#123;  const [count, setCount] = useState(initialCount); // 状态 Hook  const [data, setData] = useState(null);  // 副作用 Hook，类似生命周期函数  useEffect(() =&gt; &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(setData);  &#125;, []); // 空依赖数组表示只在组件挂载时运行一次  return (    &lt;div&gt;      &lt;p&gt;Count: &#123;count&#125;&lt;/p&gt;      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;Increment&lt;/button&gt;    &lt;/div&gt;  );&#125;
-
-
-优点：JSX 提供了无与伦比的灵活性。Hooks（如 useState, useEffect）让函数式组件也能拥有状态和生命周期逻辑，代码更简洁、复用性更强。
-挑战：需要对 JavaScript 的闭包、this 指向（在类组件中）有深刻理解。JSX 的学习曲线对初学者来说可能稍高。
-
-Vue 组件：选项式 API 与组合式 API
-Vue 提供了两种组件 API 风格。
-
-选项式 API (Options API)：对新手友好，结构清晰。
-&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;export default &#123;  props: [&#x27;initialCount&#x27;],  data() &#123;    return &#123;      count: this.initialCount,      data: null    &#125;;  &#125;,  methods: &#123;    increment() &#123;      this.count++;    &#125;  &#125;,  mounted() &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(data =&gt; this.data = data);  &#125;&#125;&lt;/script&gt;
-
-组合式 API (Composition API)：受 React Hooks 启发，更适合大型复杂项目，逻辑组织更灵活。
-&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script setup&gt;import &#123; ref, onMounted &#125; from &#x27;vue&#x27;;const props = defineProps([&#x27;initialCount&#x27;]);const count = ref(props.initialCount); // 响应式状态const data = ref(null);function increment() &#123;  count.value++;&#125;onMounted(async () =&gt; &#123;  data.value = await (await fetch(&#x27;https://api.example.com/data&#x27;)).json();&#125;);&lt;/script&gt;
-
-
-优点：.vue 文件结构清晰，模板语法更接近原生 HTML。组合式 API 解决了选项式 API 在大型组件中逻辑分散的问题，代码组织更灵活。
-挑战：在组合式 API 中需要理解 ref 和 reactive 的区别。
-
-
-3. 生态系统与状态管理React：庞大而分散，选择自由
-
-状态管理：
-简单场景：使用 useState 和 useReducer 配合 Context API。
-复杂应用：Redux 是事实上的标准，功能强大，但以学习曲线陡峭和模板代码多而闻名。近年来，Zustand 和 MobX 等更轻量、更现代的方案越来越受欢迎。
-
-
-生态：React 的生态系统是其最大的优势之一。几乎任何你能想到的功能都有成熟的第三方库支持。但也意味着你需要花时间去评估和选择技术栈，这被称为“选择疲劳症”。Next.js 框架的出现极大地改变了这一局面，它为 React 提供了一个强大的、带有一系列最佳实践的全栈开发骨架。
-
-Vue：官方维护，集成度高
-
-状态管理：
-Pinia 是 Vue 3 的官方推荐方案（取代了 Vuex）。它设计极其简洁、类型友好，并且没有 mutations 的概念，上手非常快。
-
-
-生态：Vue 的核心库（如 vue-router for routing, pinia for state management）都由官方团队维护。这保证了它们之间的高度协同和一致性。开发者不需要在众多选项中纠lge，可以快速开始。Nuxt.js 是 Vue 生态的“Next.js”，提供了服务端渲染（SSR）、静态站点生成（SSG）等高级功能。
-
-
-4. 性能两者都使用了虚拟 DOM (Virtual DOM)，性能都非常出色，足以应对绝大多数应用场景。
-
-React：通过 Fiber 架构实现了可中断的异步渲染，为将来的并发模式等高级功能铺平了道路。
-Vue：在编译时进行了更多优化。它会静态分析模板，找出动态部分和静态部分，从而在更新时只对比动态节点，减少了虚拟 DOM diff 的开销。
-
-在实际应用中，性能瓶颈更多地来自于应用本身的逻辑（如巨大的列表、频繁的非必要更新），而不是框架本身。
-
-总结与选择建议
-选择 React 的理由：
-
-大型项目和团队：React 的单向数据流和庞大的生态系统非常适合构建复杂、可维护的大型企业级应用。
-招聘市场：React 的岗位需求量目前是最大的，如果你想最大化就业机会，React 是一个稳妥的选择。
-追求极致灵活性：如果你想完全掌控你的技术栈，自由组合各种库来构建应用，React 提供了这种自由。
-跨平台开发：React Native 允许你使用 React 的知识来构建原生移动应用（iOS&#x2F;Android），这是一个巨大的加分项。
-
-
-选择 Vue 的理由：
-
-快速开发和上手：Vue 的学习曲线更平缓，文档极其出色，官方工具链开箱即用，非常适合初创公司、中小型项目和追求开发效率的场景。
-对传统开发者友好：如果你有扎实的 HTML&#x2F;CSS&#x2F;JS 基础，Vue 的模板语法会让你感到非常亲切。
-无缝集成：官方提供的路由和状态管理库与核心库无缝集成，减少了决策成本和集成问题。
-性能：开箱即用的性能表现非常优秀，心智负担小。
-
-
-
-最终，React 和 Vue 都是顶级的框架，没有绝对的好坏之分，只有“更适合”的选择。 最好的方式是都尝试一下，构建一个小项目，亲身感受它们的开发体验，然后根据你的项目需求和个人偏好做出决定。
-]]></content>
-      <categories>
-        <category>技术分享</category>
-      </categories>
-      <tags>
-        <tag>React</tag>
-        <tag>Vue</tag>
-        <tag>前端</tag>
-      </tags>
   </entry>
   <entry>
     <title>csnet 期末周复习</title>
@@ -2040,6 +2040,272 @@ ECN
       </tags>
   </entry>
   <entry>
+    <title>域名解析与网站绑定完全指南</title>
+    <url>/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/</url>
+    <content><![CDATA[域名解析与网站绑定完全指南🌐 前言当我们在浏览器输入 summer-flower.com 时，为什么能访问到我们的网站？这背后涉及了复杂的域名解析系统。本文将从零开始，详细解释域名解析的工作原理，以及如何将自定义域名绑定到 GitHub Pages。
+📚 基础概念什么是域名？域名（Domain Name）是互联网上网站的人类可读地址，例如：
+
+google.com
+github.com 
+summer-flower.com
+
+它的作用是将复杂的IP地址（如 185.199.108.153）转换为容易记忆的名称。
+什么是DNS？DNS（Domain Name System，域名系统）是互联网的”电话簿”，负责将域名翻译成IP地址。
+DNS解析过程：用户输入: summer-flower.com    ↓DNS查询: summer-flower.com 对应哪个IP？    ↓  DNS返回: 185.199.108.153    ↓浏览器访问: 185.199.108.153    ↓服务器返回: 网站内容
+
+🔧 DNS记录类型详解1. A记录（Address Record）作用: 将域名直接指向IPv4地址
+格式: 域名 → IP地址
+示例:
+summer-flower.com → 185.199.108.153
+
+使用场景: 
+
+将域名指向网站服务器
+最常用的记录类型
+一个域名可以有多个A记录（负载均衡）
+
+2. CNAME记录（Canonical Name Record）作用: 将域名指向另一个域名
+格式: 域名 → 另一个域名
+示例:
+www.summer-flower.com → summer-flower.comblog.summer-flower.com → summer-flower.com
+
+使用场景:
+
+子域名重定向
+CDN配置
+服务别名
+
+重要限制: 
+
+根域名（如 summer-flower.com）不能使用CNAME
+一个域名不能同时有CNAME和其他记录
+
+3. NS记录（Name Server Record）作用: 指定域名的DNS服务器
+格式: 域名 → DNS服务器地址
+示例:
+summer-flower.com → ns1.huaweicloud-dns.orgsummer-flower.com → ns2.huaweicloud-dns.org
+
+使用场景:
+
+域名注册商设置
+DNS服务器迁移
+
+4. SOA记录（Start of Authority Record）作用: 定义域名的权威信息
+包含信息:
+
+主DNS服务器
+域名管理员邮箱
+序列号
+刷新时间
+重试时间
+
+使用场景:
+
+系统自动创建
+DNS同步控制
+
+5. MX记录（Mail Exchange Record）作用: 指定邮件服务器
+示例:
+summer-flower.com → mail.summer-flower.com
+
+6. TXT记录（Text Record）作用: 存储文本信息
+使用场景:
+
+域名验证
+SPF邮件验证
+网站验证
+
+🌍 DNS解析的完整流程1. 浏览器发起请求用户输入: https://summer-flower.com
+
+2. 本地DNS缓存检查检查顺序:1. 浏览器缓存2. 操作系统缓存3. 路由器缓存
+
+3. 递归DNS查询本地DNS服务器 → 根DNS服务器根DNS服务器 → .com顶级域DNS服务器  .com DNS服务器 → summer-flower.com权威DNS服务器权威DNS服务器 → 返回IP地址
+
+4. 返回结果并缓存IP地址 → 本地DNS服务器 → 用户设备同时: 各级缓存存储结果
+
+🚀 GitHub Pages 域名绑定详解GitHub Pages 的工作原理默认访问方式:
+https://用户名.github.io/仓库名例如: https://231220075.github.io
+
+自定义域名访问:
+https://your-domain.com例如: https://summer-flower.com
+
+绑定步骤详解步骤1: 创建CNAME文件位置: /source/CNAME（对于Hexo）
+内容:
+summer-flower.com
+
+作用:
+
+告诉GitHub Pages你的自定义域名
+触发GitHub生成SSL证书
+启用域名重定向
+
+步骤2: 配置DNS记录GitHub Pages IP地址:
+185.199.108.153185.199.109.153185.199.110.153  185.199.111.153
+
+DNS配置:
+类型: A主机记录: @ 或 *记录值: 185.199.108.153TTL: 300
+
+重复添加其他3个IP地址
+步骤3: 等待生效时间线:
+DNS配置 → 5-30分钟 → DNS传播完成DNS传播完成 → 10-15分钟 → GitHub检测到GitHub检测到 → 5-10分钟 → SSL证书生成SSL证书生成 → 网站完全可用
+
+GitHub Pages 的验证机制DNS检查过程1. GitHub定期查询你的域名2. 检查是否指向GitHub Pages IP3. 验证CNAME文件内容4. 生成SSL证书5. 启用HTTPS访问
+
+状态变化🔴 DNS check unsuccessful   ↓ (DNS生效)🟡 DNS check in progress   ↓ (验证完成)🟢 DNS configuration successful     ↓ (SSL生成)✅ Enforce HTTPS 可用
+
+⚠️ 常见问题与解决方案问题1: DNS检查失败症状:
+DNS check unsuccessfulDomain does not resolve to the GitHub Pages server
+
+原因:
+
+DNS记录配置错误
+DNS还未传播完成
+存在冲突记录
+
+解决方案:
+# 检查DNS是否生效dig your-domain.com# 期望结果: 4个A记录指向GitHub Pages
+
+问题2: CNAME和A记录冲突错误配置:
+summer-flower.com → CNAME → other-domain.com (错误)summer-flower.com → A → 185.199.108.153 (正确)
+
+解决方案: 删除CNAME记录，只保留A记录
+问题3: www子域名配置方案A: 使用泛域名解析
+*.summer-flower.com → A → GitHub Pages IP
+
+方案B: 单独配置CNAME
+www.summer-flower.com → CNAME → summer-flower.com
+
+问题4: SSL证书问题常见原因:
+
+DNS配置不正确
+GitHub还在验证过程中
+域名验证失败
+
+解决方案:
+
+等待DNS完全传播
+确保CNAME文件正确
+检查GitHub Pages设置
+
+🛠️ 实际操作示例华为云DNS配置登录控制台:
+华为云控制台 → 域名与网站 → 云解析服务
+
+添加记录:
+记录类型: A主机记录: * (泛域名) 或 @ (根域名)线路类型: 全网默认TTL: 300记录值: 185.199.108.153
+
+重复添加其他GitHub Pages IP
+验证配置命令行验证:
+# 检查DNS解析dig summer-flower.com# 检查网站访问curl -I https://summer-flower.com# 检查SSL证书curl -I https://summer-flower.com | grep -i server
+
+在线工具验证:
+
+DNS传播检查: https://www.whatsmydns.net/
+SSL证书检查: https://www.ssllabs.com/ssltest/
+
+📊 性能优化建议TTL设置优化开发阶段:
+TTL: 300 (5分钟) - 便于快速测试
+
+生产环境:
+TTL: 3600 (1小时) - 减少DNS查询
+
+多IP配置的好处负载均衡:
+
+分散访问压力
+提高可用性
+
+容错机制:
+
+某个IP故障时自动切换
+提高网站稳定性
+
+CDN集成CloudFlare示例:
+域名 → CloudFlare → GitHub Pages
+
+优势:
+
+全球加速
+DDoS防护
+高级SSL功能
+
+🔒 安全考虑HTTPS强制GitHub Pages设置:
+Settings → Pages → Enforce HTTPS ✓
+
+好处:
+
+数据传输加密
+SEO优势
+现代浏览器要求
+
+DNS安全DNSSEC:
+
+防止DNS劫持
+验证DNS响应真实性
+
+私有DNS:
+
+使用可信DNS服务器
+避免DNS污染
+
+📈 监控与维护监控指标可用性监控:
+
+网站响应时间
+DNS解析时间
+SSL证书到期时间
+
+工具推荐:
+
+UptimeRobot（免费）
+Pingdom（付费）
+CloudFlare Analytics
+
+维护任务定期检查:
+
+DNS记录是否正确
+SSL证书是否有效
+网站访问是否正常
+
+备份策略:
+
+DNS配置备份
+域名转移码保存
+重要文件备份
+
+🎯 总结域名解析是现代互联网的基础设施，理解其工作原理对于网站管理至关重要：
+关键要点
+DNS记录类型: A记录指向IP，CNAME指向域名
+GitHub Pages绑定: 需要正确的DNS配置和CNAME文件
+传播时间: DNS更改需要5-60分钟生效
+安全性: 启用HTTPS和DNSSEC保护
+监控: 持续监控确保服务稳定
+
+最佳实践
+使用A记录指向GitHub Pages IP
+避免不必要的CNAME记录
+设置合适的TTL值
+启用HTTPS强制
+定期监控和维护
+
+通过本文的学习，相信你已经对域名解析有了全面的理解。在实际操作中，记住耐心等待DNS传播，遇到问题时系统性地排查，大部分问题都能迎刃而解。
+
+相关资源:
+
+GitHub Pages 官方文档
+DNS 基础知识
+华为云 DNS 使用指南
+
+祝你的网站部署顺利！🚀
+]]></content>
+      <categories>
+        <category>技术学习</category>
+      </categories>
+      <tags>
+        <tag>域名</tag>
+        <tag>DNS</tag>
+        <tag>GitHub Pages</tag>
+        <tag>网站部署</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>云原生结课project</title>
     <url>/2025/08/12/%E4%BA%91%E5%8E%9F%E7%94%9F%E7%BB%93%E8%AF%BEproject/</url>
     <content><![CDATA[📝 云原生结课project
@@ -2520,6 +2786,44 @@ GitHub 开源项目介绍
       </tags>
   </entry>
   <entry>
+    <title>用rust复刻git</title>
+    <url>/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/</url>
+    <content><![CDATA[📝 用rust复刻git
+本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历
+
+前言大二下选课的时候发现有一门《rust程序设计》的课程，之前在大一上c++的时候最早接触过rust这个名字，但是一直没怎么了解过，于是抱着好奇心和同伴组队选了这门课，这也是这门项目的由来。
+整个项目从4月份开始，到5月底向猪脚答辩时完成了1.0版本（https://github.com/231220075/git.git），包含了除远程分支外的基本功能。后续在暑假期间补上了远程分支控制的部分，即1.1版本（https://github.com/231220075/rit.git），命名为rit-&gt;rust-git。
+初步开发
+首先需要了解git的工作原理，这一部分参考https://git-scm.com/book/en/v，不再赘述。
+每一条git命令执行过程比较固定，解析好命令行参数后执行对应的处理函数即可。解析命令行参数使用clap（易于使用，能处理复杂参数解析，且自动生成help页）。clap解析命令行参数并返回具体类型的 subcommand，并调用其run函数。这里为了后续子命令的实现，我们把.git所在目录路径作为参数传给run，并为-C做了处理。
+在做subcommand之前需要先实现一些底层命令，我们做了cat-file、hash-object、write&#x2F;read-tree、update-index、commit-tree、update-ref&amp;&amp;symboloc-ref等等（后两个比较简单，后续直接简化到utils&#x2F;refs作为分支管理工具了），这一部分逐步理清并构建了git的工作环境，如index区、.git文件内容管理、refs管理等等，以及git中 blob、tree、commit这几种object的结构，这些就是git的底层代码，到此为止我们就能完全读懂.git下的所有文件及其功能了。
+理解底层代码后剩下的部分就比较简单了，subcommand就是在底层命令的基础上运行的，基本就是组合一下，加上判断处理。比较复杂的可能是checkout和merge，课程对merge要求比较简单，如果有冲突只要显示两个分支哪部分有不同，这部分由另一位成员完成，我不做过多阐述；而checkout主要涉及到切换分支的时间点，workspace、index和ref commit是否一致的问题。我的理解是，如果切换分支前，仅考虑目标文件，index&#x3D;workspace&#x3D;current ref commit，说明不存在未暂存&amp;&amp;未提交的更改，即index和workspace都是clean，这种情况下可以直接切换ref commit,并把目标commit的tree object写入index和更新workspace；否则说明有未暂存||未提交的更改，需要考虑保留这些更改，存在一个“merge”的过程，对于存在冲突的文件以index&#x2F;workspace为准。
+这个过程中每一步开发新功能前需要先把频繁使用的method构建一个util，方便后续使用，我们主要是用到很多关于三类object构建和读写、index的读写、文件读写以及压缩、hash和做单元测试的method，构建了相关的utils。谈到unit test，需要感谢我的同伴开发了完整的测试框架，为我们的测试做出来巨大的贡献、巨大的carry，respect！也是rust优秀的单元测试让我这个懒人也愿意开始做测试了，amazing啊qwq。
+
+debug&amp;&amp;踩坑
+关于debug，包括两部分。一是客观方面作为课设，猪脚还是做了oj，我们这个项目需要通过测试拿分。猪脚的oj是用脚本做断言测试公开了部分测试和要求，涉及大文件、可执行文件、图片等的测试；另一方面主观上每个subcommand和底层命令我们做了对应的集成测试，主要是交替使用原版git和rust-git检查问题。
+大部分bug在检测的过程中就知道哪里有问题，可以快速解决，但有的是认知问题。比较典型的是，index区暂存文件的结构和tree object的文件结构是不一样的，前者是完整的路径，而后者是递归存储的。
+另外就是配置了GitHub的CI，name: Rust CI# 触发条件：当代码推送到仓库或创建 Pull Request 时触发on:  push:    branches: [ &#x27;**&#x27; ]jobs:  build-and-test:    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境    steps:      # Step 1: 检出代码      - name: Checkout code        uses: actions/checkout@v3      # Step 2: 设置 Rust 工具链      - name: Set up Rust        uses: actions-rs/toolchain@v1        with:          toolchain: stable  # 使用稳定的 Rust 工具链      # Step 3: 运行 cargo test      - name: Run Tests        run: cargo test -- --test-threads=1      # Step 4: 运行 cargo clippy 检查      - name: Run Clippy        run: cargo clippy -- -D warnings  # 将警告视为错误      # （可选）Step 5: 构建项目      - name: Build Project        run: cargo build --release
+这样每次提交自动触发测试，虽然每次都要发个邮件提醒有点烦就是了……大概如下
+
+🤖️ 远程分支
+进入8月才有时间收拾这个没完成的摊子，想补充的远程分支部分主要是fetch、pull和push三个subcommand，目标是能和GitHub的repo交互更新即可。
+我最终选择用https与GitHub传输，虽然传输大文件不稳定，但是本人对https比较熟悉（ssh现阶段就不太考虑了）。fetch主要是获取远程仓库的分支和对应的commit hash，而首先要设定远程传输的仓库URL，所以先实现remote指令设置分支和URL的映射，保存在.git&#x2F;config文件。fetch同样可以指定参数，选择获取所有远程分支还是特定远程分支，然后创建“.git&#x2F;refs&#x2F;remote&#x2F;分支名”文件，记录其commit hash。
+而pull则是fetch+merge，先获取远程分支，然后将当前分支与目标分支合并。有一个需要注意的点是，在init后remote add&amp;&amp;pull，此时本地分支因为没有提交过，refs下并没有默认的master&#x2F;main文件，因为没有提交过、没有commit hash，此时要做merge会出现问题，既没有本地分支也没有index区，我之前的实现会merge fail。所以我取巧了一下，如果是初始化之后直接pull的这种情况，直接fetch+checkout到远程分支；而push则协商需要传输的对象，并创建pack文件通过https传输。
+需要注意的地方主要有两点：一是pull下来的pack需要解压缩，这个解压缩器的设计需要比较精确，完全理解git的压缩pack的逻辑才能设计足够精确的解压器、才能完全解压出100%的object，否则会丢失部分object产生缺损；二是所有的pack在push上去后都会被GitHub端接收，需要严格遵循格式，我在此过程中有两个问题，tree object的文件组织格式（没错，正是前文提到的）和index&amp;&amp;tree object中表项没按字典序排序。说实话之前在和原版git比对的时候也注意到了这个顺序问题，但当时感觉没什么影响，现在被教训了，只能说一切都有其存在的意义
+
+
+感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+]]></content>
+      <categories>
+        <category>学习记录</category>
+      </categories>
+      <tags>
+        <tag>rust</tag>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>🌐 网页构建基础知识详解</title>
     <url>/2025/08/13/%E7%BD%91%E9%A1%B5%E6%9E%84%E5%BB%BA%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E8%AF%A6%E8%A7%A3/</url>
     <content><![CDATA[🌐 网页构建基础知识体系作为一个前端开发的初学者，了解网页构建的完整体系是非常重要的。本文将从专业角度为你系统地解释整个网页开发的基础知识。
@@ -2848,44 +3152,6 @@ TypeScript：类型安全的 JavaScript
       </categories>
       <tags>
         <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>用rust复刻git</title>
-    <url>/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/</url>
-    <content><![CDATA[📝 用rust复刻git
-本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历
-
-前言大二下选课的时候发现有一门《rust程序设计》的课程，之前在大一上c++的时候最早接触过rust这个名字，但是一直没怎么了解过，于是抱着好奇心和同伴组队选了这门课，这也是这门项目的由来。
-整个项目从4月份开始，到5月底向猪脚答辩时完成了1.0版本（https://github.com/231220075/git.git），包含了除远程分支外的基本功能。后续在暑假期间补上了远程分支控制的部分，即1.1版本（https://github.com/231220075/rit.git），命名为rit-&gt;rust-git。
-初步开发
-首先需要了解git的工作原理，这一部分参考https://git-scm.com/book/en/v，不再赘述。
-每一条git命令执行过程比较固定，解析好命令行参数后执行对应的处理函数即可。解析命令行参数使用clap（易于使用，能处理复杂参数解析，且自动生成help页）。clap解析命令行参数并返回具体类型的 subcommand，并调用其run函数。这里为了后续子命令的实现，我们把.git所在目录路径作为参数传给run，并为-C做了处理。
-在做subcommand之前需要先实现一些底层命令，我们做了cat-file、hash-object、write&#x2F;read-tree、update-index、commit-tree、update-ref&amp;&amp;symboloc-ref等等（后两个比较简单，后续直接简化到utils&#x2F;refs作为分支管理工具了），这一部分逐步理清并构建了git的工作环境，如index区、.git文件内容管理、refs管理等等，以及git中 blob、tree、commit这几种object的结构，这些就是git的底层代码，到此为止我们就能完全读懂.git下的所有文件及其功能了。
-理解底层代码后剩下的部分就比较简单了，subcommand就是在底层命令的基础上运行的，基本就是组合一下，加上判断处理。比较复杂的可能是checkout和merge，课程对merge要求比较简单，如果有冲突只要显示两个分支哪部分有不同，这部分由另一位成员完成，我不做过多阐述；而checkout主要涉及到切换分支的时间点，workspace、index和ref commit是否一致的问题。我的理解是，如果切换分支前，仅考虑目标文件，index&#x3D;workspace&#x3D;current ref commit，说明不存在未暂存&amp;&amp;未提交的更改，即index和workspace都是clean，这种情况下可以直接切换ref commit,并把目标commit的tree object写入index和更新workspace；否则说明有未暂存||未提交的更改，需要考虑保留这些更改，存在一个“merge”的过程，对于存在冲突的文件以index&#x2F;workspace为准。
-这个过程中每一步开发新功能前需要先把频繁使用的method构建一个util，方便后续使用，我们主要是用到很多关于三类object构建和读写、index的读写、文件读写以及压缩、hash和做单元测试的method，构建了相关的utils。谈到unit test，需要感谢我的同伴开发了完整的测试框架，为我们的测试做出来巨大的贡献、巨大的carry，respect！也是rust优秀的单元测试让我这个懒人也愿意开始做测试了，amazing啊qwq。
-
-debug&amp;&amp;踩坑
-关于debug，包括两部分。一是客观方面作为课设，猪脚还是做了oj，我们这个项目需要通过测试拿分。猪脚的oj是用脚本做断言测试公开了部分测试和要求，涉及大文件、可执行文件、图片等的测试；另一方面主观上每个subcommand和底层命令我们做了对应的集成测试，主要是交替使用原版git和rust-git检查问题。
-大部分bug在检测的过程中就知道哪里有问题，可以快速解决，但有的是认知问题。比较典型的是，index区暂存文件的结构和tree object的文件结构是不一样的，前者是完整的路径，而后者是递归存储的。
-另外就是配置了GitHub的CI，name: Rust CI# 触发条件：当代码推送到仓库或创建 Pull Request 时触发on:  push:    branches: [ &#x27;**&#x27; ]jobs:  build-and-test:    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境    steps:      # Step 1: 检出代码      - name: Checkout code        uses: actions/checkout@v3      # Step 2: 设置 Rust 工具链      - name: Set up Rust        uses: actions-rs/toolchain@v1        with:          toolchain: stable  # 使用稳定的 Rust 工具链      # Step 3: 运行 cargo test      - name: Run Tests        run: cargo test -- --test-threads=1      # Step 4: 运行 cargo clippy 检查      - name: Run Clippy        run: cargo clippy -- -D warnings  # 将警告视为错误      # （可选）Step 5: 构建项目      - name: Build Project        run: cargo build --release
-这样每次提交自动触发测试，虽然每次都要发个邮件提醒有点烦就是了……大概如下
-
-🤖️ 远程分支
-进入8月才有时间收拾这个没完成的摊子，想补充的远程分支部分主要是fetch、pull和push三个subcommand，目标是能和GitHub的repo交互更新即可。
-我最终选择用https与GitHub传输，虽然传输大文件不稳定，但是本人对https比较熟悉（ssh现阶段就不太考虑了）。fetch主要是获取远程仓库的分支和对应的commit hash，而首先要设定远程传输的仓库URL，所以先实现remote指令设置分支和URL的映射，保存在.git&#x2F;config文件。fetch同样可以指定参数，选择获取所有远程分支还是特定远程分支，然后创建“.git&#x2F;refs&#x2F;remote&#x2F;分支名”文件，记录其commit hash。
-而pull则是fetch+merge，先获取远程分支，然后将当前分支与目标分支合并。有一个需要注意的点是，在init后remote add&amp;&amp;pull，此时本地分支因为没有提交过，refs下并没有默认的master&#x2F;main文件，因为没有提交过、没有commit hash，此时要做merge会出现问题，既没有本地分支也没有index区，我之前的实现会merge fail。所以我取巧了一下，如果是初始化之后直接pull的这种情况，直接fetch+checkout到远程分支；而push则协商需要传输的对象，并创建pack文件通过https传输。
-需要注意的地方主要有两点：一是pull下来的pack需要解压缩，这个解压缩器的设计需要比较精确，完全理解git的压缩pack的逻辑才能设计足够精确的解压器、才能完全解压出100%的object，否则会丢失部分object产生缺损；二是所有的pack在push上去后都会被GitHub端接收，需要严格遵循格式，我在此过程中有两个问题，tree object的文件组织格式（没错，正是前文提到的）和index&amp;&amp;tree object中表项没按字典序排序。说实话之前在和原版git比对的时候也注意到了这个顺序问题，但当时感觉没什么影响，现在被教训了，只能说一切都有其存在的意义
-
-
-感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
-]]></content>
-      <categories>
-        <category>学习记录</category>
-      </categories>
-      <tags>
-        <tag>rust</tag>
-        <tag>git</tag>
       </tags>
   </entry>
   <entry>
