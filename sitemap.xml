@@ -2,6 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://summer-flower.com/manifest.json</loc>
+    
+    <lastmod>2025-08-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://summer-flower.com/links/index.html</loc>
+    
+    <lastmod>2025-08-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://summer-flower.com/about/index.html</loc>
+    
+    <lastmod>2025-08-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://summer-flower.com/sitemap/index.html</loc>
+    
+    <lastmod>2025-08-16</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://summer-flower.com/404.html</loc>
     
     <lastmod>2025-08-15</lastmod>
@@ -210,6 +246,13 @@
   </url>
   
   <url>
+    <loc>http://summer-flower.com/tags/%E5%AD%A6%E4%B9%A0/</loc>
+    <lastmod>2025-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>http://summer-flower.com/tags/%E5%9F%9F%E5%90%8D/</loc>
     <lastmod>2025-08-16</lastmod>
     <changefreq>weekly</changefreq>
@@ -238,21 +281,7 @@
   </url>
   
   <url>
-    <loc>http://summer-flower.com/tags/%E5%AD%A6%E4%B9%A0/</loc>
-    <lastmod>2025-08-16</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>http://summer-flower.com/tags/%E4%B9%A1%E6%84%81/</loc>
-    <lastmod>2025-08-16</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>http://summer-flower.com/tags/start/</loc>
     <lastmod>2025-08-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -267,6 +296,13 @@
   
   <url>
     <loc>http://summer-flower.com/tags/git/</loc>
+    <lastmod>2025-08-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>http://summer-flower.com/tags/start/</loc>
     <lastmod>2025-08-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
