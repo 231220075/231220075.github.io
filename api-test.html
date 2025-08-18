@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>英超API测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 英超API连接测试</h1>
+    
+    <div id="test-results"></div>
+    
+    <button onclick="testConnection()">测试连接</button>
+    <button onclick="testAPI()">测试API</button>
+    <button onclick="testStandings()">测试积分榜</button>
+    <button onclick="clearResults()">清除结果</button>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `${new Date().toLocaleTimeString()}: ${message}`;
+            document.getElementById('test-results').appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+        
+        async function testConnection() {
+            addResult('🔍 测试基础连接...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ 连接成功! 状态: ${data.status}`, 'success');
+                } else {
+                    addResult(`❌ 连接失败! HTTP ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ 连接出错: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAPI() {
+            addResult('🔍 测试API端点...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/premier-league/standings`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    addResult(`✅ API调用成功! 数据源: ${data.source}`, 'success');
+                    addResult(`📊 数据类型: ${typeof data.data}, 长度: ${Array.isArray(data.data) ? data.data.length : 'N/A'}`, 'info');
+                } else {
+                    addResult(`❌ API返回错误: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ API调用出错: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testStandings() {
+            addResult('🔍 测试积分榜数据...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/premier-league/standings`);
+                const data = await response.json();
+                
+                if (data.success && Array.isArray(data.data)) {
+                    const firstTeam = data.data[0];
+                    addResult(`✅ 积分榜数据正常! 第一名: ${firstTeam.team.name} (${firstTeam.points}分)`, 'success');
+                    
+                    if (data.season) {
+                        const startYear = data.season.startDate?.substring(0, 4);
+                        const endYear = startYear ? parseInt(startYear) + 1 : '?';
+                        addResult(`📅 赛季: ${startYear}-${endYear.toString().slice(2)} (第${data.season.currentMatchday}轮)`, 'info');
+                    }
+                } else {
+                    addResult(`❌ 积分榜数据格式错误`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ 积分榜测试出错: ${error.message}`, 'error');
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.onload = function() {
+            addResult('🚀 开始自动测试...', 'info');
+            setTimeout(testConnection, 500);
+        };
+    </script>
+</body>
+</html>
