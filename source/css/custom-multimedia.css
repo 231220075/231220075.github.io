@@ -1,0 +1,212 @@
+/* ===========================================
+   自定义多媒体页面样式
+   ========================================== */
+
+/* 通用响应式改进 */
+@media (max-width: 1200px) {
+  .music-card-container,
+  .movie-cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .interactive-music-player,
+  .interactive-video-player,
+  .photo-upload-section {
+    margin: 20px -15px;
+    border-radius: 0;
+  }
+  
+  .input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .input-group input {
+    min-width: auto;
+    margin-bottom: 10px;
+  }
+  
+  .preset-songs,
+  .preset-videos {
+    justify-content: center;
+  }
+}
+
+/* 页面加载动画 */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.music-card,
+.movie-card,
+.photo-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* 交互反馈优化 */
+.upload-btn:active,
+.input-group button:active {
+  transform: translateY(0);
+}
+
+/* 滚动条美化 */
+.music-player-container::-webkit-scrollbar,
+.video-player-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.music-player-container::-webkit-scrollbar-track,
+.video-player-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.music-player-container::-webkit-scrollbar-thumb,
+.video-player-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.music-player-container::-webkit-scrollbar-thumb:hover,
+.video-player-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* 焦点可访问性 */
+.tab-btn:focus,
+.upload-btn:focus,
+.input-group button:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* 加载状态优化 */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 错误状态样式 */
+.error-message {
+  background: #ff6b6b;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.error-message::before {
+  content: "⚠️";
+  font-size: 1.2em;
+}
+
+/* 成功状态样式 */
+.success-message {
+  background: #51cf66;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.success-message::before {
+  content: "✅";
+  font-size: 1.2em;
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+  .photo-card,
+  .movie-card,
+  .note-card,
+  .photography-note {
+    background: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .photo-card h3,
+  .movie-card h3,
+  .note-card h4,
+  .photography-note h4 {
+    color: #f7fafc;
+  }
+  
+  .category-item {
+    background: rgba(45, 55, 72, 0.7);
+    color: #e2e8f0;
+  }
+  
+  .stat-card {
+    background: rgba(45, 55, 72, 0.8);
+    color: #e2e8f0;
+  }
+  
+  .preview-item {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .music-card,
+  .movie-card,
+  .photo-card {
+    border: 2px solid #000;
+  }
+  
+  .tab-btn,
+  .upload-btn {
+    border: 2px solid #000;
+  }
+  
+  .tag {
+    border: 1px solid #000;
+  }
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  .music-card,
+  .movie-card,
+  .photo-card,
+  .photo-item {
+    animation: none;
+    transition: none;
+  }
+  
+  .photo-img,
+  .movie-poster img,
+  .photo-item img {
+    transition: none;
+  }
+  
+  .loading {
+    animation: none;
+  }
+}

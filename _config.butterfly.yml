@@ -21,6 +21,12 @@ menu:
   List||fas fa-list:
     Music: /music/ || fas fa-music
     Movie: /movies/ || fas fa-video
+    Photos: /photos-gallery/ || fas fa-camera
+    Games: /games/ || fas fa-gamepad
+  Archives: /archives/ || fas fa-archive
+  Links: /links/ || fas fa-link
+  About: /about/ || fas fa-user
+  Sitemap: /sitemap/ || fas fa-sitemap
   Comments: /comments/ || fas fa-envelope-open
 # --------------------------------------
 # Code Blocks Settings
@@ -52,7 +58,7 @@ social:
 # Image Settings
 # --------------------------------------
 
-favicon: /img/favicon.png
+favicon: /img/favicon.ico
 
 avatar:
   img: /photos/avatar.jpg
@@ -141,9 +147,9 @@ post_meta:
 # The top_img settings of home page
 # default: top img - full screen, site info - middle
 # The position of site info, eg: 300px/300em/300rem/10%
-index_site_info_top:
+index_site_info_inset-block-start:
 # The height of top_img, eg: 300px/300em/300rem
-index_top_img_height:
+index_top_img_block-size:
 
 # The subtitle on homepage
 subtitle:
@@ -199,7 +205,7 @@ toc:
   style_simple: false
   scroll_percent: true
 
-post_copyright:
+post_copyinset-inline-end:
   enable: true
   decode: false
   author_href:
@@ -261,7 +267,7 @@ footer:
     since: 2025
   custom_text:
   # Copyright of theme and framework
-  copyright: true
+  copyinset-inline-end: true
 
 # --------------------------------------
 # Aside Settings
@@ -355,7 +361,7 @@ aside:
 # --------------------------------------
 
 # The distance between the bottom right button and the bottom (default unit: px)
-rightside_bottom:
+rightside_inset-block-end:
 
 # Conversion between Traditional and Simplified Chinese
 translate:
@@ -416,7 +422,7 @@ photofigcaption: false
 copy:
   enable: true
   # Add the copyright information after copied content
-  copyright:
+  copyinset-inline-end:
     enable: false
     limit_count: 150
 
@@ -431,6 +437,7 @@ wordcount:
   total_wordcount: true
 
 # Busuanzi count for PV / UV in site
+# 已启用 Google Analytics 4 和 Microsoft Clarity，关闭基础的 Busuanzi 统计
 busuanzi:
   site_uv: true
   site_pv: true
@@ -685,13 +692,17 @@ crisp:
 baidu_analytics:
 
 # https://analytics.google.com/analytics/web/
-google_analytics:
+# 请注册 Google Analytics 4，创建媒体资源后获取测量ID（格式：G-XXXXXXXXXX）
+# 注册地址：https://analytics.google.com/
+google_analytics: 
 
 # https://www.cloudflare.com/zh-tw/web-analytics/
 cloudflare_analytics:
 
 # https://clarity.microsoft.com/
-microsoft_clarity:
+# 请注册 Microsoft Clarity，添加网站后获取项目ID
+# 注册地址：https://clarity.microsoft.com/
+microsoft_clarity: su3jybron2  # 替换为您的 Clarity 项目ID
 
 # https://umami.is/
 umami_analytics:
@@ -825,7 +836,7 @@ hr_icon:
   enable: true
   # The unicode value of Font Awesome icon, such as '\3423'
   icon:
-  icon_top:
+  icon_inset-block-start:
 
 # Typewriter Effect
 # https://github.com/disjukr/activate-power-mode
@@ -899,7 +910,7 @@ clickShowText:
 # https://github.com/francoischalifour/medium-zoom
 # https://fancyapps.com/fancybox/
 # Leave it empty if you don't need lightbox
-lightbox:
+lightbox: fancybox
 
 # --------------------------------------
 # Tag Plugins settings
@@ -984,8 +995,8 @@ aplayerInject:
 # https://github.com/polonel/SnackBar
 # position: top-left / top-center / top-right / bottom-left / bottom-center / bottom-right
 snackbar:
-  enable: false
-  position: bottom-left
+  enable: true
+  position: bottom-right
   # The background color of Toast Notification in light mode and dark mode
   bg_light: '#49b1f5'
   bg_dark: '#1f1f1f'
@@ -1007,12 +1018,12 @@ lazyload:
 # See https://github.com/JLHwung/hexo-offline
 # ---------------
 pwa:
-  enable: false
-  manifest:
-  apple_touch_icon:
-  favicon_32_32:
-  favicon_16_16:
-  mask_icon:
+  enable: true
+  manifest: /manifest.json
+  apple_touch_icon: /img/favicon.ico
+  favicon_32_32: /img/favicon.ico
+  favicon_16_16: /img/favicon.ico
+  mask_icon: /img/favicon.ico
 
 # Open graph meta tags
 # https://hexo.io/docs/helpers#open-graph
@@ -1039,8 +1050,12 @@ css_prefix: true
 inject:
   head:
     # - <link rel="stylesheet" href="/xxx.css">
-  bottom:
+    # Modern Live2D Widget
+    - <script src="https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
+  inset-block-end:
     # - <script src="xxxx"></script>
+    - <script src="/js/redirect-handler.js"></script>
+    - <script src="/js/pwa-install.js"></script>
 
 # CDN Settings
 # Don't modify the following settings unless you know how they work
