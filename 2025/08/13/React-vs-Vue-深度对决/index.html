@@ -1,0 +1,389 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>React vs. Vue：前端框架的深度对决 | Summer Flower</title><meta name="author" content="forever"><meta name="copyright" content="forever"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="在当今前端开发领域，React 和 Vue 无疑是两座无法绕开的高峰。它们都拥有庞大的社区、丰富的生态和出色的性能，但其设计哲学和开发体验却大相径庭。作为开发者，理解它们的核心差异，才能在项目选型时做出最明智的决策。本文将从专业角度，对这两个框架进行一次深度对比。 概览   特性 React Vue    类型 用于构建用户界面的 JavaScript 库 渐进式 JavaScript 框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React vs. Vue：前端框架的深度对决">
+<meta property="og:url" content="http://summer-flower.com/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/index.html">
+<meta property="og:site_name" content="Summer Flower">
+<meta property="og:description" content="在当今前端开发领域，React 和 Vue 无疑是两座无法绕开的高峰。它们都拥有庞大的社区、丰富的生态和出色的性能，但其设计哲学和开发体验却大相径庭。作为开发者，理解它们的核心差异，才能在项目选型时做出最明智的决策。本文将从专业角度，对这两个框架进行一次深度对比。 概览   特性 React Vue    类型 用于构建用户界面的 JavaScript 库 渐进式 JavaScript 框架">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://summer-flower.com/photos/avatar.jpg">
+<meta property="article:published_time" content="2025-08-13T08:45:00.000Z">
+<meta property="article:modified_time" content="2025-08-13T07:38:58.623Z">
+<meta property="article:author" content="forever">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="前端">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://summer-flower.com/photos/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "React vs. Vue：前端框架的深度对决",
+  "url": "http://summer-flower.com/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/",
+  "image": "http://summer-flower.com/photos/avatar.jpg",
+  "datePublished": "2025-08-13T08:45:00.000Z",
+  "dateModified": "2025-08-13T07:38:58.623Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "forever",
+      "url": "http://summer-flower.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="http://summer-flower.com/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.clarity.ms"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="manifest" href="/manifest.json"/><link rel="apple-touch-icon" sizes="180x180" href="/img/favicon.ico"/><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon.ico"/><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon.ico"/><link rel="mask-icon" href="/img/favicon.ico" color="#5bbad5"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "su3jybron2");
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'React vs. Vue：前端框架的深度对决',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><script src="https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Summer Flower" type="application/atom+xml">
+</head><body><div id="web_bg" style="background-image: url(/url(/source/photos/arknight.jpg));"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/photos/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li><li><a class="site-page child" href="/photos-gallery/"><i class="fa-fw fas fa-camera"></i><span> Photos</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-gamepad"></i><span> Games</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap/"><i class="fa-fw fas fa-sitemap"></i><span> Sitemap</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> Comments</span></a></div><div class="menus_item"><a class="site-page" href="/browser/"><i class="fa-fw fas fa-globe"></i><span> Browser</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Summer Flower</span></a><a class="nav-page-title" href="/"><span class="site-name">React vs. Vue：前端框架的深度对决</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li><li><a class="site-page child" href="/photos-gallery/"><i class="fa-fw fas fa-camera"></i><span> Photos</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-gamepad"></i><span> Games</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap/"><i class="fa-fw fas fa-sitemap"></i><span> Sitemap</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> Comments</span></a></div><div class="menus_item"><a class="site-page" href="/browser/"><i class="fa-fw fas fa-globe"></i><span> Browser</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">React vs. Vue：前端框架的深度对决</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-08-13T08:45:00.000Z" title="Created 2025-08-13 16:45:00">2025-08-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-08-13T07:38:58.623Z" title="Updated 2025-08-13 15:38:58">2025-08-13</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">技术分享</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">2.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>8mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2025-08-13 15:38:58&quot;}" hidden></div><p>在当今前端开发领域，React 和 Vue 无疑是两座无法绕开的高峰。它们都拥有庞大的社区、丰富的生态和出色的性能，但其设计哲学和开发体验却大相径庭。作为开发者，理解它们的核心差异，才能在项目选型时做出最明智的决策。本文将从专业角度，对这两个框架进行一次深度对比。</p>
+<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><table>
+<thead>
+<tr>
+<th align="left">特性</th>
+<th align="left">React</th>
+<th align="left">Vue</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>类型</strong></td>
+<td align="left">用于构建用户界面的 JavaScript <strong>库</strong></td>
+<td align="left">渐进式 JavaScript <strong>框架</strong></td>
+</tr>
+<tr>
+<td align="left"><strong>核心思想</strong></td>
+<td align="left">一切皆是 JavaScript，拥抱函数式编程</td>
+<td align="left">拥抱传统 Web，HTML&#x2F;CSS&#x2F;JS 分离</td>
+</tr>
+<tr>
+<td align="left"><strong>创建者</strong></td>
+<td align="left">Meta (Facebook)</td>
+<td align="left">尤雨溪 (前 Google 工程师)</td>
+</tr>
+<tr>
+<td align="left"><strong>上手难度</strong></td>
+<td align="left">较陡峭，需要深入理解 JS 和 JSX</td>
+<td align="left">相对平缓，对新手更友好</td>
+</tr>
+<tr>
+<td align="left"><strong>灵活性</strong></td>
+<td align="left">极高，生态系统庞大，选择多样</td>
+<td align="left">较高，官方提供全家桶，开箱即用</td>
+</tr>
+<tr>
+<td align="left"><strong>数据流</strong></td>
+<td align="left">单向数据流</td>
+<td align="left">支持单向和双向数据绑定</td>
+</tr>
+<tr>
+<td align="left"><strong>状态管理</strong></td>
+<td align="left">Context API, Redux, MobX, Zustand</td>
+<td align="left">Pinia (官方推荐), Vuex</td>
+</tr>
+<tr>
+<td align="left"><strong>路由</strong></td>
+<td align="left">React Router</td>
+<td align="left">Vue Router (官方)</td>
+</tr>
+<tr>
+<td align="left"><strong>构建工具</strong></td>
+<td align="left">Create React App, Vite, Next.js</td>
+<td align="left">Vue CLI, Vite, Nuxt.js</td>
+</tr>
+<tr>
+<td align="left"><strong>市场份额</strong></td>
+<td align="left">更大，尤其在欧美和大型企业</td>
+<td align="left">快速增长，在亚洲和初创公司中非常流行</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="1-核心理念与设计哲学"><a href="#1-核心理念与设计哲学" class="headerlink" title="1. 核心理念与设计哲学"></a>1. 核心理念与设计哲学</h3><p><strong>React：更像一个“库”，专注 UI</strong></p>
+<p>React 的核心定位是一个用于构建用户界面（UI）的 JavaScript <strong>库</strong>。它本身只关心视图层（MVC 中的 V）。这意味着 React 只提供构建 UI 组件的核心功能。至于路由、状态管理、HTTP 请求等，你需要自己选择并集成第三方库。</p>
+<ul>
+<li><strong>All in JS</strong>：React 的一个核心哲学是“All in JS”。它认为模板逻辑和渲染逻辑本质上是耦合的，因此发明了 <strong>JSX</strong>（JavaScript XML），让你可以在 JavaScript 代码中直接编写类似 HTML 的结构。这提供了极大的灵活性和编程能力，因为你可以使用 JavaScript 的全部功能（如 <code>map</code>, <code>filter</code>）来构建 UI。</li>
+<li><strong>单向数据流</strong>：数据总是从父组件通过 <code>props</code> 流向子组件。子组件不能直接修改父组件的数据，需要通过调用父组件传递的回调函数来通知父组件进行更新。这种模式使得数据流向清晰可控，在大型应用中更容易追踪和调试。</li>
+</ul>
+<p><strong>Vue：一个“渐进式框架”</strong></p>
+<p>Vue 的定位是一个<strong>渐进式框架</strong>。这意味着你可以从一个简单的功能（比如只用它来处理页面上的一小块交互）开始，然后根据需求逐渐引入路由（Vue Router）、状态管理（Pinia）等功能，最终构建一个功能完整的单页应用（SPA）。</p>
+<ul>
+<li><strong>拥抱传统 Web</strong>：Vue 的设计对有传统 HTML&#x2F;CSS&#x2F;JS 背景的开发者非常友好。它的<strong>单文件组件 (SFC - Single File Component)</strong> 将一个组件的模板 (<code>&lt;template&gt;</code>)、脚本 (<code>&lt;script&gt;</code>) 和样式 (<code>&lt;style&gt;</code>) 封装在同一个 <code>.vue</code> 文件中。这种结构清晰，关注点分离，非常直观。</li>
+<li><strong>灵活的数据绑定</strong>：Vue 同时支持单向数据流和双向数据绑定。通过 <code>v-model</code> 指令，可以轻松实现表单输入和状态之间的双向绑定，这在处理表单时大大简化了代码。</li>
+</ul>
+<hr>
+<h3 id="2-组件化开发"><a href="#2-组件化开发" class="headerlink" title="2. 组件化开发"></a>2. 组件化开发</h3><p>两者都采用组件化思想，但实现方式不同。</p>
+<p><strong>React 组件：函数与 Hooks</strong></p>
+<p>现代 React 开发主要使用<strong>函数式组件</strong>和 <strong>Hooks</strong>。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// React Functional Component with Hooks</span></span><br><span class="line"><span class="keyword">import</span> <span class="title class_">React</span>, &#123; useState, useEffect &#125; <span class="keyword">from</span> <span class="string">&#x27;react&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">MyComponent</span>(<span class="params">&#123; initialCount &#125;</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [count, setCount] = <span class="title function_">useState</span>(initialCount); <span class="comment">// 状态 Hook</span></span><br><span class="line">  <span class="keyword">const</span> [data, setData] = <span class="title function_">useState</span>(<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 副作用 Hook，类似生命周期函数</span></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 模拟数据获取</span></span><br><span class="line">    <span class="title function_">fetch</span>(<span class="string">&#x27;https://api.example.com/data&#x27;</span>)</span><br><span class="line">      .<span class="title function_">then</span>(<span class="function"><span class="params">res</span> =&gt;</span> res.<span class="title function_">json</span>())</span><br><span class="line">      .<span class="title function_">then</span>(setData);</span><br><span class="line">  &#125;, []); <span class="comment">// 空依赖数组表示只在组件挂载时运行一次</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>Count: &#123;count&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;()</span> =&gt;</span> setCount(count + 1)&#125;&gt;Increment<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>优点</strong>：JSX 提供了无与伦比的灵活性。Hooks（如 <code>useState</code>, <code>useEffect</code>）让函数式组件也能拥有状态和生命周期逻辑，代码更简洁、复用性更强。</li>
+<li><strong>挑战</strong>：需要对 JavaScript 的闭包、<code>this</code> 指向（在类组件中）有深刻理解。JSX 的学习曲线对初学者来说可能稍高。</li>
+</ul>
+<p><strong>Vue 组件：选项式 API 与组合式 API</strong></p>
+<p>Vue 提供了两种组件 API 风格。</p>
+<ol>
+<li><p><strong>选项式 API (Options API)</strong>：对新手友好，结构清晰。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- MyComponent.vue --&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;</span><br><span class="line">    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  props: [&#x27;initialCount&#x27;],</span><br><span class="line">  data() &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      count: this.initialCount,</span><br><span class="line">      data: null</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    increment() &#123;</span><br><span class="line">      this.count++;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted() &#123;</span><br><span class="line">    // 模拟数据获取</span><br><span class="line">    fetch(&#x27;https://api.example.com/data&#x27;)</span><br><span class="line">      .then(res =&gt; res.json())</span><br><span class="line">      .then(data =&gt; this.data = data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>组合式 API (Composition API)</strong>：受 React Hooks 启发，更适合大型复杂项目，逻辑组织更灵活。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- MyComponent.vue --&gt;</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;</span><br><span class="line">    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script setup&gt;</span><br><span class="line">import &#123; ref, onMounted &#125; from &#x27;vue&#x27;;</span><br><span class="line"></span><br><span class="line">const props = defineProps([&#x27;initialCount&#x27;]);</span><br><span class="line">const count = ref(props.initialCount); // 响应式状态</span><br><span class="line">const data = ref(null);</span><br><span class="line"></span><br><span class="line">function increment() &#123;</span><br><span class="line">  count.value++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">onMounted(async () =&gt; &#123;</span><br><span class="line">  data.value = await (await fetch(&#x27;https://api.example.com/data&#x27;)).json();</span><br><span class="line">&#125;);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li><strong>优点</strong>：<code>.vue</code> 文件结构清晰，模板语法更接近原生 HTML。组合式 API 解决了选项式 API 在大型组件中逻辑分散的问题，代码组织更灵活。</li>
+<li><strong>挑战</strong>：在组合式 API 中需要理解 <code>ref</code> 和 <code>reactive</code> 的区别。</li>
+</ul>
+<hr>
+<h3 id="3-生态系统与状态管理"><a href="#3-生态系统与状态管理" class="headerlink" title="3. 生态系统与状态管理"></a>3. 生态系统与状态管理</h3><p><strong>React：庞大而分散，选择自由</strong></p>
+<ul>
+<li><strong>状态管理</strong>：<ul>
+<li><strong>简单场景</strong>：使用 <code>useState</code> 和 <code>useReducer</code> 配合 <code>Context API</code>。</li>
+<li><strong>复杂应用</strong>：<strong>Redux</strong> 是事实上的标准，功能强大，但以学习曲线陡峭和模板代码多而闻名。近年来，<strong>Zustand</strong> 和 <strong>MobX</strong> 等更轻量、更现代的方案越来越受欢迎。</li>
+</ul>
+</li>
+<li><strong>生态</strong>：React 的生态系统是其最大的优势之一。几乎任何你能想到的功能都有成熟的第三方库支持。但也意味着你需要花时间去评估和选择技术栈，这被称为“选择疲劳症”。<strong>Next.js</strong> 框架的出现极大地改变了这一局面，它为 React 提供了一个强大的、带有一系列最佳实践的全栈开发骨架。</li>
+</ul>
+<p><strong>Vue：官方维护，集成度高</strong></p>
+<ul>
+<li><strong>状态管理</strong>：<ul>
+<li><strong>Pinia</strong> 是 Vue 3 的官方推荐方案（取代了 Vuex）。它设计极其简洁、类型友好，并且没有 <code>mutations</code> 的概念，上手非常快。</li>
+</ul>
+</li>
+<li><strong>生态</strong>：Vue 的核心库（如 <code>vue-router</code> for routing, <code>pinia</code> for state management）都由官方团队维护。这保证了它们之间的高度协同和一致性。开发者不需要在众多选项中纠lge，可以快速开始。<strong>Nuxt.js</strong> 是 Vue 生态的“Next.js”，提供了服务端渲染（SSR）、静态站点生成（SSG）等高级功能。</li>
+</ul>
+<hr>
+<h3 id="4-性能"><a href="#4-性能" class="headerlink" title="4. 性能"></a>4. 性能</h3><p>两者都使用了<strong>虚拟 DOM (Virtual DOM)</strong>，性能都非常出色，足以应对绝大多数应用场景。</p>
+<ul>
+<li><strong>React</strong>：通过 Fiber 架构实现了可中断的异步渲染，为将来的并发模式等高级功能铺平了道路。</li>
+<li><strong>Vue</strong>：在编译时进行了更多优化。它会静态分析模板，找出动态部分和静态部分，从而在更新时只对比动态节点，减少了虚拟 DOM diff 的开销。</li>
+</ul>
+<p>在实际应用中，性能瓶颈更多地来自于应用本身的逻辑（如巨大的列表、频繁的非必要更新），而不是框架本身。</p>
+<hr>
+<h3 id="总结与选择建议"><a href="#总结与选择建议" class="headerlink" title="总结与选择建议"></a>总结与选择建议</h3><ul>
+<li><p><strong>选择 React 的理由</strong>：</p>
+<ol>
+<li><strong>大型项目和团队</strong>：React 的单向数据流和庞大的生态系统非常适合构建复杂、可维护的大型企业级应用。</li>
+<li><strong>招聘市场</strong>：React 的岗位需求量目前是最大的，如果你想最大化就业机会，React 是一个稳妥的选择。</li>
+<li><strong>追求极致灵活性</strong>：如果你想完全掌控你的技术栈，自由组合各种库来构建应用，React 提供了这种自由。</li>
+<li><strong>跨平台开发</strong>：React Native 允许你使用 React 的知识来构建原生移动应用（iOS&#x2F;Android），这是一个巨大的加分项。</li>
+</ol>
+</li>
+<li><p><strong>选择 Vue 的理由</strong>：</p>
+<ol>
+<li><strong>快速开发和上手</strong>：Vue 的学习曲线更平缓，文档极其出色，官方工具链开箱即用，非常适合初创公司、中小型项目和追求开发效率的场景。</li>
+<li><strong>对传统开发者友好</strong>：如果你有扎实的 HTML&#x2F;CSS&#x2F;JS 基础，Vue 的模板语法会让你感到非常亲切。</li>
+<li><strong>无缝集成</strong>：官方提供的路由和状态管理库与核心库无缝集成，减少了决策成本和集成问题。</li>
+<li><strong>性能</strong>：开箱即用的性能表现非常优秀，心智负担小。</li>
+</ol>
+</li>
+</ul>
+<p><strong>最终，React 和 Vue 都是顶级的框架，没有绝对的好坏之分，只有“更适合”的选择。</strong> 最好的方式是都尝试一下，构建一个小项目，亲身感受它们的开发体验，然后根据你的项目需求和个人偏好做出决定。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://summer-flower.com">forever</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://summer-flower.com/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/">http://summer-flower.com/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/React/">React</a><a class="post-meta__tags" href="/tags/Vue/">Vue</a><a class="post-meta__tags" href="/tags/%E5%89%8D%E7%AB%AF/">前端</a></div><div class="post-share"><div class="social-share" data-image="/photos/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/" title="域名解析与网站绑定完全指南"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">Previous</div><div class="info-item-2">域名解析与网站绑定完全指南</div></div><div class="info-2"><div class="info-item-1">域名解析与网站绑定完全指南🌐 前言当我们在浏览器输入 summer-flower.com 时，为什么能访问到我们的网站？这背后涉及了复杂的域名解析系统。本文将从零开始，详细解释域名解析的工作原理，以及如何将自定义域名绑定到 GitHub Pages。 📚 基础概念什么是域名？域名（Domain Name）是互联网上网站的人类可读地址，例如：  google.com github.com  summer-flower.com  它的作用是将复杂的IP地址（如 185.199.108.153）转换为容易记忆的名称。 什么是DNS？DNS（Domain Name System，域名系统）是互联网的”电话簿”，负责将域名翻译成IP地址。 DNS解析过程：123456789用户输入: summer-flower.com    ↓DNS查询: summer-flower.com 对应哪个IP？    ↓  DNS返回: 185.199.108.153    ↓浏览器访问: 185.199.108.153    ↓服务器返回: 网站内容  🔧 DNS记录类型详解1. A记录（Addres...</div></div></div></a><a class="pagination-related" href="/2025/08/13/%E7%BD%91%E9%A1%B5%E6%9E%84%E5%BB%BA%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E8%AF%A6%E8%A7%A3/" title="🌐 网页构建基础知识详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">🌐 网页构建基础知识详解</div></div><div class="info-2"><div class="info-item-1">🌐 网页构建基础知识体系作为一个前端开发的初学者，了解网页构建的完整体系是非常重要的。本文将从专业角度为你系统地解释整个网页开发的基础知识。 1. 前端三剑客 - 网页的基础构成🏗️ HTML (HyperText Markup Language) 作用：网页的骨架和结构 比喻：就像房子的框架，定义了哪里是门、哪里是窗户 核心概念：  1234567891011&lt;!DOCTYPE html&gt;&lt;html&gt;  &lt;head&gt;    &lt;title&gt;页面标题&lt;/title&gt;  &lt;/head&gt;  &lt;body&gt;    &lt;h1&gt;这是标题&lt;/h1&gt;    &lt;p&gt;这是段落&lt;/p&gt;    &lt;div&gt;这是容器&lt;/div&gt;  &lt;/body&gt;&lt;/html&gt;  常用HTML标签：  &lt;h1&gt; - &lt;h6&gt;：标题 &lt;p&gt;：段落 &lt;div&gt;：容器 &lt;span&gt;：内联元素 &...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/08/13/%E7%BD%91%E9%A1%B5%E6%9E%84%E5%BB%BA%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E8%AF%A6%E8%A7%A3/" title="🌐 网页构建基础知识详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-13</div><div class="info-item-2">🌐 网页构建基础知识详解</div></div><div class="info-2"><div class="info-item-1">🌐 网页构建基础知识体系作为一个前端开发的初学者，了解网页构建的完整体系是非常重要的。本文将从专业角度为你系统地解释整个网页开发的基础知识。 1. 前端三剑客 - 网页的基础构成🏗️ HTML (HyperText Markup Language) 作用：网页的骨架和结构 比喻：就像房子的框架，定义了哪里是门、哪里是窗户 核心概念：  1234567891011&lt;!DOCTYPE html&gt;&lt;html&gt;  &lt;head&gt;    &lt;title&gt;页面标题&lt;/title&gt;  &lt;/head&gt;  &lt;body&gt;    &lt;h1&gt;这是标题&lt;/h1&gt;    &lt;p&gt;这是段落&lt;/p&gt;    &lt;div&gt;这是容器&lt;/div&gt;  &lt;/body&gt;&lt;/html&gt;  常用HTML标签：  &lt;h1&gt; - &lt;h6&gt;：标题 &lt;p&gt;：段落 &lt;div&gt;：容器 &lt;span&gt;：内联元素 &...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comments</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/photos/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">forever</div><div class="author-info-description">this is forever’s blog , and I plan to share some photos and cs learning stories , wish can help you and make your day .</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">15</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/231220075"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/231220075" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:231220075@smail.nju.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%A7%88"><span class="toc-number">1.</span> <span class="toc-text">概览</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%A0%B8%E5%BF%83%E7%90%86%E5%BF%B5%E4%B8%8E%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6"><span class="toc-number">2.</span> <span class="toc-text">1. 核心理念与设计哲学</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%BB%84%E4%BB%B6%E5%8C%96%E5%BC%80%E5%8F%91"><span class="toc-number">3.</span> <span class="toc-text">2. 组件化开发</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%94%9F%E6%80%81%E7%B3%BB%E7%BB%9F%E4%B8%8E%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86"><span class="toc-number">4.</span> <span class="toc-text">3. 生态系统与状态管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%80%A7%E8%83%BD"><span class="toc-number">5.</span> <span class="toc-text">4. 性能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E9%80%89%E6%8B%A9%E5%BB%BA%E8%AE%AE"><span class="toc-number">6.</span> <span class="toc-text">总结与选择建议</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/" title="域名解析与网站绑定完全指南">域名解析与网站绑定完全指南</a><time datetime="2025-08-15T03:00:00.000Z" title="Created 2025-08-15 11:00:00">2025-08-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/" title="React vs. Vue：前端框架的深度对决">React vs. Vue：前端框架的深度对决</a><time datetime="2025-08-13T08:45:00.000Z" title="Created 2025-08-13 16:45:00">2025-08-13</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/13/%E7%BD%91%E9%A1%B5%E6%9E%84%E5%BB%BA%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E8%AF%A6%E8%A7%A3/" title="🌐 网页构建基础知识详解">🌐 网页构建基础知识详解</a><time datetime="2025-08-12T16:00:00.000Z" title="Created 2025-08-13 00:00:00">2025-08-13</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/12/Java%20%E6%B3%A8%E8%A7%A3/" title="Java 注解">Java 注解</a><time datetime="2025-08-12T08:18:13.000Z" title="Created 2025-08-12 16:18:13">2025-08-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/12/%E4%BA%91%E5%8E%9F%E7%94%9F%E7%BB%93%E8%AF%BEproject/" title="云原生结课project">云原生结课project</a><time datetime="2025-08-12T07:52:32.000Z" title="Created 2025-08-12 15:52:32">2025-08-12</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By forever</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll to Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getGiscusTheme = theme => theme === 'dark' ? 'dark' : 'light'
+
+  const createScriptElement = config => {
+    const ele = document.createElement('script')
+    Object.entries(config).forEach(([key, value]) => {
+      ele.setAttribute(key, value)
+    })
+    return ele
+  }
+
+  const loadGiscus = (el = document, key) => {
+    const mappingConfig = isShuoshuo
+      ? { 'data-mapping': 'specific', 'data-term': key }
+      : { 'data-mapping': (option && option['data-mapping']) || 'pathname' }
+
+    const giscusConfig = {
+      src: 'https://giscus.app/client.js',
+      'data-repo': '231220075/231220075.github.io',
+      'data-repo-id': 'R_kgDOOA3Tzw',
+      'data-category-id': 'DIC_kwDOOA3Tz84Ct7NB',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true,
+      ...option,
+      ...mappingConfig
+    }
+
+    const scriptElement = createScriptElement(giscusConfig)
+
+    el.querySelector('#giscus-wrap').appendChild(scriptElement)
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyGiscus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const changeGiscusTheme = theme => {
+    const iframe = document.querySelector('#giscus-wrap iframe')
+    if (iframe) {
+      const message = {
+        giscus: {
+          setConfig: {
+            theme: getGiscusTheme(theme)
+          }
+        }
+      }
+      iframe.contentWindow.postMessage(message, 'https://giscus.app')
+    }
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if (isShuoshuo) {
+    'Giscus' === 'Giscus'
+      ? window.shuoshuoComment = { loadComment: loadGiscus }
+      : window.loadOtherComment = loadGiscus
+    return
+  }
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment = loadGiscus
+  }
+})()</script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
