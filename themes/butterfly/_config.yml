@@ -23,7 +23,6 @@ menu:
     Movie: /movies/ || fas fa-video
     Photos: /photos-gallery/ || fas fa-camera
     Games: /games/ || fas fa-gamepad
-    Premier League: /premier-league/ || fas fa-futbol
   Archives: /archives/ || fas fa-archive
   Links: /links/ || fas fa-link
   About: /about/ || fas fa-user

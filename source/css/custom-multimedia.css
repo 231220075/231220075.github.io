@@ -2,9 +2,6 @@
    自定义多媒体页面样式
    ========================================== */
 
-/* 引入英超页面样式 */
-@import url('./premier-league.css');
-
 /* 通用响应式改进 */
 @media (max-width: 1200px) {
   .music-card-container,
