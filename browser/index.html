@@ -685,12 +685,12 @@
         }
         
         loadAPISettings() {
-            const saved = localStorage.getItem('ai-chat-settings');
-            if (saved) {
-                return JSON.parse(saved);
-            }
             return {
-                siliconcloud: { apiKey: '', model: 'Qwen/Qwen2.5-7B-Instruct', baseURL: 'https://api.siliconflow.cn' }
+                siliconcloud: { 
+                    apiKey: 'sk-xwwnwycjglcndwbtdlqmqyazrdeqgigffjaggrzrkmvoxjvc', 
+                    model: 'Qwen/Qwen3-8B', 
+                    baseURL: 'https://api.siliconflow.cn' 
+                }
             };
         }
         
@@ -733,7 +733,7 @@
             
             switch (provider) {
                 case 'siliconcloud':
-                    return !!settings.apiKey;
+                    return true; // API Key已固定，直接返回可用
                 default:
                     return false;
             }
@@ -811,7 +811,6 @@
             const message = this.messageInput.value.trim();
             if (!message || this.isTyping) return;
             
-            // 添加用户消息
             this.addMessage('user', message);
             this.messageInput.value = '';
             this.updateCharCount();
@@ -1322,24 +1321,40 @@
             switch (currentProvider) {
                 case 'siliconcloud':
                     configHTML += `
-                        <h3>硅基流动 配置</h3>
+                        <h3>硅基流动配置</h3>
                         <div style="margin-bottom: 15px;">
-                            <label>API Key:</label><br>
-                            <input type="password" id="siliconcloud-key" value="${settings.apiKey}" style="width: 100%; padding: 8px; margin-top: 5px;" placeholder="sk-...">
-                            <small>获取地址: <a href="https://cloud.siliconflow.cn/account/ak" target="_blank">硅基流动 API Keys</a></small>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <label>模型:</label><br>
+                            <label>当前模型:</label><br>
                             <select id="siliconcloud-model" style="width: 100%; padding: 8px; margin-top: 5px;">
-                                <option value="Qwen/Qwen2.5-7B-Instruct" ${settings.model === 'Qwen/Qwen2.5-7B-Instruct' ? 'selected' : ''}>Qwen2.5-7B (免费)</option>
-                                <option value="Qwen/Qwen2.5-14B-Instruct" ${settings.model === 'Qwen/Qwen2.5-14B-Instruct' ? 'selected' : ''}>Qwen2.5-14B</option>
-                                <option value="Qwen/Qwen2.5-32B-Instruct" ${settings.model === 'Qwen/Qwen2.5-32B-Instruct' ? 'selected' : ''}>Qwen2.5-32B</option>
-                                <option value="Qwen/Qwen2.5-72B-Instruct" ${settings.model === 'Qwen/Qwen2.5-72B-Instruct' ? 'selected' : ''}>Qwen2.5-72B</option>
-                                <option value="01-ai/Yi-1.5-9B-Chat-16K" ${settings.model === '01-ai/Yi-1.5-9B-Chat-16K' ? 'selected' : ''}>Yi-1.5-9B</option>
-                                <option value="deepseek-ai/DeepSeek-V2.5" ${settings.model === 'deepseek-ai/DeepSeek-V2.5' ? 'selected' : ''}>DeepSeek-V2.5</option>
+                                <option value="Qwen/Qwen2.5-72B-Instruct" ${settings.model === 'Qwen/Qwen2.5-72B-Instruct' ? 'selected' : ''}>🧠 Qwen2.5-72B-Instruct (超大模型)</option>
+                                <option value="Qwen/Qwen2.5-32B-Instruct" ${settings.model === 'Qwen/Qwen2.5-32B-Instruct' ? 'selected' : ''}>� Qwen2.5-32B-Instruct (大模型)</option>
+                                <option value="Qwen/Qwen2.5-14B-Instruct" ${settings.model === 'Qwen/Qwen2.5-14B-Instruct' ? 'selected' : ''}>⚡ Qwen2.5-14B-Instruct (快速)</option>
+                                <option value="Qwen/Qwen2.5-7B-Instruct" ${settings.model === 'Qwen/Qwen2.5-7B-Instruct' ? 'selected' : ''}>� Qwen2.5-7B-Instruct (轻量)</option>
+                                <option value="Qwen/Qwen2.5-Coder-32B-Instruct" ${settings.model === 'Qwen/Qwen2.5-Coder-32B-Instruct' ? 'selected' : ''}>💻 Qwen2.5-Coder-32B (代码专家)</option>
+                                <option value="Qwen/Qwen2.5-Math-72B-Instruct" ${settings.model === 'Qwen/Qwen2.5-Math-72B-Instruct' ? 'selected' : ''}>🔢 Qwen2.5-Math-72B (数学专家)</option>
+                                <option value="Qwen/Qwen2-VL-72B-Instruct" ${settings.model === 'Qwen/Qwen2-VL-72B-Instruct' ? 'selected' : ''}>🖼️ Qwen2-VL-72B (图片分析)</option>
+                                <option value="Qwen/Qwen2-VL-7B-Instruct" ${settings.model === 'Qwen/Qwen2-VL-7B-Instruct' ? 'selected' : ''}>🖼️ Qwen2-VL-7B (图片分析)</option>
+                                <option value="meta-llama/Meta-Llama-3.1-405B-Instruct" ${settings.model === 'meta-llama/Meta-Llama-3.1-405B-Instruct' ? 'selected' : ''}>🦙 Llama-3.1-405B (最强开源)</option>
+                                <option value="meta-llama/Meta-Llama-3.1-70B-Instruct" ${settings.model === 'meta-llama/Meta-Llama-3.1-70B-Instruct' ? 'selected' : ''}>🦙 Llama-3.1-70B (均衡)</option>
+                                <option value="meta-llama/Meta-Llama-3.1-8B-Instruct" ${settings.model === 'meta-llama/Meta-Llama-3.1-8B-Instruct' ? 'selected' : ''}>🦙 Llama-3.1-8B (轻量)</option>
+                                <option value="microsoft/WizardLM-2-8x22B" ${settings.model === 'microsoft/WizardLM-2-8x22B' ? 'selected' : ''}>�‍♂️ WizardLM-2-8x22B (推理)</option>
+                                <option value="microsoft/WizardLM-2-7B" ${settings.model === 'microsoft/WizardLM-2-7B' ? 'selected' : ''}>🧙‍♂️ WizardLM-2-7B (轻量)</option>
+                                <option value="deepseek-ai/DeepSeek-V2.5" ${settings.model === 'deepseek-ai/DeepSeek-V2.5' ? 'selected' : ''}>🌊 DeepSeek-V2.5 (深度思考)</option>
+                                <option value="deepseek-ai/deepseek-llm-67b-chat" ${settings.model === 'deepseek-ai/deepseek-llm-67b-chat' ? 'selected' : ''}>🌊 DeepSeek-67B (对话)</option>
+                                <option value="THUDM/glm-4-9b-chat" ${settings.model === 'THUDM/glm-4-9b-chat' ? 'selected' : ''}>🔮 GLM-4-9B (智谱)</option>
+                                <option value="01-ai/Yi-1.5-34B-Chat" ${settings.model === '01-ai/Yi-1.5-34B-Chat' ? 'selected' : ''}>🌟 Yi-1.5-34B (零一万物)</option>
+                                <option value="01-ai/Yi-1.5-9B-Chat" ${settings.model === '01-ai/Yi-1.5-9B-Chat' ? 'selected' : ''}>🌟 Yi-1.5-9B (零一万物)</option>
+                                <option value="internlm/internlm2_5-20b-chat" ${settings.model === 'internlm/internlm2_5-20b-chat' ? 'selected' : ''}>� InternLM2.5-20B (上海AI实验室)</option>
+                                <option value="internlm/internlm2_5-7b-chat" ${settings.model === 'internlm/internlm2_5-7b-chat' ? 'selected' : ''}>🚀 InternLM2.5-7B (上海AI实验室)</option>
                             </select>
                         </div>
-                        <p style="color: #666; font-size: 14px;">💡 注册即送200万Token，Qwen2.5-7B模型永久免费！</p>
+                        <div style="padding: 12px; background: #f0f9ff; border-radius: 8px; margin-bottom: 15px;">
+                            <p style="margin: 0; color: #0369a1; font-size: 14px;">
+                                ✅ API密钥已配置完成<br>
+                                🖼️ 图片分析：选择带 🖼️ 标记的多模态模型<br>
+                                🧠 高级推理：选择带 🧠 标记的专业模型<br>
+                                🎯 推荐：Qwen3-8B (图片+文字) 或 GLM-Z1-9B (纯文字推理)
+                            </p>
+                        </div>
                     `;
                     break;
                 case 'openai':
@@ -1462,25 +1477,7 @@
         saveSettings(provider) {
             switch (provider) {
                 case 'siliconcloud':
-                    this.apiSettings.siliconcloud.apiKey = document.getElementById('siliconcloud-key').value;
                     this.apiSettings.siliconcloud.model = document.getElementById('siliconcloud-model').value;
-                    break;
-                case 'openai':
-                    this.apiSettings.openai.apiKey = document.getElementById('openai-key').value;
-                    this.apiSettings.openai.model = document.getElementById('openai-model').value;
-                    break;
-                case 'claude':
-                    this.apiSettings.claude.apiKey = document.getElementById('claude-key').value;
-                    break;
-                case 'gemini':
-                    this.apiSettings.gemini.apiKey = document.getElementById('gemini-key').value;
-                    break;
-                case 'ollama':
-                    this.apiSettings.ollama.baseURL = document.getElementById('ollama-url').value;
-                    this.apiSettings.ollama.model = document.getElementById('ollama-model').value;
-                    break;
-                case 'huggingface':
-                    this.apiSettings.huggingface.apiKey = document.getElementById('hf-key').value;
                     break;
             }
             this.saveAPISettings();
@@ -1556,20 +1553,225 @@
             }
         }
         
-        handleFileUpload() {
+        async handleFileUpload() {
             const files = this.fileInput.files;
             if (files.length > 0) {
                 for (let file of files) {
                     if (file.type.startsWith('image/')) {
-                        this.addMessage('user', `📸 上传了图片：${file.name}`);
-                        this.addMessage('assistant', '我看到您上传了一张图片，但目前演示版本还不支持图片分析功能。在实际应用中，我可以分析图片内容并回答相关问题。');
+                        const settings = this.apiSettings.siliconcloud;
+                        
+                        // 支持图片分析的模型列表
+                        const visionModels = [
+                            'Qwen/Qwen2-VL-72B-Instruct',
+                            'Qwen/Qwen2-VL-7B-Instruct'
+                        ];
+                        
+                        // 检查当前模型是否支持多模态
+                        if (!visionModels.includes(settings.model)) {
+                            this.addMessage('assistant', `检测到您上传了图片，但当前使用的模型 "${settings.model}" 不支持图片分析。\n\n请在设置中切换到以下支持图片分析的模型之一：\n🖼️ Qwen2-VL-72B-Instruct (推荐)\n🖼️ Qwen2-VL-7B-Instruct (轻量版)\n\n切换后即可开始图片分析对话！`, true);
+                            continue;
+                        }
+                        
+                        // 直接分析图片
+                        this.addMessage('user', `📎 上传了图片：${file.name}`);
+                        this.showTyping();
+                        
+                        try {
+                            // 转换图片为base64
+                            const base64 = await this.fileToBase64(file);
+                            
+                            // 创建AI回复消息容器
+                            const aiMessageDiv = this.createStreamingMessage();
+                            let fullResponse = '';
+                            
+                            // 定义流式回调函数
+                            const onChunk = (chunk) => {
+                                fullResponse += chunk;
+                                this.updateStreamingMessage(aiMessageDiv, fullResponse);
+                            };
+                            
+                            // 调用图片分析
+                            const response = await this.analyzeImage(base64, onChunk);
+                            
+                            // 如果没有流式内容，使用完整响应
+                            if (!fullResponse && response) {
+                                fullResponse = response;
+                                this.updateStreamingMessage(aiMessageDiv, fullResponse);
+                            }
+                            
+                            // 完成分析
+                            this.finalizeStreamingMessage(aiMessageDiv, fullResponse);
+                            this.hideTyping();
+                        } catch (error) {
+                            this.hideTyping();
+                            this.addMessage('assistant', '抱歉，图片分析时出现错误。请稍后再试。', true);
+                            console.error('图片分析错误:', error);
+                        }
                     } else {
                         this.addMessage('user', `📎 上传了文件：${file.name}`);
-                        this.addMessage('assistant', '我看到您上传了一个文件，但目前演示版本还不支持文件处理功能。在实际应用中，我可以分析文档内容并回答相关问题。');
+                        this.addMessage('assistant', '抱歉，目前只支持图片分析功能。请上传图片文件。');
                     }
                 }
             }
             this.fileInput.value = '';
+        
+        fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        async analyzeImage(base64Image, onChunk = null) {
+            const settings = this.apiSettings.siliconcloud;
+            
+            try {
+                const response = await fetch(`${settings.baseURL}/v1/chat/completions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${settings.apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: settings.model,
+                        messages: [
+                            {
+                                role: 'user',
+                                content: [
+                                    {
+                                        type: 'text',
+                                        text: '请详细分析这张图片，描述你看到的内容、场景、人物、物体等。请用中文回答。'
+                                    },
+                                    {
+                                        type: 'image_url',
+                                        image_url: {
+                                            url: base64Image
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        stream: true,
+                        max_tokens: 2000,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let fullResponse = '';
+                
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // 保留不完整的行
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+                            
+                            try {
+                                const parsed = JSON.parse(data);
+                                const content = parsed.choices?.[0]?.delta?.content;
+                                if (content) {
+                                    fullResponse += content;
+                                    if (onChunk) onChunk(content);
+                                }
+                            } catch (e) {
+                                // 忽略解析错误
+                            }
+                        }
+                    }
+                }
+                
+                return fullResponse;
+            } catch (error) {
+                console.error('图片分析错误:', error);
+                throw error;
+            }
+        }
+                                        type: 'image_url',
+                                        image_url: {
+                                            url: base64Image
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        max_tokens: 1000,
+                        temperature: 0.7,
+                        stream: !!onChunk
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error Response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                }
+                
+                // 如果是流式响应
+                if (onChunk) {
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+                    
+                    try {
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split('\n');
+                            buffer = lines.pop() || '';
+                            
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    const data = line.slice(6);
+                                    if (data === '[DONE]') return;
+                                    
+                                    try {
+                                        const chunk = JSON.parse(data);
+                                        const content = chunk.choices?.[0]?.delta?.content;
+                                        if (content) {
+                                            onChunk(content);
+                                        }
+                                    } catch (e) {
+                                        console.warn('Failed to parse chunk:', e);
+                                    }
+                                }
+                            }
+                        }
+                    } finally {
+                        reader.releaseLock();
+                    }
+                    return '';
+                } else {
+                    // 非流式响应
+                    const data = await response.json();
+                    return data.choices[0].message.content;
+                }
+            } catch (error) {
+                console.error('Image analysis error:', error);
+                
+                // 如果是多模态模型错误，尝试回退到文本模式
+                if (error.message.includes('400') || error.message.includes('model')) {
+                    return '抱歉，当前模型暂时无法分析图片。建议切换到支持多模态的模型，或者您可以描述图片内容，我来帮您分析。';
+                }
+                
+                throw error;
+            }
         }
         
         showModelInfo() {
@@ -1600,7 +1802,7 @@
           </div>
           <ul class="card-category-list" id="aside-cat-list">
             <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"><span class="card-category-list-name">学习记录</span><span class="card-category-list-count">4</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"><span class="card-category-list-name">技术分享</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/"><span class="card-category-list-name">技术学习</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E6%83%B3/"><span class="card-category-list-name">生活随想</span><span class="card-category-list-count">2</span></a></li>
-          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E4%B9%A1%E6%84%81/" style="font-size: 1.1em; color: #999">乡愁</a> <a href="/tags/start/" style="font-size: 1.1em; color: #999">start</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 1.5em; color: #99a9bf">学习</a> <a href="/tags/Vue/" style="font-size: 1.1em; color: #999">Vue</a> <a href="/tags/DNS/" style="font-size: 1.1em; color: #999">DNS</a> <a href="/tags/git/" style="font-size: 1.1em; color: #999">git</a> <a href="/tags/JAVA/" style="font-size: 1.1em; color: #999">JAVA</a> <a href="/tags/React/" style="font-size: 1.1em; color: #999">React</a> <a href="/tags/%E5%9F%9F%E5%90%8D/" style="font-size: 1.1em; color: #999">域名</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 1.5em; color: #99a9bf">前端</a> <a href="/tags/GitHub-Pages/" style="font-size: 1.1em; color: #999">GitHub Pages</a> <a href="/tags/rust/" style="font-size: 1.1em; color: #999">rust</a> <a href="/tags/%E5%A4%9A%E5%AA%92%E4%BD%93/" style="font-size: 1.1em; color: #999">多媒体</a> <a href="/tags/%E7%BD%91%E7%AB%99%E9%83%A8%E7%BD%B2/" style="font-size: 1.1em; color: #999">网站部署</a> <a href="/tags/%E6%B5%8B%E8%AF%95/" style="font-size: 1.1em; color: #999">测试</a></div></div><div class="card-widget card-archives">
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E4%B9%A1%E6%84%81/" style="font-size: 1.1em; color: #999">乡愁</a> <a href="/tags/start/" style="font-size: 1.1em; color: #999">start</a> <a href="/tags/GitHub-Pages/" style="font-size: 1.1em; color: #999">GitHub Pages</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 1.5em; color: #99a9bf">学习</a> <a href="/tags/Vue/" style="font-size: 1.1em; color: #999">Vue</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 1.5em; color: #99a9bf">前端</a> <a href="/tags/git/" style="font-size: 1.1em; color: #999">git</a> <a href="/tags/%E6%B5%8B%E8%AF%95/" style="font-size: 1.1em; color: #999">测试</a> <a href="/tags/%E5%9F%9F%E5%90%8D/" style="font-size: 1.1em; color: #999">域名</a> <a href="/tags/%E7%BD%91%E7%AB%99%E9%83%A8%E7%BD%B2/" style="font-size: 1.1em; color: #999">网站部署</a> <a href="/tags/React/" style="font-size: 1.1em; color: #999">React</a> <a href="/tags/JAVA/" style="font-size: 1.1em; color: #999">JAVA</a> <a href="/tags/%E5%A4%9A%E5%AA%92%E4%BD%93/" style="font-size: 1.1em; color: #999">多媒体</a> <a href="/tags/DNS/" style="font-size: 1.1em; color: #999">DNS</a> <a href="/tags/rust/" style="font-size: 1.1em; color: #999">rust</a></div></div><div class="card-widget card-archives">
     <div class="item-headline">
       <i class="fas fa-archive"></i>
       <span>Archives</span>
@@ -1628,4 +1830,4 @@
         </li>
       
     </ul>
-  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">11</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">55.9k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-08-22T03:16:57.910Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By forever</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">11</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">55.9k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-08-22T08:34:27.034Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By forever</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
