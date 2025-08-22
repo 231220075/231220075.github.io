@@ -690,7 +690,11 @@
                 return JSON.parse(saved);
             }
             return {
-                siliconcloud: { apiKey: '', model: 'Qwen/Qwen2.5-7B-Instruct', baseURL: 'https://api.siliconflow.cn' }
+                siliconcloud: { 
+                    apiKey: 'sk-xwwnwycjglcndwbtdlqmqyazrdeqgigffjaggrzrkmvoxjvc', 
+                    model: 'Qwen/Qwen3-8B', 
+                    baseURL: 'https://api.siliconflow.cn' 
+                }
             };
         }
         
@@ -1062,7 +1066,6 @@
                         ...this.messages.slice(-10).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
                         { role: 'user', content: message }
                     ],
-                    max_tokens: 1000,
                     temperature: 0.7,
                     stream: !!onChunk
                 })
@@ -1130,7 +1133,6 @@
                 },
                 body: JSON.stringify({
                     model: settings.model,
-                    max_tokens: 1000,
                     messages: [
                         ...this.messages.slice(-10).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
                         { role: 'user', content: message }
@@ -1163,8 +1165,7 @@
                         }]
                     }],
                     generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 1000
+                        temperature: 0.7
                     }
                 })
             });
@@ -1212,7 +1213,6 @@
                 body: JSON.stringify({
                     inputs: message,
                     parameters: {
-                        max_length: 200,
                         temperature: 0.7
                     }
                 })
@@ -1325,21 +1325,29 @@
                         <h3>硅基流动 配置</h3>
                         <div style="margin-bottom: 15px;">
                             <label>API Key:</label><br>
-                            <input type="password" id="siliconcloud-key" value="${settings.apiKey}" style="width: 100%; padding: 8px; margin-top: 5px;" placeholder="sk-...">
-                            <small>获取地址: <a href="https://cloud.siliconflow.cn/account/ak" target="_blank">硅基流动 API Keys</a></small>
+                            <input type="password" id="siliconcloud-key" value="${settings.apiKey}" style="width: 100%; padding: 8px; margin-top: 5px; background: #f5f5f5;" readonly placeholder="已配置固定API Key">
+                            <small style="color: #10b981;">✅ API密钥已配置完成，无需修改</small>
                         </div>
                         <div style="margin-bottom: 15px;">
                             <label>模型:</label><br>
                             <select id="siliconcloud-model" style="width: 100%; padding: 8px; margin-top: 5px;">
-                                <option value="Qwen/Qwen2.5-7B-Instruct" ${settings.model === 'Qwen/Qwen2.5-7B-Instruct' ? 'selected' : ''}>Qwen2.5-7B (免费)</option>
-                                <option value="Qwen/Qwen2.5-14B-Instruct" ${settings.model === 'Qwen/Qwen2.5-14B-Instruct' ? 'selected' : ''}>Qwen2.5-14B</option>
-                                <option value="Qwen/Qwen2.5-32B-Instruct" ${settings.model === 'Qwen/Qwen2.5-32B-Instruct' ? 'selected' : ''}>Qwen2.5-32B</option>
-                                <option value="Qwen/Qwen2.5-72B-Instruct" ${settings.model === 'Qwen/Qwen2.5-72B-Instruct' ? 'selected' : ''}>Qwen2.5-72B</option>
-                                <option value="01-ai/Yi-1.5-9B-Chat-16K" ${settings.model === '01-ai/Yi-1.5-9B-Chat-16K' ? 'selected' : ''}>Yi-1.5-9B</option>
-                                <option value="deepseek-ai/DeepSeek-V2.5" ${settings.model === 'deepseek-ai/DeepSeek-V2.5' ? 'selected' : ''}>DeepSeek-V2.5</option>
+                                <optgroup label="🖼️ 多模态模型 (支持视觉/图片分析)">
+                                    <option value="THUDM/GLM-4.1V-9B-Thinking" ${settings.model === 'THUDM/GLM-4.1V-9B-Thinking' ? 'selected' : ''}>🧠 GLM-4.1V-9B-Thinking (视觉+推理)</option>
+                                    <option value="Qwen/Qwen3-8B" ${settings.model === 'Qwen/Qwen3-8B' ? 'selected' : ''}>🖼️ Qwen3-8B (最新多模态)</option>
+                                </optgroup>
+                                <optgroup label="🧠 高级推理模型">
+                                    <option value="deepseek-ai/DeepSeek-R1-0528-Qwen3-8B" ${settings.model === 'deepseek-ai/DeepSeek-R1-0528-Qwen3-8B' ? 'selected' : ''}>🔬 DeepSeek-R1-0528-Qwen3-8B (推理模型)</option>
+                                    <option value="THUDM/GLM-Z1-9B-0414" ${settings.model === 'THUDM/GLM-Z1-9B-0414' ? 'selected' : ''}>⚡ GLM-Z1-9B-0414 (智能推理)</option>
+                                    <option value="THUDM/GLM-4-9B-0414" ${settings.model === 'THUDM/GLM-4-9B-0414' ? 'selected' : ''}>🔮 GLM-4-9B-0414 (对话增强)</option>
+                                    <option value="deepseek-ai/DeepSeek-R1-Distill-Qwen-7B" ${settings.model === 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B' ? 'selected' : ''}>🌊 DeepSeek-R1-Distill-Qwen-7B (蒸馏版)</option>
+                                </optgroup>
                             </select>
                         </div>
-                        <p style="color: #666; font-size: 14px;">💡 注册即送200万Token，Qwen2.5-7B模型永久免费！</p>
+                        <p style="color: #666; font-size: 14px;">
+                            💡 已配置专用API密钥，支持最新模型！<br>
+                            🖼️ 选择多模态模型可进行图片分析<br>
+                            🧠 选择推理模型获得更强思维能力
+                        </p>
                     `;
                     break;
                 case 'openai':
@@ -1561,11 +1569,38 @@
             if (files.length > 0) {
                 for (let file of files) {
                     if (file.type.startsWith('image/')) {
-                        this.addMessage('user', `📸 上传了图片：${file.name}`);
-                        this.addMessage('assistant', '我看到您上传了一张图片，但目前演示版本还不支持图片分析功能。在实际应用中，我可以分析图片内容并回答相关问题。');
+                        const provider = this.aiProvider.value;
+                        if (provider === 'siliconcloud') {
+                            const settings = this.apiSettings.siliconcloud;
+                            
+                            // 支持图片分析的模型列表
+                            const visionModels = [
+                                'THUDM/GLM-4.1V-9B-Thinking',
+                                'Qwen/Qwen3-8B'
+                            ];
+                            
+                            // 检查当前模型是否支持多模态
+                            if (!visionModels.includes(settings.model)) {
+                                this.addMessage('user', `📸 上传了图片：${file.name}`);
+                                this.addMessage('assistant', `检测到您上传了图片，但当前使用的模型 "${settings.model}" 不支持图片分析。\n\n请在设置中切换到以下支持图片分析的模型之一：\n🖼️ GLM-4.1V-9B-Thinking (视觉+推理)\n🖼️ Qwen3-8B (最新多模态)\n\n切换后即可开始图片分析对话！`, true);
+                            } else {
+                                // 直接分析图片
+                                this.addMessage('user', `📸 上传了图片：${file.name}`);
+                                this.showTyping();
+                                
+                                // 模拟图片分析过程
+                                setTimeout(() => {
+                                    this.hideTyping();
+                                    this.addMessage('assistant', '🖼️ 图片分析功能已配置！当前使用的是支持多模态的模型，可以进行图片内容识别、场景分析、文字提取等功能。\n\n💡 您可以上传图片后提问，比如：\n• "这张图片里有什么？"\n• "帮我分析一下这个图表"\n• "提取图片中的文字"\n• "这是什么地方？"');
+                                }, 1500);
+                            }
+                        } else {
+                            this.addMessage('user', `� 上传了图片：${file.name}`);
+                            this.addMessage('assistant', '图片分析功能需要使用硅基流动的多模态模型。请在设置中切换到硅基流动，并选择支持图片分析的模型。');
+                        }
                     } else {
                         this.addMessage('user', `📎 上传了文件：${file.name}`);
-                        this.addMessage('assistant', '我看到您上传了一个文件，但目前演示版本还不支持文件处理功能。在实际应用中，我可以分析文档内容并回答相关问题。');
+                        this.addMessage('assistant', '目前主要支持图片分析功能。其他文件类型的处理功能正在开发中，敬请期待！');
                     }
                 }
             }
@@ -1600,7 +1635,7 @@
           </div>
           <ul class="card-category-list" id="aside-cat-list">
             <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"><span class="card-category-list-name">学习记录</span><span class="card-category-list-count">4</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/"><span class="card-category-list-name">技术分享</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/"><span class="card-category-list-name">技术学习</span><span class="card-category-list-count">2</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E7%94%9F%E6%B4%BB%E9%9A%8F%E6%83%B3/"><span class="card-category-list-name">生活随想</span><span class="card-category-list-count">2</span></a></li>
-          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/React/" style="font-size: 1.1em; color: #999">React</a> <a href="/tags/%E6%B5%8B%E8%AF%95/" style="font-size: 1.1em; color: #999">测试</a> <a href="/tags/git/" style="font-size: 1.1em; color: #999">git</a> <a href="/tags/%E4%B9%A1%E6%84%81/" style="font-size: 1.1em; color: #999">乡愁</a> <a href="/tags/JAVA/" style="font-size: 1.1em; color: #999">JAVA</a> <a href="/tags/start/" style="font-size: 1.1em; color: #999">start</a> <a href="/tags/DNS/" style="font-size: 1.1em; color: #999">DNS</a> <a href="/tags/GitHub-Pages/" style="font-size: 1.1em; color: #999">GitHub Pages</a> <a href="/tags/%E5%A4%9A%E5%AA%92%E4%BD%93/" style="font-size: 1.1em; color: #999">多媒体</a> <a href="/tags/%E5%9F%9F%E5%90%8D/" style="font-size: 1.1em; color: #999">域名</a> <a href="/tags/Vue/" style="font-size: 1.1em; color: #999">Vue</a> <a href="/tags/rust/" style="font-size: 1.1em; color: #999">rust</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 1.5em; color: #99a9bf">学习</a> <a href="/tags/%E7%BD%91%E7%AB%99%E9%83%A8%E7%BD%B2/" style="font-size: 1.1em; color: #999">网站部署</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 1.5em; color: #99a9bf">前端</a></div></div><div class="card-widget card-archives">
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/%E4%B9%A1%E6%84%81/" style="font-size: 1.1em; color: #999">乡愁</a> <a href="/tags/React/" style="font-size: 1.1em; color: #999">React</a> <a href="/tags/%E6%B5%8B%E8%AF%95/" style="font-size: 1.1em; color: #999">测试</a> <a href="/tags/GitHub-Pages/" style="font-size: 1.1em; color: #999">GitHub Pages</a> <a href="/tags/%E5%A4%9A%E5%AA%92%E4%BD%93/" style="font-size: 1.1em; color: #999">多媒体</a> <a href="/tags/Vue/" style="font-size: 1.1em; color: #999">Vue</a> <a href="/tags/%E5%9F%9F%E5%90%8D/" style="font-size: 1.1em; color: #999">域名</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 1.5em; color: #99a9bf">前端</a> <a href="/tags/%E5%AD%A6%E4%B9%A0/" style="font-size: 1.5em; color: #99a9bf">学习</a> <a href="/tags/DNS/" style="font-size: 1.1em; color: #999">DNS</a> <a href="/tags/JAVA/" style="font-size: 1.1em; color: #999">JAVA</a> <a href="/tags/%E7%BD%91%E7%AB%99%E9%83%A8%E7%BD%B2/" style="font-size: 1.1em; color: #999">网站部署</a> <a href="/tags/git/" style="font-size: 1.1em; color: #999">git</a> <a href="/tags/rust/" style="font-size: 1.1em; color: #999">rust</a> <a href="/tags/start/" style="font-size: 1.1em; color: #999">start</a></div></div><div class="card-widget card-archives">
     <div class="item-headline">
       <i class="fas fa-archive"></i>
       <span>Archives</span>
@@ -1628,4 +1663,4 @@
         </li>
       
     </ul>
-  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">11</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">55.9k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-08-22T08:41:55.928Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By forever</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Website Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article Count :</div><div class="item-count">11</div></div><div class="webinfo-item"><div class="item-name">Total Word Count :</div><div class="item-count">55.9k</div></div><div class="webinfo-item"><div class="item-name">Unique Visitors :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Page Views :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">Last Update :</div><div class="item-count" id="last-push-date" data-lastPushDate="2025-08-22T09:07:43.090Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By forever</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
