@@ -1,24 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>R2CN开源项目</title>
-    <url>/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/</url>
-    <content><![CDATA[📝 R2CN开源项目
-经开源软件论坛的介绍，尝试参与一个R2CN的开源项目，提交了PR。
+    <title>React vs. Vue：前端框架的深度对决</title>
+    <url>/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/</url>
+    <content><![CDATA[在当今前端开发领域，React 和 Vue 无疑是两座无法绕开的高峰。它们都拥有庞大的社区、丰富的生态和出色的性能，但其设计哲学和开发体验却大相径庭。作为开发者，理解它们的核心差异，才能在项目选型时做出最明智的决策。本文将从专业角度，对这两个框架进行一次深度对比。
+概览
 
-正文内容2025.8.23，在开学前我参加了南大e-science中心牵头举办的第三届开源软件论坛，认识了来自清北交大等高校的大佬，尤其是参加了25ACS、ICS的超算队员。（孙远航@北京大学，贾朝蓬@清华大学，桂仲腾@上海交通大学，黄烨@中山大学 etc..）另外北大还介绍了他们自己组建的校内北大☁️（捡垃圾捡的说是）搞得我也想折腾个服务器，虽然好像也没什么个人需求，而且南大☁️已经存在了。。。
-剩下的报告除了各获奖超算队的解题思路，本校的大四学长介绍了monorepo的相关知识，并介绍了两个开源实习项目，这也是和R2CN接触的开始。
-测试任务在注册成为实习生之前需要做一个测试任务，考察对rust和git的了解程度。这个之前由于正好合作开发了rust-git，所以对我来说比较简单bushi。有前人提交了一个issue但是没有继续完成，所以我直接接手了。
-总结总结一下本文的要点…
 
-感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+特性
+React
+Vue
+
+
+
+类型
+用于构建用户界面的 JavaScript 库
+渐进式 JavaScript 框架
+
+
+核心思想
+一切皆是 JavaScript，拥抱函数式编程
+拥抱传统 Web，HTML&#x2F;CSS&#x2F;JS 分离
+
+
+创建者
+Meta (Facebook)
+尤雨溪 (前 Google 工程师)
+
+
+上手难度
+较陡峭，需要深入理解 JS 和 JSX
+相对平缓，对新手更友好
+
+
+灵活性
+极高，生态系统庞大，选择多样
+较高，官方提供全家桶，开箱即用
+
+
+数据流
+单向数据流
+支持单向和双向数据绑定
+
+
+状态管理
+Context API, Redux, MobX, Zustand
+Pinia (官方推荐), Vuex
+
+
+路由
+React Router
+Vue Router (官方)
+
+
+构建工具
+Create React App, Vite, Next.js
+Vue CLI, Vite, Nuxt.js
+
+
+市场份额
+更大，尤其在欧美和大型企业
+快速增长，在亚洲和初创公司中非常流行
+
+
+
+1. 核心理念与设计哲学React：更像一个“库”，专注 UI
+React 的核心定位是一个用于构建用户界面（UI）的 JavaScript 库。它本身只关心视图层（MVC 中的 V）。这意味着 React 只提供构建 UI 组件的核心功能。至于路由、状态管理、HTTP 请求等，你需要自己选择并集成第三方库。
+
+All in JS：React 的一个核心哲学是“All in JS”。它认为模板逻辑和渲染逻辑本质上是耦合的，因此发明了 JSX（JavaScript XML），让你可以在 JavaScript 代码中直接编写类似 HTML 的结构。这提供了极大的灵活性和编程能力，因为你可以使用 JavaScript 的全部功能（如 map, filter）来构建 UI。
+单向数据流：数据总是从父组件通过 props 流向子组件。子组件不能直接修改父组件的数据，需要通过调用父组件传递的回调函数来通知父组件进行更新。这种模式使得数据流向清晰可控，在大型应用中更容易追踪和调试。
+
+Vue：一个“渐进式框架”
+Vue 的定位是一个渐进式框架。这意味着你可以从一个简单的功能（比如只用它来处理页面上的一小块交互）开始，然后根据需求逐渐引入路由（Vue Router）、状态管理（Pinia）等功能，最终构建一个功能完整的单页应用（SPA）。
+
+拥抱传统 Web：Vue 的设计对有传统 HTML&#x2F;CSS&#x2F;JS 背景的开发者非常友好。它的单文件组件 (SFC - Single File Component) 将一个组件的模板 (&lt;template&gt;)、脚本 (&lt;script&gt;) 和样式 (&lt;style&gt;) 封装在同一个 .vue 文件中。这种结构清晰，关注点分离，非常直观。
+灵活的数据绑定：Vue 同时支持单向数据流和双向数据绑定。通过 v-model 指令，可以轻松实现表单输入和状态之间的双向绑定，这在处理表单时大大简化了代码。
+
+
+2. 组件化开发两者都采用组件化思想，但实现方式不同。
+React 组件：函数与 Hooks
+现代 React 开发主要使用函数式组件和 Hooks。
+// React Functional Component with Hooksimport React, &#123; useState, useEffect &#125; from &#x27;react&#x27;;function MyComponent(&#123; initialCount &#125;) &#123;  const [count, setCount] = useState(initialCount); // 状态 Hook  const [data, setData] = useState(null);  // 副作用 Hook，类似生命周期函数  useEffect(() =&gt; &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(setData);  &#125;, []); // 空依赖数组表示只在组件挂载时运行一次  return (    &lt;div&gt;      &lt;p&gt;Count: &#123;count&#125;&lt;/p&gt;      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;Increment&lt;/button&gt;    &lt;/div&gt;  );&#125;
+
+
+优点：JSX 提供了无与伦比的灵活性。Hooks（如 useState, useEffect）让函数式组件也能拥有状态和生命周期逻辑，代码更简洁、复用性更强。
+挑战：需要对 JavaScript 的闭包、this 指向（在类组件中）有深刻理解。JSX 的学习曲线对初学者来说可能稍高。
+
+Vue 组件：选项式 API 与组合式 API
+Vue 提供了两种组件 API 风格。
+
+选项式 API (Options API)：对新手友好，结构清晰。
+&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;export default &#123;  props: [&#x27;initialCount&#x27;],  data() &#123;    return &#123;      count: this.initialCount,      data: null    &#125;;  &#125;,  methods: &#123;    increment() &#123;      this.count++;    &#125;  &#125;,  mounted() &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(data =&gt; this.data = data);  &#125;&#125;&lt;/script&gt;
+
+组合式 API (Composition API)：受 React Hooks 启发，更适合大型复杂项目，逻辑组织更灵活。
+&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script setup&gt;import &#123; ref, onMounted &#125; from &#x27;vue&#x27;;const props = defineProps([&#x27;initialCount&#x27;]);const count = ref(props.initialCount); // 响应式状态const data = ref(null);function increment() &#123;  count.value++;&#125;onMounted(async () =&gt; &#123;  data.value = await (await fetch(&#x27;https://api.example.com/data&#x27;)).json();&#125;);&lt;/script&gt;
+
+
+优点：.vue 文件结构清晰，模板语法更接近原生 HTML。组合式 API 解决了选项式 API 在大型组件中逻辑分散的问题，代码组织更灵活。
+挑战：在组合式 API 中需要理解 ref 和 reactive 的区别。
+
+
+3. 生态系统与状态管理React：庞大而分散，选择自由
+
+状态管理：
+简单场景：使用 useState 和 useReducer 配合 Context API。
+复杂应用：Redux 是事实上的标准，功能强大，但以学习曲线陡峭和模板代码多而闻名。近年来，Zustand 和 MobX 等更轻量、更现代的方案越来越受欢迎。
+
+
+生态：React 的生态系统是其最大的优势之一。几乎任何你能想到的功能都有成熟的第三方库支持。但也意味着你需要花时间去评估和选择技术栈，这被称为“选择疲劳症”。Next.js 框架的出现极大地改变了这一局面，它为 React 提供了一个强大的、带有一系列最佳实践的全栈开发骨架。
+
+Vue：官方维护，集成度高
+
+状态管理：
+Pinia 是 Vue 3 的官方推荐方案（取代了 Vuex）。它设计极其简洁、类型友好，并且没有 mutations 的概念，上手非常快。
+
+
+生态：Vue 的核心库（如 vue-router for routing, pinia for state management）都由官方团队维护。这保证了它们之间的高度协同和一致性。开发者不需要在众多选项中纠lge，可以快速开始。Nuxt.js 是 Vue 生态的“Next.js”，提供了服务端渲染（SSR）、静态站点生成（SSG）等高级功能。
+
+
+4. 性能两者都使用了虚拟 DOM (Virtual DOM)，性能都非常出色，足以应对绝大多数应用场景。
+
+React：通过 Fiber 架构实现了可中断的异步渲染，为将来的并发模式等高级功能铺平了道路。
+Vue：在编译时进行了更多优化。它会静态分析模板，找出动态部分和静态部分，从而在更新时只对比动态节点，减少了虚拟 DOM diff 的开销。
+
+在实际应用中，性能瓶颈更多地来自于应用本身的逻辑（如巨大的列表、频繁的非必要更新），而不是框架本身。
+
+总结与选择建议
+选择 React 的理由：
+
+大型项目和团队：React 的单向数据流和庞大的生态系统非常适合构建复杂、可维护的大型企业级应用。
+招聘市场：React 的岗位需求量目前是最大的，如果你想最大化就业机会，React 是一个稳妥的选择。
+追求极致灵活性：如果你想完全掌控你的技术栈，自由组合各种库来构建应用，React 提供了这种自由。
+跨平台开发：React Native 允许你使用 React 的知识来构建原生移动应用（iOS&#x2F;Android），这是一个巨大的加分项。
+
+
+选择 Vue 的理由：
+
+快速开发和上手：Vue 的学习曲线更平缓，文档极其出色，官方工具链开箱即用，非常适合初创公司、中小型项目和追求开发效率的场景。
+对传统开发者友好：如果你有扎实的 HTML&#x2F;CSS&#x2F;JS 基础，Vue 的模板语法会让你感到非常亲切。
+无缝集成：官方提供的路由和状态管理库与核心库无缝集成，减少了决策成本和集成问题。
+性能：开箱即用的性能表现非常优秀，心智负担小。
+
+
+
+最终，React 和 Vue 都是顶级的框架，没有绝对的好坏之分，只有“更适合”的选择。 最好的方式是都尝试一下，构建一个小项目，亲身感受它们的开发体验，然后根据你的项目需求和个人偏好做出决定。
 ]]></content>
       <categories>
-        <category>技术学习</category>
+        <category>技术分享</category>
       </categories>
       <tags>
-        <tag>rust</tag>
-        <tag>开源</tag>
+        <tag>React</tag>
+        <tag>Vue</tag>
+        <tag>前端</tag>
       </tags>
   </entry>
   <entry>
@@ -313,879 +446,24 @@ Web层测试/** * @WebMvcTest: 只加载Web层组件（Controller、Filter、Web
       </tags>
   </entry>
   <entry>
-    <title>React vs. Vue：前端框架的深度对决</title>
-    <url>/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/</url>
-    <content><![CDATA[在当今前端开发领域，React 和 Vue 无疑是两座无法绕开的高峰。它们都拥有庞大的社区、丰富的生态和出色的性能，但其设计哲学和开发体验却大相径庭。作为开发者，理解它们的核心差异，才能在项目选型时做出最明智的决策。本文将从专业角度，对这两个框架进行一次深度对比。
-概览
-
-
-特性
-React
-Vue
-
-
-
-类型
-用于构建用户界面的 JavaScript 库
-渐进式 JavaScript 框架
-
-
-核心思想
-一切皆是 JavaScript，拥抱函数式编程
-拥抱传统 Web，HTML&#x2F;CSS&#x2F;JS 分离
-
-
-创建者
-Meta (Facebook)
-尤雨溪 (前 Google 工程师)
-
-
-上手难度
-较陡峭，需要深入理解 JS 和 JSX
-相对平缓，对新手更友好
-
-
-灵活性
-极高，生态系统庞大，选择多样
-较高，官方提供全家桶，开箱即用
-
-
-数据流
-单向数据流
-支持单向和双向数据绑定
-
-
-状态管理
-Context API, Redux, MobX, Zustand
-Pinia (官方推荐), Vuex
-
-
-路由
-React Router
-Vue Router (官方)
-
-
-构建工具
-Create React App, Vite, Next.js
-Vue CLI, Vite, Nuxt.js
-
-
-市场份额
-更大，尤其在欧美和大型企业
-快速增长，在亚洲和初创公司中非常流行
-
-
-
-1. 核心理念与设计哲学React：更像一个“库”，专注 UI
-React 的核心定位是一个用于构建用户界面（UI）的 JavaScript 库。它本身只关心视图层（MVC 中的 V）。这意味着 React 只提供构建 UI 组件的核心功能。至于路由、状态管理、HTTP 请求等，你需要自己选择并集成第三方库。
-
-All in JS：React 的一个核心哲学是“All in JS”。它认为模板逻辑和渲染逻辑本质上是耦合的，因此发明了 JSX（JavaScript XML），让你可以在 JavaScript 代码中直接编写类似 HTML 的结构。这提供了极大的灵活性和编程能力，因为你可以使用 JavaScript 的全部功能（如 map, filter）来构建 UI。
-单向数据流：数据总是从父组件通过 props 流向子组件。子组件不能直接修改父组件的数据，需要通过调用父组件传递的回调函数来通知父组件进行更新。这种模式使得数据流向清晰可控，在大型应用中更容易追踪和调试。
-
-Vue：一个“渐进式框架”
-Vue 的定位是一个渐进式框架。这意味着你可以从一个简单的功能（比如只用它来处理页面上的一小块交互）开始，然后根据需求逐渐引入路由（Vue Router）、状态管理（Pinia）等功能，最终构建一个功能完整的单页应用（SPA）。
-
-拥抱传统 Web：Vue 的设计对有传统 HTML&#x2F;CSS&#x2F;JS 背景的开发者非常友好。它的单文件组件 (SFC - Single File Component) 将一个组件的模板 (&lt;template&gt;)、脚本 (&lt;script&gt;) 和样式 (&lt;style&gt;) 封装在同一个 .vue 文件中。这种结构清晰，关注点分离，非常直观。
-灵活的数据绑定：Vue 同时支持单向数据流和双向数据绑定。通过 v-model 指令，可以轻松实现表单输入和状态之间的双向绑定，这在处理表单时大大简化了代码。
-
-
-2. 组件化开发两者都采用组件化思想，但实现方式不同。
-React 组件：函数与 Hooks
-现代 React 开发主要使用函数式组件和 Hooks。
-// React Functional Component with Hooksimport React, &#123; useState, useEffect &#125; from &#x27;react&#x27;;function MyComponent(&#123; initialCount &#125;) &#123;  const [count, setCount] = useState(initialCount); // 状态 Hook  const [data, setData] = useState(null);  // 副作用 Hook，类似生命周期函数  useEffect(() =&gt; &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(setData);  &#125;, []); // 空依赖数组表示只在组件挂载时运行一次  return (    &lt;div&gt;      &lt;p&gt;Count: &#123;count&#125;&lt;/p&gt;      &lt;button onClick=&#123;() =&gt; setCount(count + 1)&#125;&gt;Increment&lt;/button&gt;    &lt;/div&gt;  );&#125;
-
-
-优点：JSX 提供了无与伦比的灵活性。Hooks（如 useState, useEffect）让函数式组件也能拥有状态和生命周期逻辑，代码更简洁、复用性更强。
-挑战：需要对 JavaScript 的闭包、this 指向（在类组件中）有深刻理解。JSX 的学习曲线对初学者来说可能稍高。
-
-Vue 组件：选项式 API 与组合式 API
-Vue 提供了两种组件 API 风格。
-
-选项式 API (Options API)：对新手友好，结构清晰。
-&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script&gt;export default &#123;  props: [&#x27;initialCount&#x27;],  data() &#123;    return &#123;      count: this.initialCount,      data: null    &#125;;  &#125;,  methods: &#123;    increment() &#123;      this.count++;    &#125;  &#125;,  mounted() &#123;    // 模拟数据获取    fetch(&#x27;https://api.example.com/data&#x27;)      .then(res =&gt; res.json())      .then(data =&gt; this.data = data);  &#125;&#125;&lt;/script&gt;
-
-组合式 API (Composition API)：受 React Hooks 启发，更适合大型复杂项目，逻辑组织更灵活。
-&lt;!-- MyComponent.vue --&gt;&lt;template&gt;  &lt;div&gt;    &lt;p&gt;Count: &#123;&#123; count &#125;&#125;&lt;/p&gt;    &lt;button @click=&quot;increment&quot;&gt;Increment&lt;/button&gt;  &lt;/div&gt;&lt;/template&gt;&lt;script setup&gt;import &#123; ref, onMounted &#125; from &#x27;vue&#x27;;const props = defineProps([&#x27;initialCount&#x27;]);const count = ref(props.initialCount); // 响应式状态const data = ref(null);function increment() &#123;  count.value++;&#125;onMounted(async () =&gt; &#123;  data.value = await (await fetch(&#x27;https://api.example.com/data&#x27;)).json();&#125;);&lt;/script&gt;
-
-
-优点：.vue 文件结构清晰，模板语法更接近原生 HTML。组合式 API 解决了选项式 API 在大型组件中逻辑分散的问题，代码组织更灵活。
-挑战：在组合式 API 中需要理解 ref 和 reactive 的区别。
-
-
-3. 生态系统与状态管理React：庞大而分散，选择自由
-
-状态管理：
-简单场景：使用 useState 和 useReducer 配合 Context API。
-复杂应用：Redux 是事实上的标准，功能强大，但以学习曲线陡峭和模板代码多而闻名。近年来，Zustand 和 MobX 等更轻量、更现代的方案越来越受欢迎。
-
-
-生态：React 的生态系统是其最大的优势之一。几乎任何你能想到的功能都有成熟的第三方库支持。但也意味着你需要花时间去评估和选择技术栈，这被称为“选择疲劳症”。Next.js 框架的出现极大地改变了这一局面，它为 React 提供了一个强大的、带有一系列最佳实践的全栈开发骨架。
-
-Vue：官方维护，集成度高
-
-状态管理：
-Pinia 是 Vue 3 的官方推荐方案（取代了 Vuex）。它设计极其简洁、类型友好，并且没有 mutations 的概念，上手非常快。
-
-
-生态：Vue 的核心库（如 vue-router for routing, pinia for state management）都由官方团队维护。这保证了它们之间的高度协同和一致性。开发者不需要在众多选项中纠lge，可以快速开始。Nuxt.js 是 Vue 生态的“Next.js”，提供了服务端渲染（SSR）、静态站点生成（SSG）等高级功能。
-
-
-4. 性能两者都使用了虚拟 DOM (Virtual DOM)，性能都非常出色，足以应对绝大多数应用场景。
-
-React：通过 Fiber 架构实现了可中断的异步渲染，为将来的并发模式等高级功能铺平了道路。
-Vue：在编译时进行了更多优化。它会静态分析模板，找出动态部分和静态部分，从而在更新时只对比动态节点，减少了虚拟 DOM diff 的开销。
-
-在实际应用中，性能瓶颈更多地来自于应用本身的逻辑（如巨大的列表、频繁的非必要更新），而不是框架本身。
-
-总结与选择建议
-选择 React 的理由：
-
-大型项目和团队：React 的单向数据流和庞大的生态系统非常适合构建复杂、可维护的大型企业级应用。
-招聘市场：React 的岗位需求量目前是最大的，如果你想最大化就业机会，React 是一个稳妥的选择。
-追求极致灵活性：如果你想完全掌控你的技术栈，自由组合各种库来构建应用，React 提供了这种自由。
-跨平台开发：React Native 允许你使用 React 的知识来构建原生移动应用（iOS&#x2F;Android），这是一个巨大的加分项。
-
-
-选择 Vue 的理由：
-
-快速开发和上手：Vue 的学习曲线更平缓，文档极其出色，官方工具链开箱即用，非常适合初创公司、中小型项目和追求开发效率的场景。
-对传统开发者友好：如果你有扎实的 HTML&#x2F;CSS&#x2F;JS 基础，Vue 的模板语法会让你感到非常亲切。
-无缝集成：官方提供的路由和状态管理库与核心库无缝集成，减少了决策成本和集成问题。
-性能：开箱即用的性能表现非常优秀，心智负担小。
-
-
-
-最终，React 和 Vue 都是顶级的框架，没有绝对的好坏之分，只有“更适合”的选择。 最好的方式是都尝试一下，构建一个小项目，亲身感受它们的开发体验，然后根据你的项目需求和个人偏好做出决定。
-]]></content>
-      <categories>
-        <category>技术分享</category>
-      </categories>
-      <tags>
-        <tag>React</tag>
-        <tag>Vue</tag>
-        <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>my first address</title>
-    <url>/2025/02/28/hello-world/</url>
-    <content><![CDATA[this is my first articletest文件，梦开始的地方
-]]></content>
-  </entry>
-  <entry>
-    <title>云原生结课project</title>
-    <url>/2025/08/12/%E4%BA%91%E5%8E%9F%E7%94%9F%E7%BB%93%E8%AF%BEproject/</url>
-    <content><![CDATA[📝 云原生结课project
-顺手上传暑课项目
-
-1. 项目组员信息
-
-
-姓名
-学号
-个人贡献
-
-
-
-黄睿智
-231220075
-part3 + 文档编写
-
-
-白子敬
-231220077
-part1
-
-
-陈翔宇
-231220088
-part2
-
-
-
-2. 限流功能相关的关键代码和说明2.1 限流系统架构概述本项目采用基于 Bucket4j + Redis 的分布式限流方案，实现了多层次的流量控制机制：
-
-应用层限流：使用 Bucket4j 令牌桶算法
-连接层限流：Spring Boot Tomcat 连接池限制
-网络层限流：Kubernetes 网络策略和端口转发限制
-
-2.2 核心限流组件限流配置类 (RateLimitConfig.java)@Configurationpublic class RedisConfig &#123;        @Value(&quot;$&#123;REDIS_HOST:$&#123;spring.redis.host:localhost&#125;&#125;&quot;)    private String redisHost;        @Value(&quot;$&#123;REDIS_PORT:$&#123;spring.redis.port:6379&#125;&#125;&quot;)    private int redisPort;        @Bean    @Primary    public RedisConnectionFactory redisConnectionFactory() &#123;        // 直接从环境变量读取        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Spring Data Redis connecting to: &quot; + host + &quot;:&quot; + port);                RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();        config.setHostName(host);        config.setPort(port);                JedisConnectionFactory factory = new JedisConnectionFactory(config);        return factory;    &#125;        @Bean    public RedisTemplate&lt;String, Object&gt; redisTemplate(RedisConnectionFactory connectionFactory) &#123;        RedisTemplate&lt;String, Object&gt; template = new RedisTemplate&lt;&gt;();        template.setConnectionFactory(connectionFactory);        return template;    &#125;        @Bean    public JedisPool jedisPool() &#123;        // 直接从环境变量读取，如果为空则使用配置文件        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Jedis Pool connecting to: &quot; + host + &quot;:&quot; + port);                JedisPoolConfig config = new JedisPoolConfig();        config.setMaxTotal(8);        config.setMaxIdle(8);        config.setMinIdle(0);        config.setTestOnBorrow(true);        config.setTestOnReturn(true);        config.setTestWhileIdle(true);        return new JedisPool(config, host, port);    &#125;&#125;
-
-限流服务类 (RateLimiterService.java)@Servicepublic class RateLimiterService &#123;    private final ProxyManager&lt;byte[]&gt; buckets;    private static final byte[] KEY = &quot;global-rate-limit-key&quot;.getBytes();    @Autowired    public RateLimiterService(ProxyManager&lt;byte[]&gt; buckets) &#123;        this.buckets = buckets;    &#125;    public Bucket resolveBucket() &#123;        return buckets.builder().build(KEY, getConfigSupplier());    &#125;    private Supplier&lt;BucketConfiguration&gt; getConfigSupplier() &#123;        return () -&gt; BucketConfiguration.builder()                .addLimit(Bandwidth.classic(                    100,                     Refill.greedy(100, Duration.ofSeconds(1)))                )                .build();    &#125;&#125;
-
-限流拦截器 (RateLimitInterceptor.java)@Componentpublic class RateLimitInterceptor implements HandlerInterceptor &#123;    @Autowired    private RateLimiterService rateLimiterService;    @Override    public boolean preHandle(HttpServletRequest request,                             HttpServletResponse response,                             Object handler) throws Exception &#123;        Bucket bucket = rateLimiterService.resolveBucket();        if (bucket.tryConsume(1)) &#123;            return true;        &#125; else &#123;            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());            response.getWriter().write(&quot;Too many requests&quot;);            return false;        &#125;    &#125;&#125;
-
-Web 配置类 (WebMvcConfig.java)@Configurationpublic class WebMvcConfig implements WebMvcConfigurer &#123;    @Autowired    private RateLimitInterceptor rateLimitInterceptor;    @Override    public void addInterceptors(InterceptorRegistry registry) &#123;        // 注册限流拦截器并指定拦截路径        registry.addInterceptor(rateLimitInterceptor)                .addPathPatterns(&quot;/hello&quot;)  // 只拦截/hello路径                .order(0);    &#125;&#125;
-
-2.3 应用配置application.properties 限流相关配置spring.application.name=prometheus-test-demo# 统一使用8998端口server.port=8998# Redis 配置 - 直接使用环境变量spring.redis.host=$&#123;REDIS_HOST:localhost&#125;spring.redis.port=$&#123;REDIS_PORT:6379&#125;spring.redis.timeout=2000ms# 强制使用 Jedis 客户端spring.redis.jedis.pool.enabled=truespring.redis.lettuce.pool.enabled=false# Actuator 配置management.endpoints.web.exposure.include=health,info,prometheus,metricsmanagement.endpoint.health.show-details=always# 限流相关配置rate.limit.enabled=truerate.limit.global.key=global-rate-limit-keyrate.limit.capacity=100rate.limit.refill.tokens=100rate.limit.refill.period=1s
-
-2.4 限流工作流程用户请求 → Spring MVC → RateLimitInterceptor → RateLimiterService                                ↓                          检查 Redis 令牌桶                                ↓                    有令牌？─── YES ──→ 继续处理 → HelloController                        │                        NO                        ↓                  返回 HTTP 429 错误
-
-2.5 限流算法说明令牌桶算法 (Token Bucket Algorithm)：
-
-初始化：创建容量为100的令牌桶
-令牌补充：每秒向桶中添加100个令牌
-请求处理：每个请求尝试消费1个令牌
-限流判断：
-有令牌：允许请求，消费令牌
-无令牌：拒绝请求，返回429状态码
-
-
-
-
-3. Dockerfile及K8s 编排文件3.1 Dockerfile# 第一阶段：构建阶段 - 统一使用Java 11FROM maven:3.9.6-eclipse-temurin-17 AS builder# 设置工作目录WORKDIR /usr/src/mymaven# 复制 Maven 配置文件RUN mkdir -p /root/.m2COPY settings.xml /root/.m2/settings.xml# 复制pom.xml和源代码COPY pom.xml .COPY src ./src# 构建项目RUN mvn -B  clean package# 第二阶段：运行阶段FROM eclipse-temurin:17-jre-centos7# 设置时区RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtimeRUN echo &#x27;Asia/Shanghai&#x27; &gt;/etc/timezone# 设置环境变量ENV JAVA_OPTS &#x27;&#x27;# 设置工作目录WORKDIR /app# 从构建阶段复制构建结果COPY --from=builder /usr/src/mymaven/target/prometheus-test-demo-0.0.1-SNAPSHOT.jar ./prometheus-test-demo-0.0.1-SNAPSHOT.jar# 启动命令 - 使用Java 11兼容的JVM参数ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;set -e &amp;&amp; java -XX:+PrintFlagsFinal \                                           -XX:+HeapDumpOnOutOfMemoryError \                                           -XX:HeapDumpPath=/heapdump/heapdump.hprof \                                           -XX:+UseContainerSupport \                                           -XX:MaxRAMPercentage=75.0 \                                           -Djava.security.egd=file:/dev/./urandom \                                           $JAVA_OPTS -jar prometheus-test-demo-0.0.1-SNAPSHOT.jar&quot;]
-
-Dockerfile 设计说明：
-
-构建项目时删去原demo的 -DskipTests 参数，直接运行测试样例，因此在 Jenkinsfile 中不再执行test。
-下图为测试运行结果
-
-
-3.2 Kubernetes 部署文件 (prometheus-test-demo.yaml)apiVersion: apps/v1kind: Deploymentmetadata:  labels:    app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  replicas: 1  selector:    matchLabels:      app: prometheus-test-demo  template:    metadata:      annotations:        prometheus.io/path: /actuator/prometheus        prometheus.io/port: &quot;8998&quot;        prometheus.io/scheme: http        prometheus.io/scrape: &quot;true&quot;      labels:        app: prometheus-test-demo    spec:      initContainers:      - name: wait-for-redis        ../photos/posts/yys/image: busybox:1.36        command: [&#x27;sh&#x27;, &#x27;-c&#x27;]        args:        - |          until nc -z redis-service 6379; do            echo &quot;Waiting for Redis to be ready...&quot;            sleep 2          done          echo &quot;Redis is ready!&quot;      containers:        - ../photos/posts/yys/image: 172.22.83.19:30003/nju08/prometheus-test-demo:&#123;VERSION&#125;          name: prometheus-test-demo          ports:          - containerPort: 8998          env:          - name: REDIS_HOST            value: &quot;redis-service&quot;          - name: REDIS_PORT            value: &quot;6379&quot;          resources:            requests:              memory: &quot;128Mi&quot;                  cpu: &quot;100m&quot;                    limits:              memory: &quot;512Mi&quot;                  cpu: &quot;500m&quot;                  livenessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 120            periodSeconds: 30            timeoutSeconds: 10            failureThreshold: 3          readinessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 90            periodSeconds: 10            timeoutSeconds: 5            failureThreshold: 5---apiVersion: apps/v1kind: Deploymentmetadata:  name: redis  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  replicas: 1  selector:    matchLabels:      app: redis  template:    metadata:      labels:        app: redis    spec:      containers:      - name: redis        ../photos/posts/yys/image: redis:7-alpine        ports:        - containerPort: 6379        resources:          requests:            memory: &quot;64Mi&quot;            cpu: &quot;50m&quot;          limits:            memory: &quot;128Mi&quot;            cpu: &quot;100m&quot;        args:        - redis-server        - --appendonly        - &quot;yes&quot;        volumeMounts:        - name: redis-data          mountPath: /data      volumes:      - name: redis-data        emptyDir: &#123;&#125;---apiVersion: v1kind: Servicemetadata:  name: redis-service  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  selector:    app: redis  ports:  - name: redis    port: 6379    targetPort: 6379  type: ClusterIP---apiVersion: v1kind: Servicemetadata:  name: prometheus-test-demo  labels:    app: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  type: NodePort  selector:    app: prometheus-test-demo  ports:    - name: management-port      protocol: TCP      port: 8998      targetPort: 8998
-
-K8s 配置说明：
-
-使用 InitContainer 确保 Redis 先启动
-配置了资源限制防止资源耗尽
-设置了健康检查确保服务可用
-
-3.3 ServiceMonitor 配置 (prometheus-test-serviceMonitor.yaml)apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
-
-
-4. Jenkins 持续集成、持续部署、持续测试配置文件与说明4.1 Jenkinsfile 完整配置pipeline &#123;    agent none        // 环境变量管理    environment &#123;        HARBOR_REGISTRY = &#x27;172.22.83.19:30003&#x27;        IMAGE_NAME = &#x27;nju08/prometheus-test-demo&#x27;        GIT_REPO = &#x27;https://gitee.com/grissom_sh/prometheus-test-demo.git&#x27;        NAMESPACE = &#x27;nju08&#x27;        MONITOR_NAMESPACE = &#x27;nju08&#x27;        HARBOR_USER = &#x27;nju08&#x27;    &#125;        parameters &#123;        string(name: &#x27;HARBOR_PASS&#x27;, defaultValue: &#x27;&#x27;, description: &#x27;Harbor login password&#x27;)    &#125;        stages &#123;        stage(&#x27;Clone Code&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;1.Git Clone Code&quot;                script &#123;                    try &#123;                        git url: &quot;$&#123;env.GIT_REPO&#125;&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Git clone failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                stage(&#x27;Image Build&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;2.Image Build Stage (包含 Maven 构建)&quot;                timeout(time: 30, unit: &#x27;MINUTES&#x27;) &#123;                    script &#123;                        retry(3) &#123;                            try &#123;                                // 使用 Dockerfile 多阶段构建，包含 Maven 构建和镜像构建                                sh &quot;docker build --cache-from $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest .&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Docker build attempt failed: $&#123;e.getMessage()&#125;&quot;                                throw e                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;        stage(&#x27;Push&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;3.Push Docker Image Stage&quot;                script &#123;                    try &#123;                        sh &quot;echo &#x27;$&#123;HARBOR_PASS&#125;&#x27; | docker login --username=$&#123;HARBOR_USER&#125; --password-stdin $&#123;env.HARBOR_REGISTRY&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Docker push failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                        stage(&#x27;Deploy to Kubernetes&#x27;) &#123;            agent &#123;                label &#x27;slave&#x27;            &#125;            steps &#123;                container(&#x27;jnlp-kubectl&#x27;) &#123;                    script &#123;                        stage(&#x27;Clone YAML&#x27;) &#123;                            echo &quot;4. Git Clone YAML To Slave&quot;                            try &#123;                                // 使用 checkout scm 获取当前流水线的源代码                                checkout scm                            &#125; catch (Exception e) &#123;                                error &quot;Git clone on slave failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Config YAML&#x27;) &#123;                            echo &quot;5. Change YAML File Stage&quot;                            sh &#x27;sed -i &quot;s/&#123;VERSION&#125;/$&#123;BUILD_NUMBER&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;MONITOR_NAMESPACE&#125;/$&#123;MONITOR_NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo&#x27;) &#123;                            echo &quot;6. Deploy To K8s Stage&quot;                            sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                        &#125;                                                stage(&#x27;Wait for Redis&#x27;) &#123;                            echo &quot;6.5. Wait for Redis to be ready&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=redis -n $&#123;NAMESPACE&#125; --timeout=120s&quot;                                echo &quot;Redis is ready!&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Redis readiness check failed, but continuing: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo ServiceMonitor&#x27;) &#123;                            echo &quot;7. Deploy ServiceMonitor To K8s Stage&quot;                            try &#123;                                sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            &#125; catch (Exception e) &#123;                                error &quot;ServiceMonitor deployment failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Health Check&#x27;) &#123;                            echo &quot;8. Health Check Stage&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=prometheus-test-demo -n $&#123;NAMESPACE&#125; --timeout=300s&quot;                                echo &quot;Application is healthy and ready!&quot;                            &#125; catch (Exception e) &#123;                                error &quot;Health check failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;    &#125;        // 通知机制和清理    post &#123;        success &#123;            echo &#x27;🎉 Pipeline succeeded! Application deployed successfully.&#x27;            script &#123;                echo &quot;✅ Deployment Summary:&quot;                echo &quot;   - Image: $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                echo &quot;   - Namespace: $&#123;NAMESPACE&#125;&quot;                echo &quot;   - Monitor Namespace: $&#123;MONITOR_NAMESPACE&#125;&quot;            &#125;        &#125;        failure &#123;            echo &#x27;❌ Pipeline failed! Please check the logs for details.&#x27;        &#125;        always &#123;            echo &#x27;🔄 Pipeline execution completed.&#x27;            // 清理本地镜像以节省磁盘空间            script &#123;                try &#123;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; || true&quot;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest || true&quot;                    sh &quot;docker system prune -f || true&quot;                &#125; catch (Exception e) &#123;                    echo &quot;Image cleanup failed: $&#123;e.getMessage()&#125;&quot;                &#125;            &#125;        &#125;    &#125;&#125;
-
-4.2 Jenkins 流水线说明流水线各阶段详解：
-
-Checkout 阶段：
-
-拉取源代码
-生成构建版本号
-
-
-Build 阶段：
-
-Maven 编译和测试
-生成构建产物
-
-
-Docker Build &amp; Push 阶段：
-
-构建容器镜像
-推送到镜像仓库
-
-
-Deploy to Kubernetes 阶段：
-
-配置 K8s 部署文件
-部署应用和依赖服务
-健康检查
-
-
-
-4.3 CI&#x2F;CD 流程验证截图位置镜像构建截图：
-构建成功截图：
-部署成功截图：
-
-5. 监控指标采集的配置及说明；Grafana 监控大屏截图5.1 Prometheus 监控配置5.1.1 应用监控注解配置应用 Pod 配置了 Prometheus 自动发现注解：
-annotations:  prometheus.io/path: /actuator/prometheus    # 指标采集路径  prometheus.io/port: &quot;8998&quot;                  # 监控端口  prometheus.io/scheme: http                  # 协议  prometheus.io/scrape: &quot;true&quot;               # 启用自动发现
-
-5.1.2 ServiceMonitor 配置apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
-
-5.2 关键监控指标5.2.1 应用性能指标
-HTTP 请求指标：
-
-http_server_requests_seconds_count - 请求总数
-http_server_requests_seconds_sum - 请求总耗时
-http_server_requests_seconds_max - 最大响应时间
-
-
-JVM 指标：
-
-jvm_memory_used_bytes - JVM 内存使用
-jvm_gc_pause_seconds - GC 暂停时间
-jvm_threads_live_threads - 活跃线程数
-
-
-
-5.2.2 限流相关指标
-Bucket4j 指标（如果配置了 Micrometer 集成）：
-
-bucket4j_consumed_tokens_total - 消费的令牌总数
-bucket4j_rejected_requests_total - 被拒绝的请求数
-bucket4j_available_tokens - 可用令牌数
-
-
-Tomcat 连接池指标：
-
-tomcat_sessions_active_current - 活跃会话数
-tomcat_threads_busy_threads - 繁忙线程数
-tomcat_threads_config_max_threads - 最大线程数
-
-
-指标监测：
-
-端口转发之后 curl http://localhost:8998/actuator/prometheus，得到详细数据。
-
-# HELP application_ready_time_seconds Time taken for the application to be ready to service requests# TYPE application_ready_time_seconds gaugeapplication_ready_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.994# HELP application_started_time_seconds Time taken to start the application# TYPE application_started_time_seconds gaugeapplication_started_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.787# HELP disk_free_bytes Usable space for path# TYPE disk_free_bytes gaugedisk_free_bytes&#123;path=&quot;/app/.&quot;&#125; 4.1373339648E10# HELP disk_total_bytes Total space for path# TYPE disk_total_bytes gaugedisk_total_bytes&#123;path=&quot;/app/.&quot;&#125; 5.36608768E10# HELP executor_active_threads The approximate number of threads that are actively executing tasks# TYPE executor_active_threads gaugeexecutor_active_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution# TYPE executor_completed_tasks_total counterexecutor_completed_tasks_total&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_pool_core_threads The core number of threads for the pool# TYPE executor_pool_core_threads gaugeexecutor_pool_core_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 8.0# HELP executor_pool_max_threads The maximum allowed number of threads in the pool# TYPE executor_pool_max_threads gaugeexecutor_pool_max_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_pool_size_threads The current number of threads in the pool# TYPE executor_pool_size_threads gaugeexecutor_pool_size_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_queue_remaining_tasks The number of additional elements that this queue can ideally accept without blocking# TYPE executor_queue_remaining_tasks gaugeexecutor_queue_remaining_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_queued_tasks The approximate number of tasks that are queued for execution# TYPE executor_queued_tasks gaugeexecutor_queued_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP http_server_requests_active_seconds  # TYPE http_server_requests_active_seconds summaryhttp_server_requests_active_seconds_count&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 1http_server_requests_active_seconds_sum&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.194124977# HELP http_server_requests_active_seconds_max  # TYPE http_server_requests_active_seconds_max gaugehttp_server_requests_active_seconds_max&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.262306658# HELP http_server_requests_seconds  # TYPE http_server_requests_seconds summaryhttp_server_requests_seconds_count&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 77http_server_requests_seconds_sum&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 588.946979862http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 1314http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 8.224338786http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 4708http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 15666.990410086# HELP http_server_requests_seconds_max  # TYPE http_server_requests_seconds_max gaugehttp_server_requests_seconds_max&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 0.003561359http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0# HELP jvm_info JVM version info# TYPE jvm_info gaugejvm_info&#123;runtime=&quot;OpenJDK Runtime Environment&quot;,vendor=&quot;Eclipse Adoptium&quot;,version=&quot;17.0.11+9&quot;&#125; 1# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool# TYPE jvm_buffer_count_buffers gaugejvm_buffer_count_buffers&#123;id=&quot;direct&quot;&#125; 12.0jvm_buffer_count_buffers&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_count_buffers&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool# TYPE jvm_buffer_memory_used_bytes gaugejvm_buffer_memory_used_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool# TYPE jvm_buffer_total_capacity_bytes gaugejvm_buffer_total_capacity_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine# TYPE jvm_classes_loaded_classes gaugejvm_classes_loaded_classes 10568.0# HELP jvm_classes_unloaded_classes_total The number of classes unloaded in the Java virtual machine# TYPE jvm_classes_unloaded_classes_total counterjvm_classes_unloaded_classes_total 80.0# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation# TYPE jvm_compilation_time_ms_total counterjvm_compilation_time_ms_total&#123;compiler=&quot;HotSpot 64-Bit Tiered Compilers&quot;&#125; 218885.0# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation# TYPE jvm_gc_live_data_size_bytes gaugejvm_gc_live_data_size_bytes 8.5416936E7# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool# TYPE jvm_gc_max_data_size_bytes gaugejvm_gc_max_data_size_bytes 2.68435456E8# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next# TYPE jvm_gc_memory_allocated_bytes_total counterjvm_gc_memory_allocated_bytes_total 4.95829704E8# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC# TYPE jvm_gc_memory_promoted_bytes_total counterjvm_gc_memory_promoted_bytes_total 7.1289304E7# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]# TYPE jvm_gc_overhead gaugejvm_gc_overhead 0.0# HELP jvm_gc_pause_seconds Time spent in GC pause# TYPE jvm_gc_pause_seconds summaryjvm_gc_pause_seconds_count&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 3jvm_gc_pause_seconds_sum&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.976jvm_gc_pause_seconds_count&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 16jvm_gc_pause_seconds_sum&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 1.047# HELP jvm_gc_pause_seconds_max Time spent in GC pause# TYPE jvm_gc_pause_seconds_max gaugejvm_gc_pause_seconds_max&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.0jvm_gc_pause_seconds_max&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 0.0# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use# TYPE jvm_memory_committed_bytes gaugejvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 5.7081856E7jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 7077888.0jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 1.42364672E8jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 2555904.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5636096.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.572864E7jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6815744.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1707904E7# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management# TYPE jvm_memory_max_bytes gaugejvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 1.0747904E8jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 1.3369344E7jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 2.68435456E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 5828608.0jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 1.22916864E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.22912768E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 1.073741824E9jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; -1.0# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]# TYPE jvm_memory_usage_after_gc gaugejvm_memory_usage_after_gc&#123;area=&quot;heap&quot;,pool=&quot;long-lived&quot;&#125; 0.3310730457305908# HELP jvm_memory_used_bytes The amount of used memory# TYPE jvm_memory_used_bytes gaugejvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 3.3653184E7jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 854168.0jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 8.8871744E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 1349248.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5586048.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.5632E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6518344.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1187048E7# HELP jvm_threads_daemon_threads The current number of live daemon threads# TYPE jvm_threads_daemon_threads gaugejvm_threads_daemon_threads 20.0# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads# TYPE jvm_threads_live_threads gaugejvm_threads_live_threads 24.0# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset# TYPE jvm_threads_peak_threads gaugejvm_threads_peak_threads 214.0# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM# TYPE jvm_threads_started_threads_total counterjvm_threads_started_threads_total 249.0# HELP jvm_threads_states_threads The current number of threads# TYPE jvm_threads_states_threads gaugejvm_threads_states_threads&#123;state=&quot;blocked&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;new&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;runnable&quot;&#125; 7.0jvm_threads_states_threads&#123;state=&quot;terminated&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;timed-waiting&quot;&#125; 6.0jvm_threads_states_threads&#123;state=&quot;waiting&quot;&#125; 11.0# HELP logback_events_total Number of log events that were enabled by the effective log level# TYPE logback_events_total counterlogback_events_total&#123;level=&quot;debug&quot;&#125; 0.0logback_events_total&#123;level=&quot;error&quot;&#125; 0.0logback_events_total&#123;level=&quot;info&quot;&#125; 5.0logback_events_total&#123;level=&quot;trace&quot;&#125; 0.0logback_events_total&#123;level=&quot;warn&quot;&#125; 0.0# HELP process_cpu_time_ns_total The &quot;cpu time&quot; used by the Java Virtual Machine process# TYPE process_cpu_time_ns_total counterprocess_cpu_time_ns_total 1.0813E11# HELP process_cpu_usage The &quot;recent cpu usage&quot; for the Java Virtual Machine process# TYPE process_cpu_usage gaugeprocess_cpu_usage 0.09197856413746172# HELP process_files_max_files The maximum file descriptor count# TYPE process_files_max_files gaugeprocess_files_max_files 1048576.0# HELP process_files_open_files The open file descriptor count# TYPE process_files_open_files gaugeprocess_files_open_files 15.0# HELP process_start_time_seconds Start time of the process since unix epoch.# TYPE process_start_time_seconds gaugeprocess_start_time_seconds 1.752976768479E9# HELP process_uptime_seconds The uptime of the Java virtual machine# TYPE process_uptime_seconds gaugeprocess_uptime_seconds 9948.976# HELP system_cpu_count The number of processors available to the Java virtual machine# TYPE system_cpu_count gaugesystem_cpu_count 1.0# HELP system_cpu_usage The &quot;recent cpu usage&quot; of the system the application is running in# TYPE system_cpu_usage gaugesystem_cpu_usage 0.09208738261313372# HELP system_load_average_1m The sum of the number of runnable entities queued to available processors and the number of runnable entities running on the available processors averaged over a period of time# TYPE system_load_average_1m gaugesystem_load_average_1m 0.08# HELP tomcat_sessions_active_current_sessions  # TYPE tomcat_sessions_active_current_sessions gaugetomcat_sessions_active_current_sessions 0.0# HELP tomcat_sessions_active_max_sessions  # TYPE tomcat_sessions_active_max_sessions gaugetomcat_sessions_active_max_sessions 0.0# HELP tomcat_sessions_alive_max_seconds  # TYPE tomcat_sessions_alive_max_seconds gaugetomcat_sessions_alive_max_seconds 0.0# HELP tomcat_sessions_created_sessions_total  # TYPE tomcat_sessions_created_sessions_total countertomcat_sessions_created_sessions_total 0.0# HELP tomcat_sessions_expired_sessions_total  # TYPE tomcat_sessions_expired_sessions_total countertomcat_sessions_expired_sessions_total 0.0# HELP tomcat_sessions_rejected_sessions_total  # TYPE tomcat_sessions_rejected_sessions_total countertomcat_sessions_rejected_sessions_total 0.0
-
-5.3 Grafana 监控大屏配置5.3.1 监控大屏概览本项目成功配置了多个 Grafana 监控大屏，涵盖了应用性能、网络流量和资源使用等关键指标：
-
-SpringBoot APM Dashboard - 应用性能监控
-Kubernetes &#x2F; Compute Resources &#x2F; Namespace - 集群资源监控  
-网络流量监控面板 - Pod 间通信监控
-
-5.3.2 SpringBoot APM Dashboard 配置面板配置说明：
-&#123;  &quot;dashboard&quot;: &#123;    &quot;title&quot;: &quot;SpringBoot APM Dashboard&quot;,    &quot;panels&quot;: [      &#123;        &quot;title&quot;: &quot;Basic Statistics&quot;,        &quot;type&quot;: &quot;stat&quot;,        &quot;targets&quot;: [          &#123;            &quot;expr&quot;: &quot;process_uptime_seconds&#123;instance=~\&quot;.*prometheus-test-demo.*\&quot;&#125;&quot;,            &quot;legendFormat&quot;: &quot;Uptime&quot;          &#125;,          &#123;            &quot;expr&quot;: &quot;jvm_memory_used_bytes&#123;area=\&quot;heap\&quot;&#125;/jvm_memory_max_bytes&#123;area=\&quot;heap\&quot;&#125;*100&quot;,            &quot;legendFormat&quot;: &quot;Heap Used %&quot;          &#125;        ]      &#125;    ]  &#125;&#125;
-
-关键监控指标：
-
-运行时间: 1.5 天稳定运行
-堆内存使用: 9.4% (健康水平)
-非堆内存使用: 5.2% (正常状态)
-CPU 使用率: 平均 0.577% (系统空闲)
-负载均衡: 0.436 (轻负载)
-
-
-5.3.3 Kubernetes 资源监控配置集群资源监控面板配置：
-CPU 使用率监控：
-# CPU 使用率 (基于请求)rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) * 100# CPU 使用率 (基于限制)  rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;cpu&quot;&#125; * 100
-
-内存使用率监控：
-# 内存使用率 (基于请求)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / container_spec_memory_limit_bytes * 100# 内存使用率 (基于限制)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;memory&quot;&#125; * 100
-
-监控数据分析：
-
-CPU 使用率 (基于请求)
-CPU 使用率 (基于限制) 
-内存使用率 (基于请求) 
-内存使用率 (基于限制)
-
-
-5.3.4 网络流量监控配置网络监控面板配置：
-接收&#x2F;发送字节数监控：
-# 网络接收速率rate(container_network_receive_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 网络发送速率  rate(container_network_transmit_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
-
-网络包监控：
-# 接收包速率rate(container_network_receive_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 发送包速率rate(container_network_transmit_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 丢包率rate(container_network_receive_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])rate(container_network_transmit_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
-
-网络流量分析：
-
-峰值网络吞吐量: ~200 kB&#x2F;s (发送&#x2F;接收)
-峰值包速率: ~2 kp&#x2F;s (接收&#x2F;发送)
-网络活动时间: 05:30 左右出现流量峰值
-丢包情况: 基本无丢包，网络稳定
-
-
-5.3.5 压测时的监控表现压测期间关键指标变化：
-
-CPU 使用率飙升：
-
-压测前: ~0.003 (0.3%)
-压测时: ~0.37 (37%)
-增长倍数: 约 123 倍
-
-
-网络流量激增：
-
-正常时: 几乎无流量 (0-10 kB&#x2F;s)
-压测时: 峰值 200 kB&#x2F;s
-包速率: 峰值 2000 packets&#x2F;s
-
-
-内存使用稳定：
-
-内存使用率保持在合理范围
-未出现内存泄漏现象
-
-
-
-5.3.6 限流效果在监控中的体现限流监控配置：
-# HTTP 请求速率rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 60# 错误率 (限流触发)rate(http_server_requests_seconds_count&#123;exception=&quot;IOException&quot;&#125;[1m]) /rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 100# 连接数监控tomcat_threads_busy_threads / tomcat_threads_config_max_threads * 100
-
-限流效果观察：
-
-✅ 流量控制有效: 网络流量在达到峰值后快速回落
-✅ CPU 保护机制: CPU 使用率未超过危险阈值
-✅ 连接层限流: 通过网络包丢弃实现早期限流
-
-
-6. 压测6.1 压测工具6.1.1 基础压测脚本#!/bin/bashURL=&quot;http://localhost:8998/hello&quot;CONCURRENT=10REQUESTS=100echo &quot;Starting load test...&quot;echo &quot;URL: $URL&quot;echo &quot;Concurrent requests: $CONCURRENT&quot;echo &quot;Total requests: $REQUESTS&quot;for i in $(seq 1 $REQUESTS); do    (        response=$(curl -s -w &quot;%&#123;http_code&#125;,%&#123;time_total&#125;&quot; -o /dev/null $URL)        echo &quot;Request $i: $response&quot;    ) &amp;        # 控制并发数    if (( $i % $CONCURRENT == 0 )); then        wait    fidonewaitecho &quot;Load test completed!&quot;
-
-6.1.2 高频限流测试脚本#!/bin/bash# 颜色定义RED=&#x27;\033[0;31m&#x27;GREEN=&#x27;\033[0;32m&#x27;YELLOW=&#x27;\033[1;33m&#x27;BLUE=&#x27;\033[0;34m&#x27;NC=&#x27;\033[0m&#x27; # No ColorURL=&quot;http://localhost:8998/hello&quot;NAMESPACE=&quot;nju08&quot;echo &quot;=========================================&quot;echo &quot;YYS 项目 - 超高频限流测试脚本&quot;echo &quot;=========================================&quot;# 检查端口转发check_port_forward() &#123;    if ! lsof -i :8998 &gt;/dev/null 2&gt;&amp;1; then        echo -e &quot;$&#123;RED&#125;❌ 端口转发未运行$&#123;NC&#125;&quot;        echo -e &quot;$&#123;YELLOW&#125;请先运行: kubectl port-forward deployment/prometheus-test-demo 8998:8998 -n $NAMESPACE$&#123;NC&#125;&quot;        exit 1    fi    echo -e &quot;$&#123;GREEN&#125;✅ 端口转发正常运行$&#123;NC&#125;&quot;&#125;# 多轮高频测试run_aggressive_test() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;🔥 开始超高频限流测试...$&#123;NC&#125;&quot;    echo &quot;目标: 超过 100 requests/second 限制&quot;    echo &quot;&quot;        # 测试配置    local ROUNDS=3    local REQUESTS_PER_ROUND=150    local MAX_CONCURRENT=100        for round in $(seq 1 $ROUNDS); do        echo -e &quot;$&#123;YELLOW&#125;=== 第 $round 轮测试 ===$&#123;NC&#125;&quot;        echo &quot;发送 $REQUESTS_PER_ROUND 个请求，$MAX_CONCURRENT 并发&quot;                local success_count=0        local rate_limited_count=0        local error_count=0        local timeout_count=0                start_time=$(date +%s.%N)                # 创建临时文件        temp_file=&quot;/tmp/aggressive_test_$&#123;round&#125;_$$&quot;                # 极限并发发送        for i in $(seq 1 $REQUESTS_PER_ROUND); do            &#123;                response=$(timeout 2 curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.3 \                    --max-time 1 \                    --retry 0 \                    --no-keepalive \                    $URL 2&gt;/dev/null)                                exit_code=$?                timestamp=$(date &#x27;+%H:%M:%S.%3N&#x27;)                                if [ $exit_code -eq 124 ]; then                    echo &quot;TIMEOUT,$timestamp&quot; &gt;&gt; $temp_file                elif [ $exit_code -ne 0 ] || [ -z &quot;$response&quot; ]; then                    echo &quot;CONNECTION_FAILED,$timestamp&quot; &gt;&gt; $temp_file                else                    echo &quot;$response,$timestamp&quot; &gt;&gt; $temp_file                fi            &#125; &amp;                        # 减少等待时间，增加并发密度            if (( $i % $MAX_CONCURRENT == 0 )); then                wait            fi        done                wait                end_time=$(date +%s.%N)        duration=$(echo &quot;$end_time - $start_time&quot; | bc 2&gt;/dev/null || echo &quot;1&quot;)        rate=$(echo &quot;scale=2; $REQUESTS_PER_ROUND / $duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)                echo &quot;  持续时间: $&#123;duration&#125;秒&quot;        echo &quot;  实际速率: $&#123;rate&#125; requests/second&quot;                # 统计结果        while IFS=&#x27;,&#x27; read -r status_or_error timestamp; do            case &quot;$status_or_error&quot; in                &quot;200&quot;) ((success_count++)) ;;                &quot;429&quot;|&quot;503&quot;)                     ((rate_limited_count++))                    echo -e &quot;  $&#123;YELLOW&#125;🚫 限流: $timestamp - HTTP $status_or_error$&#123;NC&#125;&quot;                    ;;                &quot;TIMEOUT&quot;)                     ((timeout_count++))                    echo -e &quot;  $&#123;RED&#125;⏰ 超时: $timestamp$&#123;NC&#125;&quot;                    ;;                &quot;CONNECTION_FAILED&quot;|*)                    ((error_count++))                    echo -e &quot;  $&#123;RED&#125;❌ 失败: $timestamp$&#123;NC&#125;&quot;                    ;;            esac        done &lt; $temp_file 2&gt;/dev/null                rm -f $temp_file                echo -e &quot;  结果: ✅$success_count 🚫$rate_limited_count ⏰$timeout_count ❌$error_count&quot;                if [ $rate_limited_count -gt 0 ] || [ $timeout_count -gt 5 ] || [ $error_count -gt 5 ]; then            echo -e &quot;  $&#123;GREEN&#125;🎯 第 $round 轮检测到限流效果!$&#123;NC&#125;&quot;        else            echo -e &quot;  $&#123;YELLOW&#125;⚠️  第 $round 轮未检测到限流$&#123;NC&#125;&quot;        fi                echo &quot;&quot;                # 轮次间短暂休息        if [ $round -lt $ROUNDS ]; then            sleep 1        fi    done&#125;# 连续轰炸测试run_continuous_bombardment() &#123;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试 (30秒内持续发送请求)$&#123;NC&#125;&quot;    echo &quot;&quot;        local duration=30    local concurrent=50    local total_requests=0    local success_count=0    local limited_count=0        start_time=$(date +%s)    end_target=$((start_time + duration))        echo &quot;开始时间: $(date)&quot;    echo &quot;目标持续: $&#123;duration&#125;秒&quot;    echo &quot;并发数: $concurrent&quot;    echo &quot;&quot;        while [ $(date +%s) -lt $end_target ]; do        # 每次发送一批请求        for i in $(seq 1 $concurrent); do            &#123;                response=$(curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.2 \                    --max-time 0.5 \                    $URL 2&gt;/dev/null)                                ((total_requests++))                                if [ &quot;$response&quot; = &quot;200&quot; ]; then                    ((success_count++))                elif [ &quot;$response&quot; = &quot;429&quot; ] || [ &quot;$response&quot; = &quot;503&quot; ]; then                    ((limited_count++))                    echo -e &quot;$&#123;YELLOW&#125;🚫 限流触发! HTTP $response at $(date &#x27;+%H:%M:%S&#x27;)$&#123;NC&#125;&quot;                fi            &#125; &amp;        done                # 短暂等待后继续        sleep 0.1    done        wait        actual_duration=$(($(date +%s) - start_time))    actual_rate=$(echo &quot;scale=2; $total_requests / $actual_duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)        echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试结果$&#123;NC&#125;&quot;    echo &quot;实际持续时间: $&#123;actual_duration&#125;秒&quot;    echo &quot;总请求数: $total_requests&quot;    echo &quot;平均速率: $&#123;actual_rate&#125; requests/second&quot;    echo &quot;成功请求: $success_count&quot;    echo &quot;限流触发: $limited_count&quot;        if [ $limited_count -gt 0 ]; then        echo -e &quot;$&#123;GREEN&#125;🎯 连续轰炸成功触发限流!$&#123;NC&#125;&quot;    else        echo -e &quot;$&#123;YELLOW&#125;⚠️  连续轰炸未触发限流$&#123;NC&#125;&quot;    fi&#125;# Apache Bench 测试 (如果可用)run_ab_test() &#123;    if command -v ab &amp;&gt; /dev/null; then        echo &quot;&quot;        echo -e &quot;$&#123;BLUE&#125;⚡ Apache Bench 高性能测试$&#123;NC&#125;&quot;        echo &quot;&quot;                echo &quot;测试1: 500个请求，200并发&quot;        ab -n 500 -c 200 $URL                echo &quot;&quot;        echo &quot;测试2: 2秒内尽可能多的请求，300并发&quot;        ab -t 2 -c 300 $URL            else        echo &quot;&quot;        echo -e &quot;$&#123;YELLOW&#125;💡 建议安装 Apache Bench 进行更高性能的测试:$&#123;NC&#125;&quot;        echo &quot;  sudo apt-get install apache2-utils&quot;        echo &quot;  然后运行: ab -n 1000 -c 300 $URL&quot;    fi&#125;# 检查限流配置check_rate_limit_config() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;⚙️ 检查当前限流配置$&#123;NC&#125;&quot;        # 检查 Redis 中的令牌桶状态    echo &quot;Redis 限流键:&quot;    kubectl exec deployment/redis -n $NAMESPACE -- redis-cli keys &quot;*rate*&quot; 2&gt;/dev/null || echo &quot;无法访问Redis&quot;        # 尝试获取桶的状态 (这个可能需要特殊的命令)    echo &quot;&quot;    echo &quot;当前应用配置:&quot;    echo &quot;- 限流阈值: 100 requests/second&quot;    echo &quot;- 令牌桶容量: 100&quot;    echo &quot;- 补充速率: 100 tokens/second&quot;    echo &quot;- 限流键: global-rate-limit-key&quot;&#125;# 主执行流程main() &#123;    check_port_forward    check_rate_limit_config    run_aggressive_test    run_continuous_bombardment    run_ab_test        echo &quot;&quot;    echo -e &quot;$&#123;GREEN&#125;🏁 超高频限流测试完成!$&#123;NC&#125;&quot;&#125;# 执行主函数main &quot;$@&quot;
-
-
-
-
-
-6.2 压测结果压测结果截图：
-
-未触发限流：  
-触发限流：    
-其中在限流之后转发的进程这边显示如下信息，说明超出阈值的request直接在tcp层被拒绝。
-
-
-HTTP 000 状态码说明：
-
-
-状态码 000 表示连接在 TCP 层被拒绝
-这证明了限流系统在连接层面起到了保护作用
-比 HTTP 429 更早介入，资源保护更彻底
-
-7. 项目总结与技术亮点7.1 技术架构亮点
-多层限流防护：
-
-应用层：Bucket4j 令牌桶算法精确控制
-连接层：Tomcat 连接池快速保护
-网络层：K8s 网络策略综合防护
-
-
-分布式限流设计：
-
-基于 Redis 的分布式令牌桶
-支持水平扩展和高可用
-保证多实例间限流一致性
-
-
-云原生最佳实践：
-
-容器化部署
-K8s 声明式配置
-微服务架构设计
-
-
-
-7.2 监控与运维亮点
-全方位监控：
-
-应用性能监控 (APM)
-基础设施监控
-业务指标监控
-
-
-自动化运维：
-
-CI&#x2F;CD 流水线自动化
-健康检查和自愈能力
-可观测性最佳实践
-
-
-
-7.3 压测验证成果
-限流功能验证：
-
-成功验证 100 req&#x2F;s 限流阈值
-确认多层限流机制有效性
-系统保护能力得到验证
-
-
-扩容能力验证：
-
-K8s 水平扩容功能正常
-负载均衡分发有效
-性能线性提升明显
-
-
-
-7.4 项目创新点
-连接层限流策略：
-
-在 TCP 连接层就实现流量控制
-比传统 HTTP 层限流更高效
-资源保护更彻底
-
-
-压测工具定制化：
-
-针对限流场景设计专用测试脚本
-能够有效触发和验证限流机制
-提供详细的测试报告和分析
-
-
-监控体系完整性：
-
-从基础设施到应用层的全栈监控
-限流专用监控面板设计
-智能告警和故障预警
-
-
-
-7.5 学习收获与心得通过本项目的实践，深入理解了：
-
-云原生技术栈：
-
-Docker 容器化技术
-Kubernetes 容器编排
-微服务架构设计原则
-
-
-限流算法与实现：
-
-令牌桶算法的原理和应用
-分布式限流的挑战和解决方案
-多层限流策略的设计思路
-
-
-DevOps 最佳实践：
-
-CI&#x2F;CD 流水线设计
-监控体系建设
-自动化测试和部署
-
-
-性能测试与调优：
-
-压测工具的选择和使用
-性能瓶颈的识别和优化
-系统扩容策略的验证
-
-
-
-
-8. 附录8.1 项目文件结构yys/├── src/                                    # 源代码目录│   ├── main/java/com/hello/hello/│   │   ├── config/                        # 配置类│   │   │   ├── RateLimitConfig.java      # 限流配置│   │   │   ├── RedisConfig.java          # Redis配置│   │   │   └── WebMvcConfig.java         # Web配置│   │   ├── controller/│   │   │   └── HelloController.java      # 控制器│   │   ├── interceptor/│   │   │   └── RateLimitInterceptor.java # 限流拦截器│   │   ├── service/│   │   │   └── RateLimiterService.java   # 限流服务│   │   └── HelloApplication.java         # 启动类│   └── main/resources/│       └── application.properties        # 应用配置├── jenkins/scripts/                       # K8s部署文件│   ├── prometheus-test-demo.yaml│   └── prometheus-test-serviceMonitor.yaml├── Dockerfile                            # Docker构建文件├── Jenkinsfile                          # Jenkins流水线├── pom.xml                              # Maven配置└── README.md                            # 项目说明文档
-
-8.2 相关技术栈版本
-Java: 17
-Spring Boot: 3.5.3
-Bucket4j: 8.10.1
-Redis: 7-alpine
-Kubernetes: 1.20+
-Docker: 20.10+
-Jenkins: 2.400+
-Prometheus: 2.40+
-Grafana: 9.0+
-
-
-报告完成时间: 2025年7月20日项目代码仓库: https://github.com/231220075/yys分支: hpa
-
+    <title>R2CN开源项目</title>
+    <url>/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/</url>
+    <content><![CDATA[📝 R2CN开源项目
+经开源软件论坛的介绍，尝试参与一个R2CN的开源项目，提交了PR。
+
+正文内容2025.8.23，在开学前我参加了南大e-science中心牵头举办的第三届开源软件论坛，认识了来自清北交大等高校的大佬，尤其是参加了25ACS、ICS的超算队员。（孙远航@北京大学，贾朝蓬@清华大学，桂仲腾@上海交通大学，黄烨@中山大学 etc..）另外北大还介绍了他们自己组建的校内北大☁️（捡垃圾捡的说是）搞得我也想折腾个服务器，虽然好像也没什么个人需求，而且南大☁️已经存在了。。。
+剩下的报告除了各获奖超算队的解题思路，本校的大四学长介绍了monorepo的相关知识，并介绍了两个开源实习项目，这也是和R2CN接触的开始。
+测试任务在注册成为实习生之前需要做一个测试任务，考察对rust和git的了解程度。这个之前由于正好合作开发了rust-git，所以对我来说比较简单bushi。有前人提交了一个issue但是没有继续完成，所以我直接接手了。issue链接如下https://github.com/web3infra-foundation/mega/issues/1197
+待更新现在通过测试任务，等待过审。8.29。
+总结
 感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
-]]></content>
-      <categories>
-        <category>学习记录</category>
-      </categories>
-      <tags>
-        <tag>学习</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>域名解析与网站绑定完全指南</title>
-    <url>/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/</url>
-    <content><![CDATA[域名解析与网站绑定完全指南🌐 前言当我们在浏览器输入 summer-flower.com 时，为什么能访问到我们的网站？这背后涉及了复杂的域名解析系统。本文将从零开始，详细解释域名解析的工作原理，以及如何将自定义域名绑定到 GitHub Pages。
-📚 基础概念什么是域名？域名（Domain Name）是互联网上网站的人类可读地址，例如：
-
-google.com
-github.com 
-summer-flower.com
-
-它的作用是将复杂的IP地址（如 185.199.108.153）转换为容易记忆的名称。
-什么是DNS？DNS（Domain Name System，域名系统）是互联网的”电话簿”，负责将域名翻译成IP地址。
-DNS解析过程：用户输入: summer-flower.com    ↓DNS查询: summer-flower.com 对应哪个IP？    ↓  DNS返回: 185.199.108.153    ↓浏览器访问: 185.199.108.153    ↓服务器返回: 网站内容
-
-🔧 DNS记录类型详解1. A记录（Address Record）作用: 将域名直接指向IPv4地址
-格式: 域名 → IP地址
-示例:
-summer-flower.com → 185.199.108.153
-
-使用场景: 
-
-将域名指向网站服务器
-最常用的记录类型
-一个域名可以有多个A记录（负载均衡）
-
-2. CNAME记录（Canonical Name Record）作用: 将域名指向另一个域名
-格式: 域名 → 另一个域名
-示例:
-www.summer-flower.com → summer-flower.comblog.summer-flower.com → summer-flower.com
-
-使用场景:
-
-子域名重定向
-CDN配置
-服务别名
-
-重要限制: 
-
-根域名（如 summer-flower.com）不能使用CNAME
-一个域名不能同时有CNAME和其他记录
-
-3. NS记录（Name Server Record）作用: 指定域名的DNS服务器
-格式: 域名 → DNS服务器地址
-示例:
-summer-flower.com → ns1.huaweicloud-dns.orgsummer-flower.com → ns2.huaweicloud-dns.org
-
-使用场景:
-
-域名注册商设置
-DNS服务器迁移
-
-4. SOA记录（Start of Authority Record）作用: 定义域名的权威信息
-包含信息:
-
-主DNS服务器
-域名管理员邮箱
-序列号
-刷新时间
-重试时间
-
-使用场景:
-
-系统自动创建
-DNS同步控制
-
-5. MX记录（Mail Exchange Record）作用: 指定邮件服务器
-示例:
-summer-flower.com → mail.summer-flower.com
-
-6. TXT记录（Text Record）作用: 存储文本信息
-使用场景:
-
-域名验证
-SPF邮件验证
-网站验证
-
-🌍 DNS解析的完整流程1. 浏览器发起请求用户输入: https://summer-flower.com
-
-2. 本地DNS缓存检查检查顺序:1. 浏览器缓存2. 操作系统缓存3. 路由器缓存
-
-3. 递归DNS查询本地DNS服务器 → 根DNS服务器根DNS服务器 → .com顶级域DNS服务器  .com DNS服务器 → summer-flower.com权威DNS服务器权威DNS服务器 → 返回IP地址
-
-4. 返回结果并缓存IP地址 → 本地DNS服务器 → 用户设备同时: 各级缓存存储结果
-
-🚀 GitHub Pages 域名绑定详解GitHub Pages 的工作原理默认访问方式:
-https://用户名.github.io/仓库名例如: https://231220075.github.io
-
-自定义域名访问:
-https://your-domain.com例如: https://summer-flower.com
-
-绑定步骤详解步骤1: 创建CNAME文件位置: /source/CNAME（对于Hexo）
-内容:
-summer-flower.com
-
-作用:
-
-告诉GitHub Pages你的自定义域名
-触发GitHub生成SSL证书
-启用域名重定向
-
-步骤2: 配置DNS记录GitHub Pages IP地址:
-185.199.108.153185.199.109.153185.199.110.153  185.199.111.153
-
-DNS配置:
-类型: A主机记录: @ 或 *记录值: 185.199.108.153TTL: 300
-
-重复添加其他3个IP地址
-步骤3: 等待生效时间线:
-DNS配置 → 5-30分钟 → DNS传播完成DNS传播完成 → 10-15分钟 → GitHub检测到GitHub检测到 → 5-10分钟 → SSL证书生成SSL证书生成 → 网站完全可用
-
-GitHub Pages 的验证机制DNS检查过程1. GitHub定期查询你的域名2. 检查是否指向GitHub Pages IP3. 验证CNAME文件内容4. 生成SSL证书5. 启用HTTPS访问
-
-状态变化🔴 DNS check unsuccessful   ↓ (DNS生效)🟡 DNS check in progress   ↓ (验证完成)🟢 DNS configuration successful     ↓ (SSL生成)✅ Enforce HTTPS 可用
-
-⚠️ 常见问题与解决方案问题1: DNS检查失败症状:
-DNS check unsuccessfulDomain does not resolve to the GitHub Pages server
-
-原因:
-
-DNS记录配置错误
-DNS还未传播完成
-存在冲突记录
-
-解决方案:
-# 检查DNS是否生效dig your-domain.com# 期望结果: 4个A记录指向GitHub Pages
-
-问题2: CNAME和A记录冲突错误配置:
-summer-flower.com → CNAME → other-domain.com (错误)summer-flower.com → A → 185.199.108.153 (正确)
-
-解决方案: 删除CNAME记录，只保留A记录
-问题3: www子域名配置方案A: 使用泛域名解析
-*.summer-flower.com → A → GitHub Pages IP
-
-方案B: 单独配置CNAME
-www.summer-flower.com → CNAME → summer-flower.com
-
-问题4: SSL证书问题常见原因:
-
-DNS配置不正确
-GitHub还在验证过程中
-域名验证失败
-
-解决方案:
-
-等待DNS完全传播
-确保CNAME文件正确
-检查GitHub Pages设置
-
-🛠️ 实际操作示例华为云DNS配置登录控制台:
-华为云控制台 → 域名与网站 → 云解析服务
-
-添加记录:
-记录类型: A主机记录: * (泛域名) 或 @ (根域名)线路类型: 全网默认TTL: 300记录值: 185.199.108.153
-
-重复添加其他GitHub Pages IP
-验证配置命令行验证:
-# 检查DNS解析dig summer-flower.com# 检查网站访问curl -I https://summer-flower.com# 检查SSL证书curl -I https://summer-flower.com | grep -i server
-
-在线工具验证:
-
-DNS传播检查: https://www.whatsmydns.net/
-SSL证书检查: https://www.ssllabs.com/ssltest/
-
-📊 性能优化建议TTL设置优化开发阶段:
-TTL: 300 (5分钟) - 便于快速测试
-
-生产环境:
-TTL: 3600 (1小时) - 减少DNS查询
-
-多IP配置的好处负载均衡:
-
-分散访问压力
-提高可用性
-
-容错机制:
-
-某个IP故障时自动切换
-提高网站稳定性
-
-CDN集成CloudFlare示例:
-域名 → CloudFlare → GitHub Pages
-
-优势:
-
-全球加速
-DDoS防护
-高级SSL功能
-
-🔒 安全考虑HTTPS强制GitHub Pages设置:
-Settings → Pages → Enforce HTTPS ✓
-
-好处:
-
-数据传输加密
-SEO优势
-现代浏览器要求
-
-DNS安全DNSSEC:
-
-防止DNS劫持
-验证DNS响应真实性
-
-私有DNS:
-
-使用可信DNS服务器
-避免DNS污染
-
-📈 监控与维护监控指标可用性监控:
-
-网站响应时间
-DNS解析时间
-SSL证书到期时间
-
-工具推荐:
-
-UptimeRobot（免费）
-Pingdom（付费）
-CloudFlare Analytics
-
-维护任务定期检查:
-
-DNS记录是否正确
-SSL证书是否有效
-网站访问是否正常
-
-备份策略:
-
-DNS配置备份
-域名转移码保存
-重要文件备份
-
-🎯 总结域名解析是现代互联网的基础设施，理解其工作原理对于网站管理至关重要：
-关键要点
-DNS记录类型: A记录指向IP，CNAME指向域名
-GitHub Pages绑定: 需要正确的DNS配置和CNAME文件
-传播时间: DNS更改需要5-60分钟生效
-安全性: 启用HTTPS和DNSSEC保护
-监控: 持续监控确保服务稳定
-
-最佳实践
-使用A记录指向GitHub Pages IP
-避免不必要的CNAME记录
-设置合适的TTL值
-启用HTTPS强制
-定期监控和维护
-
-通过本文的学习，相信你已经对域名解析有了全面的理解。在实际操作中，记住耐心等待DNS传播，遇到问题时系统性地排查，大部分问题都能迎刃而解。
-
-相关资源:
-
-GitHub Pages 官方文档
-DNS 基础知识
-华为云 DNS 使用指南
-
-祝你的网站部署顺利！🚀
 ]]></content>
       <categories>
         <category>技术学习</category>
       </categories>
       <tags>
-        <tag>域名</tag>
-        <tag>DNS</tag>
-        <tag>GitHub Pages</tag>
-        <tag>网站部署</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>用rust复刻git</title>
-    <url>/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/</url>
-    <content><![CDATA[📝 用rust复刻git
-本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历
-
-前言大二下选课的时候发现有一门《rust程序设计》的课程，之前在大一上c++的时候最早接触过rust这个名字，但是一直没怎么了解过，于是抱着好奇心和同伴组队选了这门课，这也是这门项目的由来。
-整个项目从4月份开始，到5月底向猪脚答辩时完成了1.0版本（https://github.com/231220075/git.git），包含了除远程分支外的基本功能。后续在暑假期间补上了远程分支控制的部分，即1.1版本（https://github.com/231220075/rit.git），命名为rit-&gt;rust-git。
-初步开发
-首先需要了解git的工作原理，这一部分参考https://git-scm.com/book/en/v，不再赘述。
-每一条git命令执行过程比较固定，解析好命令行参数后执行对应的处理函数即可。解析命令行参数使用clap（易于使用，能处理复杂参数解析，且自动生成help页）。clap解析命令行参数并返回具体类型的 subcommand，并调用其run函数。这里为了后续子命令的实现，我们把.git所在目录路径作为参数传给run，并为-C做了处理。
-在做subcommand之前需要先实现一些底层命令，我们做了cat-file、hash-object、write&#x2F;read-tree、update-index、commit-tree、update-ref&amp;&amp;symboloc-ref等等（后两个比较简单，后续直接简化到utils&#x2F;refs作为分支管理工具了），这一部分逐步理清并构建了git的工作环境，如index区、.git文件内容管理、refs管理等等，以及git中 blob、tree、commit这几种object的结构，这些就是git的底层代码，到此为止我们就能完全读懂.git下的所有文件及其功能了。
-理解底层代码后剩下的部分就比较简单了，subcommand就是在底层命令的基础上运行的，基本就是组合一下，加上判断处理。比较复杂的可能是checkout和merge，课程对merge要求比较简单，如果有冲突只要显示两个分支哪部分有不同，这部分由另一位成员完成，我不做过多阐述；而checkout主要涉及到切换分支的时间点，workspace、index和ref commit是否一致的问题。我的理解是，如果切换分支前，仅考虑目标文件，index&#x3D;workspace&#x3D;current ref commit，说明不存在未暂存&amp;&amp;未提交的更改，即index和workspace都是clean，这种情况下可以直接切换ref commit,并把目标commit的tree object写入index和更新workspace；否则说明有未暂存||未提交的更改，需要考虑保留这些更改，存在一个“merge”的过程，对于存在冲突的文件以index&#x2F;workspace为准。
-这个过程中每一步开发新功能前需要先把频繁使用的method构建一个util，方便后续使用，我们主要是用到很多关于三类object构建和读写、index的读写、文件读写以及压缩、hash和做单元测试的method，构建了相关的utils。谈到unit test，需要感谢我的同伴开发了完整的测试框架，为我们的测试做出来巨大的贡献、巨大的carry，respect！也是rust优秀的单元测试让我这个懒人也愿意开始做测试了，amazing啊qwq。
-
-debug&amp;&amp;踩坑
-关于debug，包括两部分。一是客观方面作为课设，猪脚还是做了oj，我们这个项目需要通过测试拿分。猪脚的oj是用脚本做断言测试公开了部分测试和要求，涉及大文件、可执行文件、图片等的测试；另一方面主观上每个subcommand和底层命令我们做了对应的集成测试，主要是交替使用原版git和rust-git检查问题。
-大部分bug在检测的过程中就知道哪里有问题，可以快速解决，但有的是认知问题。比较典型的是，index区暂存文件的结构和tree object的文件结构是不一样的，前者是完整的路径，而后者是递归存储的。
-另外就是配置了GitHub的CI，name: Rust CI# 触发条件：当代码推送到仓库或创建 Pull Request 时触发on:  push:    branches: [ &#x27;**&#x27; ]jobs:  build-and-test:    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境    steps:      # Step 1: 检出代码      - name: Checkout code        uses: actions/checkout@v3      # Step 2: 设置 Rust 工具链      - name: Set up Rust        uses: actions-rs/toolchain@v1        with:          toolchain: stable  # 使用稳定的 Rust 工具链      # Step 3: 运行 cargo test      - name: Run Tests        run: cargo test -- --test-threads=1      # Step 4: 运行 cargo clippy 检查      - name: Run Clippy        run: cargo clippy -- -D warnings  # 将警告视为错误      # （可选）Step 5: 构建项目      - name: Build Project        run: cargo build --release
-这样每次提交自动触发测试，虽然每次都要发个邮件提醒有点烦就是了……大概如下
-
-🤖️ 远程分支
-进入8月才有时间收拾这个没完成的摊子，想补充的远程分支部分主要是fetch、pull和push三个subcommand，目标是能和GitHub的repo交互更新即可。
-我最终选择用https与GitHub传输，虽然传输大文件不稳定，但是本人对https比较熟悉（ssh现阶段就不太考虑了）。fetch主要是获取远程仓库的分支和对应的commit hash，而首先要设定远程传输的仓库URL，所以先实现remote指令设置分支和URL的映射，保存在.git&#x2F;config文件。fetch同样可以指定参数，选择获取所有远程分支还是特定远程分支，然后创建“.git&#x2F;refs&#x2F;remote&#x2F;分支名”文件，记录其commit hash。
-而pull则是fetch+merge，先获取远程分支，然后将当前分支与目标分支合并。有一个需要注意的点是，在init后remote add&amp;&amp;pull，此时本地分支因为没有提交过，refs下并没有默认的master&#x2F;main文件，因为没有提交过、没有commit hash，此时要做merge会出现问题，既没有本地分支也没有index区，我之前的实现会merge fail。所以我取巧了一下，如果是初始化之后直接pull的这种情况，直接fetch+checkout到远程分支；而push则协商需要传输的对象，并创建pack文件通过https传输。
-需要注意的地方主要有两点：一是pull下来的pack需要解压缩，这个解压缩器的设计需要比较精确，完全理解git的压缩pack的逻辑才能设计足够精确的解压器、才能完全解压出100%的object，否则会丢失部分object产生缺损；二是所有的pack在push上去后都会被GitHub端接收，需要严格遵循格式，我在此过程中有两个问题，tree object的文件组织格式（没错，正是前文提到的）和index&amp;&amp;tree object中表项没按字典序排序。说实话之前在和原版git比对的时候也注意到了这个顺序问题，但当时感觉没什么影响，现在被教训了，只能说一切都有其存在的意义
-
-
-感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
-]]></content>
-      <categories>
-        <category>学习记录</category>
-      </categories>
-      <tags>
         <tag>rust</tag>
-        <tag>git</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>归去来</title>
-    <url>/2025/08/09/%E5%BD%92%E5%8E%BB%E6%9D%A5/</url>
-    <content><![CDATA[📝 归去来
-回看一年前的随笔，情更切。pyq发文，如今补上，仅供纪念。
-
-还是感觉以后回村里隐居也挺好。
-​这里只是晋东南群山中的一个小村落，我知道上一次回来是去年暑假，却不知道下一次要到什么时候了。一条马路将村子分成两片，也连接此处与县城，其上来往的公交车司机也成了姥姥姥爷的老熟人。曾几何时公交车并不像现在一样一元通全线，但在这数不清多少年的时间里唯一改变的也只是票价，始终是两位老人入城的主要交通工具。这条公交线很慢，小时候印象里的从村到城1小时至今不变。
-​往前回倒十几年，回到村里还没修水泥路，回到一些老人离开之前，印象比较深刻的是那时日常用水还是靠担的。记忆里的三处水井现在只能找到两处，一处后山，一处水库旁，现在自然是荒废了。只有我妈体验过担水，还没等我长大就舍弃了这种原始方式，不过担子倒还留存着，也是某种历史的见证了。​​前几天和姥爷下镇里理发，临返程时正巧下雨，我们俩冒着雨骑摩托车在山路上冲刺，感觉姥爷像施了避雨咒一样，结合我下雨时骑摩托被遮挡视线的经历，简直不可思议。返程之前路人还调侃老人带年轻人，只是这位朋友不明其中缘由，这辆摩托车比我年龄还大，借我姥姥的话，这玩意只有我姥爷驾驭得了。多少年过去了，自从地开始荒废之后拖拉机就不怎么开了，但摩托车仍是姥爷的得力干将，只是不知道他还想骑多少年，又能骑多少年。​​从我有记忆开始两位老人就主要靠种地和养蚕为主要收入，以至于我来到晋北看到那里的农家人甚至没见过蚕时感到惊讶。种地自然没什么好说的，主要就是小麦、玉米、土豆、高粱之类的经济作物，除去自己留一些磨成面和自给，其余便卖作收入。而房子周围两位老人也开垦了数小块土地，种一些萝卜、西红柿、豆角之类的果蔬，省去了天天去镇里买菜了。甚至后来表妹想吃草莓的时候，姥爷也真能在房子背后那片难以称得上是肥沃的土地上给她变出草莓，真的很神奇吧。除了种的田，他们还会打核桃、摘柿子和山楂，甚至会摘桑椹。不知道现在还有多少人知道核桃最外层是青皮的，去皮之后洗净才是棕色的壳。姥姥曾多次念叨村里人都觉得核桃不值钱，而城里人却愿意花较贵的钱去超市称，她表示相当不理解。而摘下的柿子除去现吃的，为了方便保存往往会做成柿饼，至今仍是；山楂则去核做成红果罐头，估计是山楂树虽着地一起荒了，我也已经记不得上一次吃红果罐头是什么时候了。​​不论病逝还是进城，在一些老人没离开前，整个村子都会养蚕。养蚕以季为周期，分春夏秋冬蚕。村里人先统计各家各户的养殖量，以张为单位，那是因为一开始拿回来的蚕籽在粘板上。从一个个小黑点长成白蚕再到结茧，喂桑叶从切成细碎到整叶铺盖，它们的住处也从粘板到数个木篓子，直到喷上药，将它们移到网格栅上，静待结茧。随着不少老人的离开，养蚕人越来越少，在前些年姥姥姥爷也因身体原因不在养蚕，网格栅也终于收进了牛圈，恐怕再无可用之日。​​如今，除了种少许地，姥爷还常常骑车上山采摘连翘（P3）。实际上近些年十里八乡的老年男女都在采这种药来卖钱，以6到9月最为频繁，但价格偏低，几元到十几元一斤上下浮动；冬天的干连翘价高，往往在五六十元一斤，但却难寻。采药人早八晚六地摘，一天下来好的话人均十几斤，不好则只有六七斤。姥姥也常会开玩笑说，今天出去吃顿饭又把姥爷一天的采药钱吃没了，我笑罢只觉得苦涩，但也知道老人是闲不住的。采药人采回药后也要观察行情，但又因为连翘不经放所以也要尽快出手，和各地收药人的搏弈始终存在，但不幸的是今年夏天我姥爷总是在涨价前出手，只能在吃饭时骂几句收药人罢了。今天的采摘量为九斤，行情为十二元每斤，在此记录一下。​​我还是会吐槽两位老人生活的地方：房子都是上个世纪的产物，到冬天特别冷；一把铁勺子从姥姥的母亲传到现在；在村里夏天要时刻盯防蚊子，尤其是上厕所qwq；种几块地还要提防野猪，也总会被拱得粮食减产；现在的日常用水每隔五天统一供应，日常囤水；村子里的人越来越少，现在凑桌麻将都难；不时还有蝎子和蛇出没（前几天我就被蝎子咬了(⁄ ⁄•⁄ω⁄•⁄ ⁄)）。但他们俩丝毫不在意。昨天又谈到我想让他们俩彻底离开这里，常住县城，给小姨做饭带娃，但姥姥仍是不在意。我说你们俩总有干不动的时候，早点下城里享受不好呗，姥姥执意说春夏之际凉快。我又说城里有空调不比村里凉快？她又提到费电了。对，这两位就是这么节俭，省了一辈子，处处细打算，却在两位女儿买房时拿出好几万，每次我回来都去超市割肉买菜，在离开的时候以前是塞钱，现在是转账，也只会告诫我好好学习……​​千反田用来形容她家乡的话也正是这个村子的现状，”这里是我的故乡，只有水和土地，人们也在渐渐衰老，失去活力”。我并不觉得这里是最美的地方，也并不觉得这里充满可能性，但是，我愿意讲述这里过往的点滴。可以预见以姥姥姥爷为代表的一代老人也离开这里后，在未来的三十年间这个村子终将荒无人烟。我不知道其他户人家的后代怎么看，我想我还会回到这里，去寻访过往踪迹。​​写在即将启程却不知何时归来之际。
-感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
-]]></content>
-      <categories>
-        <category>生活随想</category>
-      </categories>
-      <tags>
-        <tag>乡愁</tag>
+        <tag>开源</tag>
       </tags>
   </entry>
   <entry>
@@ -2777,6 +2055,690 @@ ECN
       </tags>
   </entry>
   <entry>
+    <title>云原生结课project</title>
+    <url>/2025/08/12/%E4%BA%91%E5%8E%9F%E7%94%9F%E7%BB%93%E8%AF%BEproject/</url>
+    <content><![CDATA[📝 云原生结课project
+顺手上传暑课项目
+
+1. 项目组员信息
+
+
+姓名
+学号
+个人贡献
+
+
+
+黄睿智
+231220075
+part3 + 文档编写
+
+
+白子敬
+231220077
+part1
+
+
+陈翔宇
+231220088
+part2
+
+
+
+2. 限流功能相关的关键代码和说明2.1 限流系统架构概述本项目采用基于 Bucket4j + Redis 的分布式限流方案，实现了多层次的流量控制机制：
+
+应用层限流：使用 Bucket4j 令牌桶算法
+连接层限流：Spring Boot Tomcat 连接池限制
+网络层限流：Kubernetes 网络策略和端口转发限制
+
+2.2 核心限流组件限流配置类 (RateLimitConfig.java)@Configurationpublic class RedisConfig &#123;        @Value(&quot;$&#123;REDIS_HOST:$&#123;spring.redis.host:localhost&#125;&#125;&quot;)    private String redisHost;        @Value(&quot;$&#123;REDIS_PORT:$&#123;spring.redis.port:6379&#125;&#125;&quot;)    private int redisPort;        @Bean    @Primary    public RedisConnectionFactory redisConnectionFactory() &#123;        // 直接从环境变量读取        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Spring Data Redis connecting to: &quot; + host + &quot;:&quot; + port);                RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();        config.setHostName(host);        config.setPort(port);                JedisConnectionFactory factory = new JedisConnectionFactory(config);        return factory;    &#125;        @Bean    public RedisTemplate&lt;String, Object&gt; redisTemplate(RedisConnectionFactory connectionFactory) &#123;        RedisTemplate&lt;String, Object&gt; template = new RedisTemplate&lt;&gt;();        template.setConnectionFactory(connectionFactory);        return template;    &#125;        @Bean    public JedisPool jedisPool() &#123;        // 直接从环境变量读取，如果为空则使用配置文件        String host = System.getenv(&quot;REDIS_HOST&quot;);        if (host == null || host.trim().isEmpty()) &#123;            host = redisHost;        &#125;                String portStr = System.getenv(&quot;REDIS_PORT&quot;);        int port = redisPort;        if (portStr != null &amp;&amp; !portStr.trim().isEmpty()) &#123;            try &#123;                port = Integer.parseInt(portStr);            &#125; catch (NumberFormatException e) &#123;                // 使用默认端口            &#125;        &#125;                System.out.println(&quot;Jedis Pool connecting to: &quot; + host + &quot;:&quot; + port);                JedisPoolConfig config = new JedisPoolConfig();        config.setMaxTotal(8);        config.setMaxIdle(8);        config.setMinIdle(0);        config.setTestOnBorrow(true);        config.setTestOnReturn(true);        config.setTestWhileIdle(true);        return new JedisPool(config, host, port);    &#125;&#125;
+
+限流服务类 (RateLimiterService.java)@Servicepublic class RateLimiterService &#123;    private final ProxyManager&lt;byte[]&gt; buckets;    private static final byte[] KEY = &quot;global-rate-limit-key&quot;.getBytes();    @Autowired    public RateLimiterService(ProxyManager&lt;byte[]&gt; buckets) &#123;        this.buckets = buckets;    &#125;    public Bucket resolveBucket() &#123;        return buckets.builder().build(KEY, getConfigSupplier());    &#125;    private Supplier&lt;BucketConfiguration&gt; getConfigSupplier() &#123;        return () -&gt; BucketConfiguration.builder()                .addLimit(Bandwidth.classic(                    100,                     Refill.greedy(100, Duration.ofSeconds(1)))                )                .build();    &#125;&#125;
+
+限流拦截器 (RateLimitInterceptor.java)@Componentpublic class RateLimitInterceptor implements HandlerInterceptor &#123;    @Autowired    private RateLimiterService rateLimiterService;    @Override    public boolean preHandle(HttpServletRequest request,                             HttpServletResponse response,                             Object handler) throws Exception &#123;        Bucket bucket = rateLimiterService.resolveBucket();        if (bucket.tryConsume(1)) &#123;            return true;        &#125; else &#123;            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());            response.getWriter().write(&quot;Too many requests&quot;);            return false;        &#125;    &#125;&#125;
+
+Web 配置类 (WebMvcConfig.java)@Configurationpublic class WebMvcConfig implements WebMvcConfigurer &#123;    @Autowired    private RateLimitInterceptor rateLimitInterceptor;    @Override    public void addInterceptors(InterceptorRegistry registry) &#123;        // 注册限流拦截器并指定拦截路径        registry.addInterceptor(rateLimitInterceptor)                .addPathPatterns(&quot;/hello&quot;)  // 只拦截/hello路径                .order(0);    &#125;&#125;
+
+2.3 应用配置application.properties 限流相关配置spring.application.name=prometheus-test-demo# 统一使用8998端口server.port=8998# Redis 配置 - 直接使用环境变量spring.redis.host=$&#123;REDIS_HOST:localhost&#125;spring.redis.port=$&#123;REDIS_PORT:6379&#125;spring.redis.timeout=2000ms# 强制使用 Jedis 客户端spring.redis.jedis.pool.enabled=truespring.redis.lettuce.pool.enabled=false# Actuator 配置management.endpoints.web.exposure.include=health,info,prometheus,metricsmanagement.endpoint.health.show-details=always# 限流相关配置rate.limit.enabled=truerate.limit.global.key=global-rate-limit-keyrate.limit.capacity=100rate.limit.refill.tokens=100rate.limit.refill.period=1s
+
+2.4 限流工作流程用户请求 → Spring MVC → RateLimitInterceptor → RateLimiterService                                ↓                          检查 Redis 令牌桶                                ↓                    有令牌？─── YES ──→ 继续处理 → HelloController                        │                        NO                        ↓                  返回 HTTP 429 错误
+
+2.5 限流算法说明令牌桶算法 (Token Bucket Algorithm)：
+
+初始化：创建容量为100的令牌桶
+令牌补充：每秒向桶中添加100个令牌
+请求处理：每个请求尝试消费1个令牌
+限流判断：
+有令牌：允许请求，消费令牌
+无令牌：拒绝请求，返回429状态码
+
+
+
+
+3. Dockerfile及K8s 编排文件3.1 Dockerfile# 第一阶段：构建阶段 - 统一使用Java 11FROM maven:3.9.6-eclipse-temurin-17 AS builder# 设置工作目录WORKDIR /usr/src/mymaven# 复制 Maven 配置文件RUN mkdir -p /root/.m2COPY settings.xml /root/.m2/settings.xml# 复制pom.xml和源代码COPY pom.xml .COPY src ./src# 构建项目RUN mvn -B  clean package# 第二阶段：运行阶段FROM eclipse-temurin:17-jre-centos7# 设置时区RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtimeRUN echo &#x27;Asia/Shanghai&#x27; &gt;/etc/timezone# 设置环境变量ENV JAVA_OPTS &#x27;&#x27;# 设置工作目录WORKDIR /app# 从构建阶段复制构建结果COPY --from=builder /usr/src/mymaven/target/prometheus-test-demo-0.0.1-SNAPSHOT.jar ./prometheus-test-demo-0.0.1-SNAPSHOT.jar# 启动命令 - 使用Java 11兼容的JVM参数ENTRYPOINT [&quot;sh&quot;, &quot;-c&quot;, &quot;set -e &amp;&amp; java -XX:+PrintFlagsFinal \                                           -XX:+HeapDumpOnOutOfMemoryError \                                           -XX:HeapDumpPath=/heapdump/heapdump.hprof \                                           -XX:+UseContainerSupport \                                           -XX:MaxRAMPercentage=75.0 \                                           -Djava.security.egd=file:/dev/./urandom \                                           $JAVA_OPTS -jar prometheus-test-demo-0.0.1-SNAPSHOT.jar&quot;]
+
+Dockerfile 设计说明：
+
+构建项目时删去原demo的 -DskipTests 参数，直接运行测试样例，因此在 Jenkinsfile 中不再执行test。
+下图为测试运行结果
+
+
+3.2 Kubernetes 部署文件 (prometheus-test-demo.yaml)apiVersion: apps/v1kind: Deploymentmetadata:  labels:    app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  replicas: 1  selector:    matchLabels:      app: prometheus-test-demo  template:    metadata:      annotations:        prometheus.io/path: /actuator/prometheus        prometheus.io/port: &quot;8998&quot;        prometheus.io/scheme: http        prometheus.io/scrape: &quot;true&quot;      labels:        app: prometheus-test-demo    spec:      initContainers:      - name: wait-for-redis        ../photos/posts/yys/image: busybox:1.36        command: [&#x27;sh&#x27;, &#x27;-c&#x27;]        args:        - |          until nc -z redis-service 6379; do            echo &quot;Waiting for Redis to be ready...&quot;            sleep 2          done          echo &quot;Redis is ready!&quot;      containers:        - ../photos/posts/yys/image: 172.22.83.19:30003/nju08/prometheus-test-demo:&#123;VERSION&#125;          name: prometheus-test-demo          ports:          - containerPort: 8998          env:          - name: REDIS_HOST            value: &quot;redis-service&quot;          - name: REDIS_PORT            value: &quot;6379&quot;          resources:            requests:              memory: &quot;128Mi&quot;                  cpu: &quot;100m&quot;                    limits:              memory: &quot;512Mi&quot;                  cpu: &quot;500m&quot;                  livenessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 120            periodSeconds: 30            timeoutSeconds: 10            failureThreshold: 3          readinessProbe:            httpGet:              path: /actuator/health              port: 8998            initialDelaySeconds: 90            periodSeconds: 10            timeoutSeconds: 5            failureThreshold: 5---apiVersion: apps/v1kind: Deploymentmetadata:  name: redis  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  replicas: 1  selector:    matchLabels:      app: redis  template:    metadata:      labels:        app: redis    spec:      containers:      - name: redis        ../photos/posts/yys/image: redis:7-alpine        ports:        - containerPort: 6379        resources:          requests:            memory: &quot;64Mi&quot;            cpu: &quot;50m&quot;          limits:            memory: &quot;128Mi&quot;            cpu: &quot;100m&quot;        args:        - redis-server        - --appendonly        - &quot;yes&quot;        volumeMounts:        - name: redis-data          mountPath: /data      volumes:      - name: redis-data        emptyDir: &#123;&#125;---apiVersion: v1kind: Servicemetadata:  name: redis-service  namespace: &#123;NAMESPACE&#125;  labels:    app: redisspec:  selector:    app: redis  ports:  - name: redis    port: 6379    targetPort: 6379  type: ClusterIP---apiVersion: v1kind: Servicemetadata:  name: prometheus-test-demo  labels:    app: prometheus-test-demo  namespace: &#123;NAMESPACE&#125;spec:  type: NodePort  selector:    app: prometheus-test-demo  ports:    - name: management-port      protocol: TCP      port: 8998      targetPort: 8998
+
+K8s 配置说明：
+
+使用 InitContainer 确保 Redis 先启动
+配置了资源限制防止资源耗尽
+设置了健康检查确保服务可用
+
+3.3 ServiceMonitor 配置 (prometheus-test-serviceMonitor.yaml)apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
+
+
+4. Jenkins 持续集成、持续部署、持续测试配置文件与说明4.1 Jenkinsfile 完整配置pipeline &#123;    agent none        // 环境变量管理    environment &#123;        HARBOR_REGISTRY = &#x27;172.22.83.19:30003&#x27;        IMAGE_NAME = &#x27;nju08/prometheus-test-demo&#x27;        GIT_REPO = &#x27;https://gitee.com/grissom_sh/prometheus-test-demo.git&#x27;        NAMESPACE = &#x27;nju08&#x27;        MONITOR_NAMESPACE = &#x27;nju08&#x27;        HARBOR_USER = &#x27;nju08&#x27;    &#125;        parameters &#123;        string(name: &#x27;HARBOR_PASS&#x27;, defaultValue: &#x27;&#x27;, description: &#x27;Harbor login password&#x27;)    &#125;        stages &#123;        stage(&#x27;Clone Code&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;1.Git Clone Code&quot;                script &#123;                    try &#123;                        git url: &quot;$&#123;env.GIT_REPO&#125;&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Git clone failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                stage(&#x27;Image Build&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;2.Image Build Stage (包含 Maven 构建)&quot;                timeout(time: 30, unit: &#x27;MINUTES&#x27;) &#123;                    script &#123;                        retry(3) &#123;                            try &#123;                                // 使用 Dockerfile 多阶段构建，包含 Maven 构建和镜像构建                                sh &quot;docker build --cache-from $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; -t $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest .&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Docker build attempt failed: $&#123;e.getMessage()&#125;&quot;                                throw e                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;        stage(&#x27;Push&#x27;) &#123;            agent &#123;                label &#x27;master&#x27;            &#125;            steps &#123;                echo &quot;3.Push Docker Image Stage&quot;                script &#123;                    try &#123;                        sh &quot;echo &#x27;$&#123;HARBOR_PASS&#125;&#x27; | docker login --username=$&#123;HARBOR_USER&#125; --password-stdin $&#123;env.HARBOR_REGISTRY&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                        sh &quot;docker push $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest&quot;                    &#125; catch (Exception e) &#123;                        error &quot;Docker push failed: $&#123;e.getMessage()&#125;&quot;                    &#125;                &#125;            &#125;        &#125;                        stage(&#x27;Deploy to Kubernetes&#x27;) &#123;            agent &#123;                label &#x27;slave&#x27;            &#125;            steps &#123;                container(&#x27;jnlp-kubectl&#x27;) &#123;                    script &#123;                        stage(&#x27;Clone YAML&#x27;) &#123;                            echo &quot;4. Git Clone YAML To Slave&quot;                            try &#123;                                // 使用 checkout scm 获取当前流水线的源代码                                checkout scm                            &#125; catch (Exception e) &#123;                                error &quot;Git clone on slave failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Config YAML&#x27;) &#123;                            echo &quot;5. Change YAML File Stage&quot;                            sh &#x27;sed -i &quot;s/&#123;VERSION&#125;/$&#123;BUILD_NUMBER&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;MONITOR_NAMESPACE&#125;/$&#123;MONITOR_NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;sed -i &quot;s/&#123;NAMESPACE&#125;/$&#123;NAMESPACE&#125;/g&quot; ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                            sh &#x27;cat ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo&#x27;) &#123;                            echo &quot;6. Deploy To K8s Stage&quot;                            sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-demo.yaml&#x27;                        &#125;                                                stage(&#x27;Wait for Redis&#x27;) &#123;                            echo &quot;6.5. Wait for Redis to be ready&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=redis -n $&#123;NAMESPACE&#125; --timeout=120s&quot;                                echo &quot;Redis is ready!&quot;                            &#125; catch (Exception e) &#123;                                echo &quot;Redis readiness check failed, but continuing: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Deploy prometheus-test-demo ServiceMonitor&#x27;) &#123;                            echo &quot;7. Deploy ServiceMonitor To K8s Stage&quot;                            try &#123;                                sh &#x27;kubectl apply -f ./jenkins/scripts/prometheus-test-serviceMonitor.yaml&#x27;                            &#125; catch (Exception e) &#123;                                error &quot;ServiceMonitor deployment failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                                                stage(&#x27;Health Check&#x27;) &#123;                            echo &quot;8. Health Check Stage&quot;                            try &#123;                                sh &quot;kubectl wait --for=condition=ready pod -l app=prometheus-test-demo -n $&#123;NAMESPACE&#125; --timeout=300s&quot;                                echo &quot;Application is healthy and ready!&quot;                            &#125; catch (Exception e) &#123;                                error &quot;Health check failed: $&#123;e.getMessage()&#125;&quot;                            &#125;                        &#125;                    &#125;                &#125;            &#125;        &#125;    &#125;        // 通知机制和清理    post &#123;        success &#123;            echo &#x27;🎉 Pipeline succeeded! Application deployed successfully.&#x27;            script &#123;                echo &quot;✅ Deployment Summary:&quot;                echo &quot;   - Image: $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125;&quot;                echo &quot;   - Namespace: $&#123;NAMESPACE&#125;&quot;                echo &quot;   - Monitor Namespace: $&#123;MONITOR_NAMESPACE&#125;&quot;            &#125;        &#125;        failure &#123;            echo &#x27;❌ Pipeline failed! Please check the logs for details.&#x27;        &#125;        always &#123;            echo &#x27;🔄 Pipeline execution completed.&#x27;            // 清理本地镜像以节省磁盘空间            script &#123;                try &#123;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:$&#123;BUILD_NUMBER&#125; || true&quot;                    sh &quot;docker rmi $&#123;env.HARBOR_REGISTRY&#125;/$&#123;env.IMAGE_NAME&#125;:latest || true&quot;                    sh &quot;docker system prune -f || true&quot;                &#125; catch (Exception e) &#123;                    echo &quot;Image cleanup failed: $&#123;e.getMessage()&#125;&quot;                &#125;            &#125;        &#125;    &#125;&#125;
+
+4.2 Jenkins 流水线说明流水线各阶段详解：
+
+Checkout 阶段：
+
+拉取源代码
+生成构建版本号
+
+
+Build 阶段：
+
+Maven 编译和测试
+生成构建产物
+
+
+Docker Build &amp; Push 阶段：
+
+构建容器镜像
+推送到镜像仓库
+
+
+Deploy to Kubernetes 阶段：
+
+配置 K8s 部署文件
+部署应用和依赖服务
+健康检查
+
+
+
+4.3 CI&#x2F;CD 流程验证截图位置镜像构建截图：
+构建成功截图：
+部署成功截图：
+
+5. 监控指标采集的配置及说明；Grafana 监控大屏截图5.1 Prometheus 监控配置5.1.1 应用监控注解配置应用 Pod 配置了 Prometheus 自动发现注解：
+annotations:  prometheus.io/path: /actuator/prometheus    # 指标采集路径  prometheus.io/port: &quot;8998&quot;                  # 监控端口  prometheus.io/scheme: http                  # 协议  prometheus.io/scrape: &quot;true&quot;               # 启用自动发现
+
+5.1.2 ServiceMonitor 配置apiVersion: monitoring.coreos.com/v1kind: ServiceMonitormetadata:  labels:    k8s-app: prometheus-test-demo  name: prometheus-test-demo  namespace: &#123;MONITOR_NAMESPACE&#125;spec:  endpoints:  - interval: 30s    port: tcp    path: /actuator/prometheus    scheme: &#x27;http&#x27;  selector:    matchLabels:      app: prometheus-test-demo  namespaceSelector:    matchNames:    - &#123;NAMESPACE&#125;
+
+5.2 关键监控指标5.2.1 应用性能指标
+HTTP 请求指标：
+
+http_server_requests_seconds_count - 请求总数
+http_server_requests_seconds_sum - 请求总耗时
+http_server_requests_seconds_max - 最大响应时间
+
+
+JVM 指标：
+
+jvm_memory_used_bytes - JVM 内存使用
+jvm_gc_pause_seconds - GC 暂停时间
+jvm_threads_live_threads - 活跃线程数
+
+
+
+5.2.2 限流相关指标
+Bucket4j 指标（如果配置了 Micrometer 集成）：
+
+bucket4j_consumed_tokens_total - 消费的令牌总数
+bucket4j_rejected_requests_total - 被拒绝的请求数
+bucket4j_available_tokens - 可用令牌数
+
+
+Tomcat 连接池指标：
+
+tomcat_sessions_active_current - 活跃会话数
+tomcat_threads_busy_threads - 繁忙线程数
+tomcat_threads_config_max_threads - 最大线程数
+
+
+指标监测：
+
+端口转发之后 curl http://localhost:8998/actuator/prometheus，得到详细数据。
+
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests# TYPE application_ready_time_seconds gaugeapplication_ready_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.994# HELP application_started_time_seconds Time taken to start the application# TYPE application_started_time_seconds gaugeapplication_started_time_seconds&#123;main_application_class=&quot;com.hello.hello.HelloApplication&quot;&#125; 47.787# HELP disk_free_bytes Usable space for path# TYPE disk_free_bytes gaugedisk_free_bytes&#123;path=&quot;/app/.&quot;&#125; 4.1373339648E10# HELP disk_total_bytes Total space for path# TYPE disk_total_bytes gaugedisk_total_bytes&#123;path=&quot;/app/.&quot;&#125; 5.36608768E10# HELP executor_active_threads The approximate number of threads that are actively executing tasks# TYPE executor_active_threads gaugeexecutor_active_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_completed_tasks_total The approximate total number of tasks that have completed execution# TYPE executor_completed_tasks_total counterexecutor_completed_tasks_total&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_pool_core_threads The core number of threads for the pool# TYPE executor_pool_core_threads gaugeexecutor_pool_core_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 8.0# HELP executor_pool_max_threads The maximum allowed number of threads in the pool# TYPE executor_pool_max_threads gaugeexecutor_pool_max_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_pool_size_threads The current number of threads in the pool# TYPE executor_pool_size_threads gaugeexecutor_pool_size_threads&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP executor_queue_remaining_tasks The number of additional elements that this queue can ideally accept without blocking# TYPE executor_queue_remaining_tasks gaugeexecutor_queue_remaining_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 2.147483647E9# HELP executor_queued_tasks The approximate number of tasks that are queued for execution# TYPE executor_queued_tasks gaugeexecutor_queued_tasks&#123;name=&quot;applicationTaskExecutor&quot;&#125; 0.0# HELP http_server_requests_active_seconds  # TYPE http_server_requests_active_seconds summaryhttp_server_requests_active_seconds_count&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 1http_server_requests_active_seconds_sum&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.194124977# HELP http_server_requests_active_seconds_max  # TYPE http_server_requests_active_seconds_max gaugehttp_server_requests_active_seconds_max&#123;exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;UNKNOWN&quot;&#125; 0.262306658# HELP http_server_requests_seconds  # TYPE http_server_requests_seconds summaryhttp_server_requests_seconds_count&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 77http_server_requests_seconds_sum&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 588.946979862http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 1314http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 8.224338786http_server_requests_seconds_count&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 4708http_server_requests_seconds_sum&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 15666.990410086# HELP http_server_requests_seconds_max  # TYPE http_server_requests_seconds_max gaugehttp_server_requests_seconds_max&#123;error=&quot;IOException&quot;,exception=&quot;IOException&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/actuator/health&quot;&#125; 0.003561359http_server_requests_seconds_max&#123;error=&quot;none&quot;,exception=&quot;none&quot;,method=&quot;GET&quot;,outcome=&quot;SUCCESS&quot;,status=&quot;200&quot;,uri=&quot;/hello&quot;&#125; 0.0# HELP jvm_info JVM version info# TYPE jvm_info gaugejvm_info&#123;runtime=&quot;OpenJDK Runtime Environment&quot;,vendor=&quot;Eclipse Adoptium&quot;,version=&quot;17.0.11+9&quot;&#125; 1# HELP jvm_buffer_count_buffers An estimate of the number of buffers in the pool# TYPE jvm_buffer_count_buffers gaugejvm_buffer_count_buffers&#123;id=&quot;direct&quot;&#125; 12.0jvm_buffer_count_buffers&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_count_buffers&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool# TYPE jvm_buffer_memory_used_bytes gaugejvm_buffer_memory_used_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_memory_used_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_buffer_total_capacity_bytes An estimate of the total capacity of the buffers in this pool# TYPE jvm_buffer_total_capacity_bytes gaugejvm_buffer_total_capacity_bytes&#123;id=&quot;direct&quot;&#125; 100352.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped&quot;&#125; 0.0jvm_buffer_total_capacity_bytes&#123;id=&quot;mapped - &#x27;non-volatile memory&#x27;&quot;&#125; 0.0# HELP jvm_classes_loaded_classes The number of classes that are currently loaded in the Java virtual machine# TYPE jvm_classes_loaded_classes gaugejvm_classes_loaded_classes 10568.0# HELP jvm_classes_unloaded_classes_total The number of classes unloaded in the Java virtual machine# TYPE jvm_classes_unloaded_classes_total counterjvm_classes_unloaded_classes_total 80.0# HELP jvm_compilation_time_ms_total The approximate accumulated elapsed time spent in compilation# TYPE jvm_compilation_time_ms_total counterjvm_compilation_time_ms_total&#123;compiler=&quot;HotSpot 64-Bit Tiered Compilers&quot;&#125; 218885.0# HELP jvm_gc_live_data_size_bytes Size of long-lived heap memory pool after reclamation# TYPE jvm_gc_live_data_size_bytes gaugejvm_gc_live_data_size_bytes 8.5416936E7# HELP jvm_gc_max_data_size_bytes Max size of long-lived heap memory pool# TYPE jvm_gc_max_data_size_bytes gaugejvm_gc_max_data_size_bytes 2.68435456E8# HELP jvm_gc_memory_allocated_bytes_total Incremented for an increase in the size of the (young) heap memory pool after one GC to before the next# TYPE jvm_gc_memory_allocated_bytes_total counterjvm_gc_memory_allocated_bytes_total 4.95829704E8# HELP jvm_gc_memory_promoted_bytes_total Count of positive increases in the size of the old generation memory pool before GC to after GC# TYPE jvm_gc_memory_promoted_bytes_total counterjvm_gc_memory_promoted_bytes_total 7.1289304E7# HELP jvm_gc_overhead An approximation of the percent of CPU time used by GC activities over the last lookback period or since monitoring began, whichever is shorter, in the range [0..1]# TYPE jvm_gc_overhead gaugejvm_gc_overhead 0.0# HELP jvm_gc_pause_seconds Time spent in GC pause# TYPE jvm_gc_pause_seconds summaryjvm_gc_pause_seconds_count&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 3jvm_gc_pause_seconds_sum&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.976jvm_gc_pause_seconds_count&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 16jvm_gc_pause_seconds_sum&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 1.047# HELP jvm_gc_pause_seconds_max Time spent in GC pause# TYPE jvm_gc_pause_seconds_max gaugejvm_gc_pause_seconds_max&#123;action=&quot;end of major GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;MarkSweepCompact&quot;&#125; 0.0jvm_gc_pause_seconds_max&#123;action=&quot;end of minor GC&quot;,cause=&quot;Allocation Failure&quot;,gc=&quot;Copy&quot;&#125; 0.0# HELP jvm_memory_committed_bytes The amount of memory in bytes that is committed for the Java virtual machine to use# TYPE jvm_memory_committed_bytes gaugejvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 5.7081856E7jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 7077888.0jvm_memory_committed_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 1.42364672E8jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 2555904.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5636096.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.572864E7jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6815744.0jvm_memory_committed_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1707904E7# HELP jvm_memory_max_bytes The maximum amount of memory in bytes that can be used for memory management# TYPE jvm_memory_max_bytes gaugejvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 1.0747904E8jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 1.3369344E7jvm_memory_max_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 2.68435456E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 5828608.0jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 1.22916864E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.22912768E8jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 1.073741824E9jvm_memory_max_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; -1.0# HELP jvm_memory_usage_after_gc The percentage of long-lived heap pool used after the last GC event, in the range [0..1]# TYPE jvm_memory_usage_after_gc gaugejvm_memory_usage_after_gc&#123;area=&quot;heap&quot;,pool=&quot;long-lived&quot;&#125; 0.3310730457305908# HELP jvm_memory_used_bytes The amount of used memory# TYPE jvm_memory_used_bytes gaugejvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Eden Space&quot;&#125; 3.3653184E7jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Survivor Space&quot;&#125; 854168.0jvm_memory_used_bytes&#123;area=&quot;heap&quot;,id=&quot;Tenured Gen&quot;&#125; 8.8871744E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-nmethods&#x27;&quot;&#125; 1349248.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;non-profiled nmethods&#x27;&quot;&#125; 5586048.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;CodeHeap &#x27;profiled nmethods&#x27;&quot;&#125; 1.5632E7jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Compressed Class Space&quot;&#125; 6518344.0jvm_memory_used_bytes&#123;area=&quot;nonheap&quot;,id=&quot;Metaspace&quot;&#125; 5.1187048E7# HELP jvm_threads_daemon_threads The current number of live daemon threads# TYPE jvm_threads_daemon_threads gaugejvm_threads_daemon_threads 20.0# HELP jvm_threads_live_threads The current number of live threads including both daemon and non-daemon threads# TYPE jvm_threads_live_threads gaugejvm_threads_live_threads 24.0# HELP jvm_threads_peak_threads The peak live thread count since the Java virtual machine started or peak was reset# TYPE jvm_threads_peak_threads gaugejvm_threads_peak_threads 214.0# HELP jvm_threads_started_threads_total The total number of application threads started in the JVM# TYPE jvm_threads_started_threads_total counterjvm_threads_started_threads_total 249.0# HELP jvm_threads_states_threads The current number of threads# TYPE jvm_threads_states_threads gaugejvm_threads_states_threads&#123;state=&quot;blocked&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;new&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;runnable&quot;&#125; 7.0jvm_threads_states_threads&#123;state=&quot;terminated&quot;&#125; 0.0jvm_threads_states_threads&#123;state=&quot;timed-waiting&quot;&#125; 6.0jvm_threads_states_threads&#123;state=&quot;waiting&quot;&#125; 11.0# HELP logback_events_total Number of log events that were enabled by the effective log level# TYPE logback_events_total counterlogback_events_total&#123;level=&quot;debug&quot;&#125; 0.0logback_events_total&#123;level=&quot;error&quot;&#125; 0.0logback_events_total&#123;level=&quot;info&quot;&#125; 5.0logback_events_total&#123;level=&quot;trace&quot;&#125; 0.0logback_events_total&#123;level=&quot;warn&quot;&#125; 0.0# HELP process_cpu_time_ns_total The &quot;cpu time&quot; used by the Java Virtual Machine process# TYPE process_cpu_time_ns_total counterprocess_cpu_time_ns_total 1.0813E11# HELP process_cpu_usage The &quot;recent cpu usage&quot; for the Java Virtual Machine process# TYPE process_cpu_usage gaugeprocess_cpu_usage 0.09197856413746172# HELP process_files_max_files The maximum file descriptor count# TYPE process_files_max_files gaugeprocess_files_max_files 1048576.0# HELP process_files_open_files The open file descriptor count# TYPE process_files_open_files gaugeprocess_files_open_files 15.0# HELP process_start_time_seconds Start time of the process since unix epoch.# TYPE process_start_time_seconds gaugeprocess_start_time_seconds 1.752976768479E9# HELP process_uptime_seconds The uptime of the Java virtual machine# TYPE process_uptime_seconds gaugeprocess_uptime_seconds 9948.976# HELP system_cpu_count The number of processors available to the Java virtual machine# TYPE system_cpu_count gaugesystem_cpu_count 1.0# HELP system_cpu_usage The &quot;recent cpu usage&quot; of the system the application is running in# TYPE system_cpu_usage gaugesystem_cpu_usage 0.09208738261313372# HELP system_load_average_1m The sum of the number of runnable entities queued to available processors and the number of runnable entities running on the available processors averaged over a period of time# TYPE system_load_average_1m gaugesystem_load_average_1m 0.08# HELP tomcat_sessions_active_current_sessions  # TYPE tomcat_sessions_active_current_sessions gaugetomcat_sessions_active_current_sessions 0.0# HELP tomcat_sessions_active_max_sessions  # TYPE tomcat_sessions_active_max_sessions gaugetomcat_sessions_active_max_sessions 0.0# HELP tomcat_sessions_alive_max_seconds  # TYPE tomcat_sessions_alive_max_seconds gaugetomcat_sessions_alive_max_seconds 0.0# HELP tomcat_sessions_created_sessions_total  # TYPE tomcat_sessions_created_sessions_total countertomcat_sessions_created_sessions_total 0.0# HELP tomcat_sessions_expired_sessions_total  # TYPE tomcat_sessions_expired_sessions_total countertomcat_sessions_expired_sessions_total 0.0# HELP tomcat_sessions_rejected_sessions_total  # TYPE tomcat_sessions_rejected_sessions_total countertomcat_sessions_rejected_sessions_total 0.0
+
+5.3 Grafana 监控大屏配置5.3.1 监控大屏概览本项目成功配置了多个 Grafana 监控大屏，涵盖了应用性能、网络流量和资源使用等关键指标：
+
+SpringBoot APM Dashboard - 应用性能监控
+Kubernetes &#x2F; Compute Resources &#x2F; Namespace - 集群资源监控  
+网络流量监控面板 - Pod 间通信监控
+
+5.3.2 SpringBoot APM Dashboard 配置面板配置说明：
+&#123;  &quot;dashboard&quot;: &#123;    &quot;title&quot;: &quot;SpringBoot APM Dashboard&quot;,    &quot;panels&quot;: [      &#123;        &quot;title&quot;: &quot;Basic Statistics&quot;,        &quot;type&quot;: &quot;stat&quot;,        &quot;targets&quot;: [          &#123;            &quot;expr&quot;: &quot;process_uptime_seconds&#123;instance=~\&quot;.*prometheus-test-demo.*\&quot;&#125;&quot;,            &quot;legendFormat&quot;: &quot;Uptime&quot;          &#125;,          &#123;            &quot;expr&quot;: &quot;jvm_memory_used_bytes&#123;area=\&quot;heap\&quot;&#125;/jvm_memory_max_bytes&#123;area=\&quot;heap\&quot;&#125;*100&quot;,            &quot;legendFormat&quot;: &quot;Heap Used %&quot;          &#125;        ]      &#125;    ]  &#125;&#125;
+
+关键监控指标：
+
+运行时间: 1.5 天稳定运行
+堆内存使用: 9.4% (健康水平)
+非堆内存使用: 5.2% (正常状态)
+CPU 使用率: 平均 0.577% (系统空闲)
+负载均衡: 0.436 (轻负载)
+
+
+5.3.3 Kubernetes 资源监控配置集群资源监控面板配置：
+CPU 使用率监控：
+# CPU 使用率 (基于请求)rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) * 100# CPU 使用率 (基于限制)  rate(container_cpu_usage_seconds_total&#123;namespace=&quot;nju08&quot;&#125;[5m]) / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;cpu&quot;&#125; * 100
+
+内存使用率监控：
+# 内存使用率 (基于请求)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / container_spec_memory_limit_bytes * 100# 内存使用率 (基于限制)container_memory_usage_bytes&#123;namespace=&quot;nju08&quot;&#125; / on(pod) kube_pod_container_resource_limits&#123;resource=&quot;memory&quot;&#125; * 100
+
+监控数据分析：
+
+CPU 使用率 (基于请求)
+CPU 使用率 (基于限制) 
+内存使用率 (基于请求) 
+内存使用率 (基于限制)
+
+
+5.3.4 网络流量监控配置网络监控面板配置：
+接收&#x2F;发送字节数监控：
+# 网络接收速率rate(container_network_receive_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 网络发送速率  rate(container_network_transmit_bytes_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
+
+网络包监控：
+# 接收包速率rate(container_network_receive_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 发送包速率rate(container_network_transmit_packets_total&#123;namespace=&quot;nju08&quot;&#125;[5m])# 丢包率rate(container_network_receive_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])rate(container_network_transmit_packets_dropped_total&#123;namespace=&quot;nju08&quot;&#125;[5m])
+
+网络流量分析：
+
+峰值网络吞吐量: ~200 kB&#x2F;s (发送&#x2F;接收)
+峰值包速率: ~2 kp&#x2F;s (接收&#x2F;发送)
+网络活动时间: 05:30 左右出现流量峰值
+丢包情况: 基本无丢包，网络稳定
+
+
+5.3.5 压测时的监控表现压测期间关键指标变化：
+
+CPU 使用率飙升：
+
+压测前: ~0.003 (0.3%)
+压测时: ~0.37 (37%)
+增长倍数: 约 123 倍
+
+
+网络流量激增：
+
+正常时: 几乎无流量 (0-10 kB&#x2F;s)
+压测时: 峰值 200 kB&#x2F;s
+包速率: 峰值 2000 packets&#x2F;s
+
+
+内存使用稳定：
+
+内存使用率保持在合理范围
+未出现内存泄漏现象
+
+
+
+5.3.6 限流效果在监控中的体现限流监控配置：
+# HTTP 请求速率rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 60# 错误率 (限流触发)rate(http_server_requests_seconds_count&#123;exception=&quot;IOException&quot;&#125;[1m]) /rate(http_server_requests_seconds_count&#123;uri=&quot;/hello&quot;&#125;[1m]) * 100# 连接数监控tomcat_threads_busy_threads / tomcat_threads_config_max_threads * 100
+
+限流效果观察：
+
+✅ 流量控制有效: 网络流量在达到峰值后快速回落
+✅ CPU 保护机制: CPU 使用率未超过危险阈值
+✅ 连接层限流: 通过网络包丢弃实现早期限流
+
+
+6. 压测6.1 压测工具6.1.1 基础压测脚本#!/bin/bashURL=&quot;http://localhost:8998/hello&quot;CONCURRENT=10REQUESTS=100echo &quot;Starting load test...&quot;echo &quot;URL: $URL&quot;echo &quot;Concurrent requests: $CONCURRENT&quot;echo &quot;Total requests: $REQUESTS&quot;for i in $(seq 1 $REQUESTS); do    (        response=$(curl -s -w &quot;%&#123;http_code&#125;,%&#123;time_total&#125;&quot; -o /dev/null $URL)        echo &quot;Request $i: $response&quot;    ) &amp;        # 控制并发数    if (( $i % $CONCURRENT == 0 )); then        wait    fidonewaitecho &quot;Load test completed!&quot;
+
+6.1.2 高频限流测试脚本#!/bin/bash# 颜色定义RED=&#x27;\033[0;31m&#x27;GREEN=&#x27;\033[0;32m&#x27;YELLOW=&#x27;\033[1;33m&#x27;BLUE=&#x27;\033[0;34m&#x27;NC=&#x27;\033[0m&#x27; # No ColorURL=&quot;http://localhost:8998/hello&quot;NAMESPACE=&quot;nju08&quot;echo &quot;=========================================&quot;echo &quot;YYS 项目 - 超高频限流测试脚本&quot;echo &quot;=========================================&quot;# 检查端口转发check_port_forward() &#123;    if ! lsof -i :8998 &gt;/dev/null 2&gt;&amp;1; then        echo -e &quot;$&#123;RED&#125;❌ 端口转发未运行$&#123;NC&#125;&quot;        echo -e &quot;$&#123;YELLOW&#125;请先运行: kubectl port-forward deployment/prometheus-test-demo 8998:8998 -n $NAMESPACE$&#123;NC&#125;&quot;        exit 1    fi    echo -e &quot;$&#123;GREEN&#125;✅ 端口转发正常运行$&#123;NC&#125;&quot;&#125;# 多轮高频测试run_aggressive_test() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;🔥 开始超高频限流测试...$&#123;NC&#125;&quot;    echo &quot;目标: 超过 100 requests/second 限制&quot;    echo &quot;&quot;        # 测试配置    local ROUNDS=3    local REQUESTS_PER_ROUND=150    local MAX_CONCURRENT=100        for round in $(seq 1 $ROUNDS); do        echo -e &quot;$&#123;YELLOW&#125;=== 第 $round 轮测试 ===$&#123;NC&#125;&quot;        echo &quot;发送 $REQUESTS_PER_ROUND 个请求，$MAX_CONCURRENT 并发&quot;                local success_count=0        local rate_limited_count=0        local error_count=0        local timeout_count=0                start_time=$(date +%s.%N)                # 创建临时文件        temp_file=&quot;/tmp/aggressive_test_$&#123;round&#125;_$$&quot;                # 极限并发发送        for i in $(seq 1 $REQUESTS_PER_ROUND); do            &#123;                response=$(timeout 2 curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.3 \                    --max-time 1 \                    --retry 0 \                    --no-keepalive \                    $URL 2&gt;/dev/null)                                exit_code=$?                timestamp=$(date &#x27;+%H:%M:%S.%3N&#x27;)                                if [ $exit_code -eq 124 ]; then                    echo &quot;TIMEOUT,$timestamp&quot; &gt;&gt; $temp_file                elif [ $exit_code -ne 0 ] || [ -z &quot;$response&quot; ]; then                    echo &quot;CONNECTION_FAILED,$timestamp&quot; &gt;&gt; $temp_file                else                    echo &quot;$response,$timestamp&quot; &gt;&gt; $temp_file                fi            &#125; &amp;                        # 减少等待时间，增加并发密度            if (( $i % $MAX_CONCURRENT == 0 )); then                wait            fi        done                wait                end_time=$(date +%s.%N)        duration=$(echo &quot;$end_time - $start_time&quot; | bc 2&gt;/dev/null || echo &quot;1&quot;)        rate=$(echo &quot;scale=2; $REQUESTS_PER_ROUND / $duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)                echo &quot;  持续时间: $&#123;duration&#125;秒&quot;        echo &quot;  实际速率: $&#123;rate&#125; requests/second&quot;                # 统计结果        while IFS=&#x27;,&#x27; read -r status_or_error timestamp; do            case &quot;$status_or_error&quot; in                &quot;200&quot;) ((success_count++)) ;;                &quot;429&quot;|&quot;503&quot;)                     ((rate_limited_count++))                    echo -e &quot;  $&#123;YELLOW&#125;🚫 限流: $timestamp - HTTP $status_or_error$&#123;NC&#125;&quot;                    ;;                &quot;TIMEOUT&quot;)                     ((timeout_count++))                    echo -e &quot;  $&#123;RED&#125;⏰ 超时: $timestamp$&#123;NC&#125;&quot;                    ;;                &quot;CONNECTION_FAILED&quot;|*)                    ((error_count++))                    echo -e &quot;  $&#123;RED&#125;❌ 失败: $timestamp$&#123;NC&#125;&quot;                    ;;            esac        done &lt; $temp_file 2&gt;/dev/null                rm -f $temp_file                echo -e &quot;  结果: ✅$success_count 🚫$rate_limited_count ⏰$timeout_count ❌$error_count&quot;                if [ $rate_limited_count -gt 0 ] || [ $timeout_count -gt 5 ] || [ $error_count -gt 5 ]; then            echo -e &quot;  $&#123;GREEN&#125;🎯 第 $round 轮检测到限流效果!$&#123;NC&#125;&quot;        else            echo -e &quot;  $&#123;YELLOW&#125;⚠️  第 $round 轮未检测到限流$&#123;NC&#125;&quot;        fi                echo &quot;&quot;                # 轮次间短暂休息        if [ $round -lt $ROUNDS ]; then            sleep 1        fi    done&#125;# 连续轰炸测试run_continuous_bombardment() &#123;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试 (30秒内持续发送请求)$&#123;NC&#125;&quot;    echo &quot;&quot;        local duration=30    local concurrent=50    local total_requests=0    local success_count=0    local limited_count=0        start_time=$(date +%s)    end_target=$((start_time + duration))        echo &quot;开始时间: $(date)&quot;    echo &quot;目标持续: $&#123;duration&#125;秒&quot;    echo &quot;并发数: $concurrent&quot;    echo &quot;&quot;        while [ $(date +%s) -lt $end_target ]; do        # 每次发送一批请求        for i in $(seq 1 $concurrent); do            &#123;                response=$(curl -s -w &quot;%&#123;http_code&#125;&quot; -o /dev/null \                    --connect-timeout 0.2 \                    --max-time 0.5 \                    $URL 2&gt;/dev/null)                                ((total_requests++))                                if [ &quot;$response&quot; = &quot;200&quot; ]; then                    ((success_count++))                elif [ &quot;$response&quot; = &quot;429&quot; ] || [ &quot;$response&quot; = &quot;503&quot; ]; then                    ((limited_count++))                    echo -e &quot;$&#123;YELLOW&#125;🚫 限流触发! HTTP $response at $(date &#x27;+%H:%M:%S&#x27;)$&#123;NC&#125;&quot;                fi            &#125; &amp;        done                # 短暂等待后继续        sleep 0.1    done        wait        actual_duration=$(($(date +%s) - start_time))    actual_rate=$(echo &quot;scale=2; $total_requests / $actual_duration&quot; | bc 2&gt;/dev/null || echo &quot;0&quot;)        echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;💥 连续轰炸测试结果$&#123;NC&#125;&quot;    echo &quot;实际持续时间: $&#123;actual_duration&#125;秒&quot;    echo &quot;总请求数: $total_requests&quot;    echo &quot;平均速率: $&#123;actual_rate&#125; requests/second&quot;    echo &quot;成功请求: $success_count&quot;    echo &quot;限流触发: $limited_count&quot;        if [ $limited_count -gt 0 ]; then        echo -e &quot;$&#123;GREEN&#125;🎯 连续轰炸成功触发限流!$&#123;NC&#125;&quot;    else        echo -e &quot;$&#123;YELLOW&#125;⚠️  连续轰炸未触发限流$&#123;NC&#125;&quot;    fi&#125;# Apache Bench 测试 (如果可用)run_ab_test() &#123;    if command -v ab &amp;&gt; /dev/null; then        echo &quot;&quot;        echo -e &quot;$&#123;BLUE&#125;⚡ Apache Bench 高性能测试$&#123;NC&#125;&quot;        echo &quot;&quot;                echo &quot;测试1: 500个请求，200并发&quot;        ab -n 500 -c 200 $URL                echo &quot;&quot;        echo &quot;测试2: 2秒内尽可能多的请求，300并发&quot;        ab -t 2 -c 300 $URL            else        echo &quot;&quot;        echo -e &quot;$&#123;YELLOW&#125;💡 建议安装 Apache Bench 进行更高性能的测试:$&#123;NC&#125;&quot;        echo &quot;  sudo apt-get install apache2-utils&quot;        echo &quot;  然后运行: ab -n 1000 -c 300 $URL&quot;    fi&#125;# 检查限流配置check_rate_limit_config() &#123;    echo &quot;&quot;    echo -e &quot;$&#123;BLUE&#125;⚙️ 检查当前限流配置$&#123;NC&#125;&quot;        # 检查 Redis 中的令牌桶状态    echo &quot;Redis 限流键:&quot;    kubectl exec deployment/redis -n $NAMESPACE -- redis-cli keys &quot;*rate*&quot; 2&gt;/dev/null || echo &quot;无法访问Redis&quot;        # 尝试获取桶的状态 (这个可能需要特殊的命令)    echo &quot;&quot;    echo &quot;当前应用配置:&quot;    echo &quot;- 限流阈值: 100 requests/second&quot;    echo &quot;- 令牌桶容量: 100&quot;    echo &quot;- 补充速率: 100 tokens/second&quot;    echo &quot;- 限流键: global-rate-limit-key&quot;&#125;# 主执行流程main() &#123;    check_port_forward    check_rate_limit_config    run_aggressive_test    run_continuous_bombardment    run_ab_test        echo &quot;&quot;    echo -e &quot;$&#123;GREEN&#125;🏁 超高频限流测试完成!$&#123;NC&#125;&quot;&#125;# 执行主函数main &quot;$@&quot;
+
+
+
+
+
+6.2 压测结果压测结果截图：
+
+未触发限流：  
+触发限流：    
+其中在限流之后转发的进程这边显示如下信息，说明超出阈值的request直接在tcp层被拒绝。
+
+
+HTTP 000 状态码说明：
+
+
+状态码 000 表示连接在 TCP 层被拒绝
+这证明了限流系统在连接层面起到了保护作用
+比 HTTP 429 更早介入，资源保护更彻底
+
+7. 项目总结与技术亮点7.1 技术架构亮点
+多层限流防护：
+
+应用层：Bucket4j 令牌桶算法精确控制
+连接层：Tomcat 连接池快速保护
+网络层：K8s 网络策略综合防护
+
+
+分布式限流设计：
+
+基于 Redis 的分布式令牌桶
+支持水平扩展和高可用
+保证多实例间限流一致性
+
+
+云原生最佳实践：
+
+容器化部署
+K8s 声明式配置
+微服务架构设计
+
+
+
+7.2 监控与运维亮点
+全方位监控：
+
+应用性能监控 (APM)
+基础设施监控
+业务指标监控
+
+
+自动化运维：
+
+CI&#x2F;CD 流水线自动化
+健康检查和自愈能力
+可观测性最佳实践
+
+
+
+7.3 压测验证成果
+限流功能验证：
+
+成功验证 100 req&#x2F;s 限流阈值
+确认多层限流机制有效性
+系统保护能力得到验证
+
+
+扩容能力验证：
+
+K8s 水平扩容功能正常
+负载均衡分发有效
+性能线性提升明显
+
+
+
+7.4 项目创新点
+连接层限流策略：
+
+在 TCP 连接层就实现流量控制
+比传统 HTTP 层限流更高效
+资源保护更彻底
+
+
+压测工具定制化：
+
+针对限流场景设计专用测试脚本
+能够有效触发和验证限流机制
+提供详细的测试报告和分析
+
+
+监控体系完整性：
+
+从基础设施到应用层的全栈监控
+限流专用监控面板设计
+智能告警和故障预警
+
+
+
+7.5 学习收获与心得通过本项目的实践，深入理解了：
+
+云原生技术栈：
+
+Docker 容器化技术
+Kubernetes 容器编排
+微服务架构设计原则
+
+
+限流算法与实现：
+
+令牌桶算法的原理和应用
+分布式限流的挑战和解决方案
+多层限流策略的设计思路
+
+
+DevOps 最佳实践：
+
+CI&#x2F;CD 流水线设计
+监控体系建设
+自动化测试和部署
+
+
+性能测试与调优：
+
+压测工具的选择和使用
+性能瓶颈的识别和优化
+系统扩容策略的验证
+
+
+
+
+8. 附录8.1 项目文件结构yys/├── src/                                    # 源代码目录│   ├── main/java/com/hello/hello/│   │   ├── config/                        # 配置类│   │   │   ├── RateLimitConfig.java      # 限流配置│   │   │   ├── RedisConfig.java          # Redis配置│   │   │   └── WebMvcConfig.java         # Web配置│   │   ├── controller/│   │   │   └── HelloController.java      # 控制器│   │   ├── interceptor/│   │   │   └── RateLimitInterceptor.java # 限流拦截器│   │   ├── service/│   │   │   └── RateLimiterService.java   # 限流服务│   │   └── HelloApplication.java         # 启动类│   └── main/resources/│       └── application.properties        # 应用配置├── jenkins/scripts/                       # K8s部署文件│   ├── prometheus-test-demo.yaml│   └── prometheus-test-serviceMonitor.yaml├── Dockerfile                            # Docker构建文件├── Jenkinsfile                          # Jenkins流水线├── pom.xml                              # Maven配置└── README.md                            # 项目说明文档
+
+8.2 相关技术栈版本
+Java: 17
+Spring Boot: 3.5.3
+Bucket4j: 8.10.1
+Redis: 7-alpine
+Kubernetes: 1.20+
+Docker: 20.10+
+Jenkins: 2.400+
+Prometheus: 2.40+
+Grafana: 9.0+
+
+
+报告完成时间: 2025年7月20日项目代码仓库: https://github.com/231220075/yys分支: hpa
+
+感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+]]></content>
+      <categories>
+        <category>学习记录</category>
+      </categories>
+      <tags>
+        <tag>学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>my first address</title>
+    <url>/2025/02/28/hello-world/</url>
+    <content><![CDATA[this is my first articletest文件，梦开始的地方
+]]></content>
+  </entry>
+  <entry>
+    <title>域名解析与网站绑定完全指南</title>
+    <url>/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/</url>
+    <content><![CDATA[域名解析与网站绑定完全指南🌐 前言当我们在浏览器输入 summer-flower.com 时，为什么能访问到我们的网站？这背后涉及了复杂的域名解析系统。本文将从零开始，详细解释域名解析的工作原理，以及如何将自定义域名绑定到 GitHub Pages。
+📚 基础概念什么是域名？域名（Domain Name）是互联网上网站的人类可读地址，例如：
+
+google.com
+github.com 
+summer-flower.com
+
+它的作用是将复杂的IP地址（如 185.199.108.153）转换为容易记忆的名称。
+什么是DNS？DNS（Domain Name System，域名系统）是互联网的”电话簿”，负责将域名翻译成IP地址。
+DNS解析过程：用户输入: summer-flower.com    ↓DNS查询: summer-flower.com 对应哪个IP？    ↓  DNS返回: 185.199.108.153    ↓浏览器访问: 185.199.108.153    ↓服务器返回: 网站内容
+
+🔧 DNS记录类型详解1. A记录（Address Record）作用: 将域名直接指向IPv4地址
+格式: 域名 → IP地址
+示例:
+summer-flower.com → 185.199.108.153
+
+使用场景: 
+
+将域名指向网站服务器
+最常用的记录类型
+一个域名可以有多个A记录（负载均衡）
+
+2. CNAME记录（Canonical Name Record）作用: 将域名指向另一个域名
+格式: 域名 → 另一个域名
+示例:
+www.summer-flower.com → summer-flower.comblog.summer-flower.com → summer-flower.com
+
+使用场景:
+
+子域名重定向
+CDN配置
+服务别名
+
+重要限制: 
+
+根域名（如 summer-flower.com）不能使用CNAME
+一个域名不能同时有CNAME和其他记录
+
+3. NS记录（Name Server Record）作用: 指定域名的DNS服务器
+格式: 域名 → DNS服务器地址
+示例:
+summer-flower.com → ns1.huaweicloud-dns.orgsummer-flower.com → ns2.huaweicloud-dns.org
+
+使用场景:
+
+域名注册商设置
+DNS服务器迁移
+
+4. SOA记录（Start of Authority Record）作用: 定义域名的权威信息
+包含信息:
+
+主DNS服务器
+域名管理员邮箱
+序列号
+刷新时间
+重试时间
+
+使用场景:
+
+系统自动创建
+DNS同步控制
+
+5. MX记录（Mail Exchange Record）作用: 指定邮件服务器
+示例:
+summer-flower.com → mail.summer-flower.com
+
+6. TXT记录（Text Record）作用: 存储文本信息
+使用场景:
+
+域名验证
+SPF邮件验证
+网站验证
+
+🌍 DNS解析的完整流程1. 浏览器发起请求用户输入: https://summer-flower.com
+
+2. 本地DNS缓存检查检查顺序:1. 浏览器缓存2. 操作系统缓存3. 路由器缓存
+
+3. 递归DNS查询本地DNS服务器 → 根DNS服务器根DNS服务器 → .com顶级域DNS服务器  .com DNS服务器 → summer-flower.com权威DNS服务器权威DNS服务器 → 返回IP地址
+
+4. 返回结果并缓存IP地址 → 本地DNS服务器 → 用户设备同时: 各级缓存存储结果
+
+🚀 GitHub Pages 域名绑定详解GitHub Pages 的工作原理默认访问方式:
+https://用户名.github.io/仓库名例如: https://231220075.github.io
+
+自定义域名访问:
+https://your-domain.com例如: https://summer-flower.com
+
+绑定步骤详解步骤1: 创建CNAME文件位置: /source/CNAME（对于Hexo）
+内容:
+summer-flower.com
+
+作用:
+
+告诉GitHub Pages你的自定义域名
+触发GitHub生成SSL证书
+启用域名重定向
+
+步骤2: 配置DNS记录GitHub Pages IP地址:
+185.199.108.153185.199.109.153185.199.110.153  185.199.111.153
+
+DNS配置:
+类型: A主机记录: @ 或 *记录值: 185.199.108.153TTL: 300
+
+重复添加其他3个IP地址
+步骤3: 等待生效时间线:
+DNS配置 → 5-30分钟 → DNS传播完成DNS传播完成 → 10-15分钟 → GitHub检测到GitHub检测到 → 5-10分钟 → SSL证书生成SSL证书生成 → 网站完全可用
+
+GitHub Pages 的验证机制DNS检查过程1. GitHub定期查询你的域名2. 检查是否指向GitHub Pages IP3. 验证CNAME文件内容4. 生成SSL证书5. 启用HTTPS访问
+
+状态变化🔴 DNS check unsuccessful   ↓ (DNS生效)🟡 DNS check in progress   ↓ (验证完成)🟢 DNS configuration successful     ↓ (SSL生成)✅ Enforce HTTPS 可用
+
+⚠️ 常见问题与解决方案问题1: DNS检查失败症状:
+DNS check unsuccessfulDomain does not resolve to the GitHub Pages server
+
+原因:
+
+DNS记录配置错误
+DNS还未传播完成
+存在冲突记录
+
+解决方案:
+# 检查DNS是否生效dig your-domain.com# 期望结果: 4个A记录指向GitHub Pages
+
+问题2: CNAME和A记录冲突错误配置:
+summer-flower.com → CNAME → other-domain.com (错误)summer-flower.com → A → 185.199.108.153 (正确)
+
+解决方案: 删除CNAME记录，只保留A记录
+问题3: www子域名配置方案A: 使用泛域名解析
+*.summer-flower.com → A → GitHub Pages IP
+
+方案B: 单独配置CNAME
+www.summer-flower.com → CNAME → summer-flower.com
+
+问题4: SSL证书问题常见原因:
+
+DNS配置不正确
+GitHub还在验证过程中
+域名验证失败
+
+解决方案:
+
+等待DNS完全传播
+确保CNAME文件正确
+检查GitHub Pages设置
+
+🛠️ 实际操作示例华为云DNS配置登录控制台:
+华为云控制台 → 域名与网站 → 云解析服务
+
+添加记录:
+记录类型: A主机记录: * (泛域名) 或 @ (根域名)线路类型: 全网默认TTL: 300记录值: 185.199.108.153
+
+重复添加其他GitHub Pages IP
+验证配置命令行验证:
+# 检查DNS解析dig summer-flower.com# 检查网站访问curl -I https://summer-flower.com# 检查SSL证书curl -I https://summer-flower.com | grep -i server
+
+在线工具验证:
+
+DNS传播检查: https://www.whatsmydns.net/
+SSL证书检查: https://www.ssllabs.com/ssltest/
+
+📊 性能优化建议TTL设置优化开发阶段:
+TTL: 300 (5分钟) - 便于快速测试
+
+生产环境:
+TTL: 3600 (1小时) - 减少DNS查询
+
+多IP配置的好处负载均衡:
+
+分散访问压力
+提高可用性
+
+容错机制:
+
+某个IP故障时自动切换
+提高网站稳定性
+
+CDN集成CloudFlare示例:
+域名 → CloudFlare → GitHub Pages
+
+优势:
+
+全球加速
+DDoS防护
+高级SSL功能
+
+🔒 安全考虑HTTPS强制GitHub Pages设置:
+Settings → Pages → Enforce HTTPS ✓
+
+好处:
+
+数据传输加密
+SEO优势
+现代浏览器要求
+
+DNS安全DNSSEC:
+
+防止DNS劫持
+验证DNS响应真实性
+
+私有DNS:
+
+使用可信DNS服务器
+避免DNS污染
+
+📈 监控与维护监控指标可用性监控:
+
+网站响应时间
+DNS解析时间
+SSL证书到期时间
+
+工具推荐:
+
+UptimeRobot（免费）
+Pingdom（付费）
+CloudFlare Analytics
+
+维护任务定期检查:
+
+DNS记录是否正确
+SSL证书是否有效
+网站访问是否正常
+
+备份策略:
+
+DNS配置备份
+域名转移码保存
+重要文件备份
+
+🎯 总结域名解析是现代互联网的基础设施，理解其工作原理对于网站管理至关重要：
+关键要点
+DNS记录类型: A记录指向IP，CNAME指向域名
+GitHub Pages绑定: 需要正确的DNS配置和CNAME文件
+传播时间: DNS更改需要5-60分钟生效
+安全性: 启用HTTPS和DNSSEC保护
+监控: 持续监控确保服务稳定
+
+最佳实践
+使用A记录指向GitHub Pages IP
+避免不必要的CNAME记录
+设置合适的TTL值
+启用HTTPS强制
+定期监控和维护
+
+通过本文的学习，相信你已经对域名解析有了全面的理解。在实际操作中，记住耐心等待DNS传播，遇到问题时系统性地排查，大部分问题都能迎刃而解。
+
+相关资源:
+
+GitHub Pages 官方文档
+DNS 基础知识
+华为云 DNS 使用指南
+
+祝你的网站部署顺利！🚀
+]]></content>
+      <categories>
+        <category>技术学习</category>
+      </categories>
+      <tags>
+        <tag>域名</tag>
+        <tag>DNS</tag>
+        <tag>GitHub Pages</tag>
+        <tag>网站部署</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>归去来</title>
+    <url>/2025/08/09/%E5%BD%92%E5%8E%BB%E6%9D%A5/</url>
+    <content><![CDATA[📝 归去来
+回看一年前的随笔，情更切。pyq发文，如今补上，仅供纪念。
+
+还是感觉以后回村里隐居也挺好。
+​这里只是晋东南群山中的一个小村落，我知道上一次回来是去年暑假，却不知道下一次要到什么时候了。一条马路将村子分成两片，也连接此处与县城，其上来往的公交车司机也成了姥姥姥爷的老熟人。曾几何时公交车并不像现在一样一元通全线，但在这数不清多少年的时间里唯一改变的也只是票价，始终是两位老人入城的主要交通工具。这条公交线很慢，小时候印象里的从村到城1小时至今不变。
+​往前回倒十几年，回到村里还没修水泥路，回到一些老人离开之前，印象比较深刻的是那时日常用水还是靠担的。记忆里的三处水井现在只能找到两处，一处后山，一处水库旁，现在自然是荒废了。只有我妈体验过担水，还没等我长大就舍弃了这种原始方式，不过担子倒还留存着，也是某种历史的见证了。​​前几天和姥爷下镇里理发，临返程时正巧下雨，我们俩冒着雨骑摩托车在山路上冲刺，感觉姥爷像施了避雨咒一样，结合我下雨时骑摩托被遮挡视线的经历，简直不可思议。返程之前路人还调侃老人带年轻人，只是这位朋友不明其中缘由，这辆摩托车比我年龄还大，借我姥姥的话，这玩意只有我姥爷驾驭得了。多少年过去了，自从地开始荒废之后拖拉机就不怎么开了，但摩托车仍是姥爷的得力干将，只是不知道他还想骑多少年，又能骑多少年。​​从我有记忆开始两位老人就主要靠种地和养蚕为主要收入，以至于我来到晋北看到那里的农家人甚至没见过蚕时感到惊讶。种地自然没什么好说的，主要就是小麦、玉米、土豆、高粱之类的经济作物，除去自己留一些磨成面和自给，其余便卖作收入。而房子周围两位老人也开垦了数小块土地，种一些萝卜、西红柿、豆角之类的果蔬，省去了天天去镇里买菜了。甚至后来表妹想吃草莓的时候，姥爷也真能在房子背后那片难以称得上是肥沃的土地上给她变出草莓，真的很神奇吧。除了种的田，他们还会打核桃、摘柿子和山楂，甚至会摘桑椹。不知道现在还有多少人知道核桃最外层是青皮的，去皮之后洗净才是棕色的壳。姥姥曾多次念叨村里人都觉得核桃不值钱，而城里人却愿意花较贵的钱去超市称，她表示相当不理解。而摘下的柿子除去现吃的，为了方便保存往往会做成柿饼，至今仍是；山楂则去核做成红果罐头，估计是山楂树虽着地一起荒了，我也已经记不得上一次吃红果罐头是什么时候了。​​不论病逝还是进城，在一些老人没离开前，整个村子都会养蚕。养蚕以季为周期，分春夏秋冬蚕。村里人先统计各家各户的养殖量，以张为单位，那是因为一开始拿回来的蚕籽在粘板上。从一个个小黑点长成白蚕再到结茧，喂桑叶从切成细碎到整叶铺盖，它们的住处也从粘板到数个木篓子，直到喷上药，将它们移到网格栅上，静待结茧。随着不少老人的离开，养蚕人越来越少，在前些年姥姥姥爷也因身体原因不在养蚕，网格栅也终于收进了牛圈，恐怕再无可用之日。​​如今，除了种少许地，姥爷还常常骑车上山采摘连翘（P3）。实际上近些年十里八乡的老年男女都在采这种药来卖钱，以6到9月最为频繁，但价格偏低，几元到十几元一斤上下浮动；冬天的干连翘价高，往往在五六十元一斤，但却难寻。采药人早八晚六地摘，一天下来好的话人均十几斤，不好则只有六七斤。姥姥也常会开玩笑说，今天出去吃顿饭又把姥爷一天的采药钱吃没了，我笑罢只觉得苦涩，但也知道老人是闲不住的。采药人采回药后也要观察行情，但又因为连翘不经放所以也要尽快出手，和各地收药人的搏弈始终存在，但不幸的是今年夏天我姥爷总是在涨价前出手，只能在吃饭时骂几句收药人罢了。今天的采摘量为九斤，行情为十二元每斤，在此记录一下。​​我还是会吐槽两位老人生活的地方：房子都是上个世纪的产物，到冬天特别冷；一把铁勺子从姥姥的母亲传到现在；在村里夏天要时刻盯防蚊子，尤其是上厕所qwq；种几块地还要提防野猪，也总会被拱得粮食减产；现在的日常用水每隔五天统一供应，日常囤水；村子里的人越来越少，现在凑桌麻将都难；不时还有蝎子和蛇出没（前几天我就被蝎子咬了(⁄ ⁄•⁄ω⁄•⁄ ⁄)）。但他们俩丝毫不在意。昨天又谈到我想让他们俩彻底离开这里，常住县城，给小姨做饭带娃，但姥姥仍是不在意。我说你们俩总有干不动的时候，早点下城里享受不好呗，姥姥执意说春夏之际凉快。我又说城里有空调不比村里凉快？她又提到费电了。对，这两位就是这么节俭，省了一辈子，处处细打算，却在两位女儿买房时拿出好几万，每次我回来都去超市割肉买菜，在离开的时候以前是塞钱，现在是转账，也只会告诫我好好学习……​​千反田用来形容她家乡的话也正是这个村子的现状，”这里是我的故乡，只有水和土地，人们也在渐渐衰老，失去活力”。我并不觉得这里是最美的地方，也并不觉得这里充满可能性，但是，我愿意讲述这里过往的点滴。可以预见以姥姥姥爷为代表的一代老人也离开这里后，在未来的三十年间这个村子终将荒无人烟。我不知道其他户人家的后代怎么看，我想我还会回到这里，去寻访过往踪迹。​​写在即将启程却不知何时归来之际。
+感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+]]></content>
+      <categories>
+        <category>生活随想</category>
+      </categories>
+      <tags>
+        <tag>乡愁</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>我的博客重新开始</title>
     <url>/2025/08/07/%E6%88%91%E7%9A%84%E5%8D%9A%E5%AE%A2%E9%87%8D%E6%96%B0%E5%BC%80%E5%A7%8B/</url>
     <content><![CDATA[🌟 我的博客重新开始大家好！我是 forever，欢迎来到我重新搭建的博客 “Summer Flower”。
@@ -2842,6 +2804,44 @@ GitHub 开源项目介绍
       </categories>
       <tags>
         <tag>start</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>用rust复刻git</title>
+    <url>/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/</url>
+    <content><![CDATA[📝 用rust复刻git
+本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历
+
+前言大二下选课的时候发现有一门《rust程序设计》的课程，之前在大一上c++的时候最早接触过rust这个名字，但是一直没怎么了解过，于是抱着好奇心和同伴组队选了这门课，这也是这门项目的由来。
+整个项目从4月份开始，到5月底向猪脚答辩时完成了1.0版本（https://github.com/231220075/git.git），包含了除远程分支外的基本功能。后续在暑假期间补上了远程分支控制的部分，即1.1版本（https://github.com/231220075/rit.git），命名为rit-&gt;rust-git。
+初步开发
+首先需要了解git的工作原理，这一部分参考https://git-scm.com/book/en/v，不再赘述。
+每一条git命令执行过程比较固定，解析好命令行参数后执行对应的处理函数即可。解析命令行参数使用clap（易于使用，能处理复杂参数解析，且自动生成help页）。clap解析命令行参数并返回具体类型的 subcommand，并调用其run函数。这里为了后续子命令的实现，我们把.git所在目录路径作为参数传给run，并为-C做了处理。
+在做subcommand之前需要先实现一些底层命令，我们做了cat-file、hash-object、write&#x2F;read-tree、update-index、commit-tree、update-ref&amp;&amp;symboloc-ref等等（后两个比较简单，后续直接简化到utils&#x2F;refs作为分支管理工具了），这一部分逐步理清并构建了git的工作环境，如index区、.git文件内容管理、refs管理等等，以及git中 blob、tree、commit这几种object的结构，这些就是git的底层代码，到此为止我们就能完全读懂.git下的所有文件及其功能了。
+理解底层代码后剩下的部分就比较简单了，subcommand就是在底层命令的基础上运行的，基本就是组合一下，加上判断处理。比较复杂的可能是checkout和merge，课程对merge要求比较简单，如果有冲突只要显示两个分支哪部分有不同，这部分由另一位成员完成，我不做过多阐述；而checkout主要涉及到切换分支的时间点，workspace、index和ref commit是否一致的问题。我的理解是，如果切换分支前，仅考虑目标文件，index&#x3D;workspace&#x3D;current ref commit，说明不存在未暂存&amp;&amp;未提交的更改，即index和workspace都是clean，这种情况下可以直接切换ref commit,并把目标commit的tree object写入index和更新workspace；否则说明有未暂存||未提交的更改，需要考虑保留这些更改，存在一个“merge”的过程，对于存在冲突的文件以index&#x2F;workspace为准。
+这个过程中每一步开发新功能前需要先把频繁使用的method构建一个util，方便后续使用，我们主要是用到很多关于三类object构建和读写、index的读写、文件读写以及压缩、hash和做单元测试的method，构建了相关的utils。谈到unit test，需要感谢我的同伴开发了完整的测试框架，为我们的测试做出来巨大的贡献、巨大的carry，respect！也是rust优秀的单元测试让我这个懒人也愿意开始做测试了，amazing啊qwq。
+
+debug&amp;&amp;踩坑
+关于debug，包括两部分。一是客观方面作为课设，猪脚还是做了oj，我们这个项目需要通过测试拿分。猪脚的oj是用脚本做断言测试公开了部分测试和要求，涉及大文件、可执行文件、图片等的测试；另一方面主观上每个subcommand和底层命令我们做了对应的集成测试，主要是交替使用原版git和rust-git检查问题。
+大部分bug在检测的过程中就知道哪里有问题，可以快速解决，但有的是认知问题。比较典型的是，index区暂存文件的结构和tree object的文件结构是不一样的，前者是完整的路径，而后者是递归存储的。
+另外就是配置了GitHub的CI，name: Rust CI# 触发条件：当代码推送到仓库或创建 Pull Request 时触发on:  push:    branches: [ &#x27;**&#x27; ]jobs:  build-and-test:    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境    steps:      # Step 1: 检出代码      - name: Checkout code        uses: actions/checkout@v3      # Step 2: 设置 Rust 工具链      - name: Set up Rust        uses: actions-rs/toolchain@v1        with:          toolchain: stable  # 使用稳定的 Rust 工具链      # Step 3: 运行 cargo test      - name: Run Tests        run: cargo test -- --test-threads=1      # Step 4: 运行 cargo clippy 检查      - name: Run Clippy        run: cargo clippy -- -D warnings  # 将警告视为错误      # （可选）Step 5: 构建项目      - name: Build Project        run: cargo build --release
+这样每次提交自动触发测试，虽然每次都要发个邮件提醒有点烦就是了……大概如下
+
+🤖️ 远程分支
+进入8月才有时间收拾这个没完成的摊子，想补充的远程分支部分主要是fetch、pull和push三个subcommand，目标是能和GitHub的repo交互更新即可。
+我最终选择用https与GitHub传输，虽然传输大文件不稳定，但是本人对https比较熟悉（ssh现阶段就不太考虑了）。fetch主要是获取远程仓库的分支和对应的commit hash，而首先要设定远程传输的仓库URL，所以先实现remote指令设置分支和URL的映射，保存在.git&#x2F;config文件。fetch同样可以指定参数，选择获取所有远程分支还是特定远程分支，然后创建“.git&#x2F;refs&#x2F;remote&#x2F;分支名”文件，记录其commit hash。
+而pull则是fetch+merge，先获取远程分支，然后将当前分支与目标分支合并。有一个需要注意的点是，在init后remote add&amp;&amp;pull，此时本地分支因为没有提交过，refs下并没有默认的master&#x2F;main文件，因为没有提交过、没有commit hash，此时要做merge会出现问题，既没有本地分支也没有index区，我之前的实现会merge fail。所以我取巧了一下，如果是初始化之后直接pull的这种情况，直接fetch+checkout到远程分支；而push则协商需要传输的对象，并创建pack文件通过https传输。
+需要注意的地方主要有两点：一是pull下来的pack需要解压缩，这个解压缩器的设计需要比较精确，完全理解git的压缩pack的逻辑才能设计足够精确的解压器、才能完全解压出100%的object，否则会丢失部分object产生缺损；二是所有的pack在push上去后都会被GitHub端接收，需要严格遵循格式，我在此过程中有两个问题，tree object的文件组织格式（没错，正是前文提到的）和index&amp;&amp;tree object中表项没按字典序排序。说实话之前在和原版git比对的时候也注意到了这个顺序问题，但当时感觉没什么影响，现在被教训了，只能说一切都有其存在的意义
+
+
+感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。
+]]></content>
+      <categories>
+        <category>学习记录</category>
+      </categories>
+      <tags>
+        <tag>rust</tag>
+        <tag>git</tag>
       </tags>
   </entry>
   <entry>
