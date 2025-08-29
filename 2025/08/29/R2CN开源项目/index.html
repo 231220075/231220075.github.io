@@ -1,0 +1,256 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>R2CN开源项目 | Summer Flower</title><meta name="author" content="forever"><meta name="copyright" content="forever"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="经开源软件论坛的介绍，尝试参与一个R2CN的开源项目，提交了PR。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="R2CN开源项目">
+<meta property="og:url" content="http://summer-flower.com/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/index.html">
+<meta property="og:site_name" content="Summer Flower">
+<meta property="og:description" content="经开源软件论坛的介绍，尝试参与一个R2CN的开源项目，提交了PR。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://summer-flower.com/photos/r2cn.png">
+<meta property="article:published_time" content="2025-08-29T04:59:26.000Z">
+<meta property="article:modified_time" content="2025-08-29T04:59:26.000Z">
+<meta property="article:author" content="forever">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="开源">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://summer-flower.com/photos/r2cn.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "R2CN开源项目",
+  "url": "http://summer-flower.com/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/",
+  "image": "http://summer-flower.com/photos/r2cn.png",
+  "datePublished": "2025-08-29T04:59:26.000Z",
+  "dateModified": "2025-08-29T04:59:26.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "forever",
+      "url": "http://summer-flower.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="http://summer-flower.com/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.clarity.ms"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="manifest" href="/manifest.json"/><link rel="apple-touch-icon" sizes="180x180" href="/img/favicon.ico"/><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon.ico"/><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon.ico"/><link rel="mask-icon" href="/img/favicon.ico" color="#5bbad5"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const hour = new Date().getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (theme === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else theme === 'light' ? activateLightMode() : activateDarkMode()
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>(function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "su3jybron2");
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"No results found for: ${query}","hits_stats":"${hits} articles found"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"You have switched to Traditional Chinese","cht_to_chs":"You have switched to Simplified Chinese","day_to_night":"You have switched to Dark Mode","night_to_day":"You have switched to Light Mode","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'R2CN开源项目',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><script src="https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Summer Flower" type="application/atom+xml">
+</head><body><div id="web_bg" style="background-image: url(/url(/source/photos/arknight.jpg));"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/photos/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li><li><a class="site-page child" href="/photos-gallery/"><i class="fa-fw fas fa-camera"></i><span> Photos</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-gamepad"></i><span> Games</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap/"><i class="fa-fw fas fa-sitemap"></i><span> Sitemap</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> Comments</span></a></div><div class="menus_item"><a class="site-page" href="/browser/"><i class="fa-fw fas fa-robot"></i><span> AI Assistant</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/photos/r2cn.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Summer Flower</span></a><a class="nav-page-title" href="/"><span class="site-name">R2CN开源项目</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li><li><a class="site-page child" href="/photos-gallery/"><i class="fa-fw fas fa-camera"></i><span> Photos</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-gamepad"></i><span> Games</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fas fa-link"></i><span> Links</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/sitemap/"><i class="fa-fw fas fa-sitemap"></i><span> Sitemap</span></a></div><div class="menus_item"><a class="site-page" href="/comments/"><i class="fa-fw fas fa-envelope-open"></i><span> Comments</span></a></div><div class="menus_item"><a class="site-page" href="/browser/"><i class="fa-fw fas fa-robot"></i><span> AI Assistant</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">R2CN开源项目</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-08-29T04:59:26.000Z" title="Created 2025-08-29 12:59:26">2025-08-29</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-08-29T04:59:26.000Z" title="Updated 2025-08-29 12:59:26">2025-08-29</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E5%AD%A6%E4%B9%A0/">技术学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">355</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>1mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:365,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2025-08-29 12:59:26&quot;}" hidden></div><h1 id="📝-R2CN开源项目"><a href="#📝-R2CN开源项目" class="headerlink" title="📝 R2CN开源项目"></a>📝 R2CN开源项目</h1><blockquote>
+<p>经开源软件论坛的介绍，尝试参与一个R2CN的开源项目，提交了PR。</p>
+</blockquote>
+<h2 id="正文内容"><a href="#正文内容" class="headerlink" title="正文内容"></a>正文内容</h2><p>2025.8.23，在开学前我参加了南大e-science中心牵头举办的第三届开源软件论坛，认识了来自清北交大等高校的大佬，尤其是参加了25ACS、ICS的超算队员。（孙远航@北京大学，贾朝蓬@清华大学，桂仲腾@上海交通大学，黄烨@中山大学 etc..）另外北大还介绍了他们自己组建的校内北大☁️（捡垃圾捡的说是）<img src="/../photos/posts/R2CN/a4b8bd8ea46d8a55cf7babdc541c687d.jpg" alt="alt text">搞得我也想折腾个服务器，虽然好像也没什么个人需求，而且南大☁️已经存在了。。。</p>
+<p>剩下的报告除了各获奖超算队的解题思路，本校的大四学长介绍了monorepo的相关知识，并介绍了两个开源实习项目，这也是和R2CN接触的开始。</p>
+<h3 id="测试任务"><a href="#测试任务" class="headerlink" title="测试任务"></a>测试任务</h3><p>在注册成为实习生之前需要做一个测试任务，考察对rust和git的了解程度。这个之前由于正好合作开发了rust-git，所以对我来说比较简单bushi。<br><img src="/../photos/posts/R2CN/26a09ed2f22e6310255aea1cf9b131fe.png" alt="alt text"><br>有前人提交了一个issue但是没有继续完成，所以我直接接手了。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总结一下本文的要点…</p>
+<hr>
+<p><em>感谢阅读！如果这篇文章对你有帮助，欢迎点赞和分享。</em></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://summer-flower.com">forever</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://summer-flower.com/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/">http://summer-flower.com/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/rust/">rust</a><a class="post-meta__tags" href="/tags/%E5%BC%80%E6%BA%90/">开源</a></div><div class="post-share"><div class="social-share" data-image="/photos/r2cn.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/" title="域名解析与网站绑定完全指南"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">域名解析与网站绑定完全指南</div></div><div class="info-2"><div class="info-item-1">域名解析与网站绑定完全指南🌐 前言当我们在浏览器输入 summer-flower.com 时，为什么能访问到我们的网站？这背后涉及了复杂的域名解析系统。本文将从零开始，详细解释域名解析的工作原理，以及如何将自定义域名绑定到 GitHub Pages。 📚 基础概念什么是域名？域名（Domain Name）是互联网上网站的人类可读地址，例如：  google.com github.com  summer-flower.com  它的作用是将复杂的IP地址（如 185.199.108.153）转换为容易记忆的名称。 什么是DNS？DNS（Domain Name System，域名系统）是互联网的”电话簿”，负责将域名翻译成IP地址。 DNS解析过程：123456789用户输入: summer-flower.com    ↓DNS查询: summer-flower.com 对应哪个IP？    ↓  DNS返回: 185.199.108.153    ↓浏览器访问: 185.199.108.153    ↓服务器返回: 网站内容  🔧 DNS记录类型详解1. A记录（Addres...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/08/07/%E7%94%A8rust%E5%A4%8D%E5%88%BBgit/" title="用rust复刻git"><img class="cover" src="/photos/arknight.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-07</div><div class="info-item-2">用rust复刻git</div></div><div class="info-2"><div class="info-item-1">📝 用rust复刻git 本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历  前言大二下选课的时候发现有一门《rust程序设计》的课程，之前在大一上c++的时候最早接触过rust这个名字，但是一直没怎么了解过，于是抱着好奇心和同伴组队选了这门课，这也是这门项目的由来。 整个项目从4月份开始，到5月底向猪脚答辩时完成了1.0版本（https://github.com/231220075/git.git），包含了除远程分支外的基本功能。后续在暑假期间补上了远程分支控制的部分，即1.1版本（https://github.com/231220075/rit.git），命名为rit-&gt;rust-git。 初步开发 首先需要了解git的工作原理，这一部分参考https://git-scm.com/book/en/v，不再赘述。 每一条git命令执行过程比较固定，解析好命令行参数后执行对应的处理函数即可。解析命令行参数使用clap（易于使用，能处理复杂参数解析，且自动生成help页）。clap解析命令行参数并返回具体类型的 subcommand，并调用其run函数。这...</div></div></div></a></div></div><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comments</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/photos/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">forever</div><div class="author-info-description">this is forever’s blog , and I plan to share some photos and cs learning stories , wish can help you and make your day .</div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/231220075"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/231220075" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:231220075@smail.nju.edu.cn" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%F0%9F%93%9D-R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE"><span class="toc-number">1.</span> <span class="toc-text">📝 R2CN开源项目</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A3%E6%96%87%E5%86%85%E5%AE%B9"><span class="toc-number">1.1.</span> <span class="toc-text">正文内容</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E4%BB%BB%E5%8A%A1"><span class="toc-number">1.1.1.</span> <span class="toc-text">测试任务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.2.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/" title="R2CN开源项目"><img src="/photos/r2cn.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="R2CN开源项目"/></a><div class="content"><a class="title" href="/2025/08/29/R2CN%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE/" title="R2CN开源项目">R2CN开源项目</a><time datetime="2025-08-29T04:59:26.000Z" title="Created 2025-08-29 12:59:26">2025-08-29</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/15/%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90%E4%B8%8E%E7%BD%91%E7%AB%99%E7%BB%91%E5%AE%9A%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97/" title="域名解析与网站绑定完全指南">域名解析与网站绑定完全指南</a><time datetime="2025-08-15T03:00:00.000Z" title="Created 2025-08-15 11:00:00">2025-08-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/13/React-vs-Vue-%E6%B7%B1%E5%BA%A6%E5%AF%B9%E5%86%B3/" title="React vs. Vue：前端框架的深度对决">React vs. Vue：前端框架的深度对决</a><time datetime="2025-08-13T08:45:00.000Z" title="Created 2025-08-13 16:45:00">2025-08-13</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/13/%E7%BD%91%E9%A1%B5%E6%9E%84%E5%BB%BA%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E8%AF%A6%E8%A7%A3/" title="🌐 网页构建基础知识详解">🌐 网页构建基础知识详解</a><time datetime="2025-08-12T16:00:00.000Z" title="Created 2025-08-13 00:00:00">2025-08-13</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/12/Java%20%E6%B3%A8%E8%A7%A3/" title="Java 注解">Java 注解</a><time datetime="2025-08-12T08:18:13.000Z" title="Created 2025-08-12 16:18:13">2025-08-12</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By forever</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="Scroll to Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getGiscusTheme = theme => theme === 'dark' ? 'dark' : 'light'
+
+  const createScriptElement = config => {
+    const ele = document.createElement('script')
+    Object.entries(config).forEach(([key, value]) => {
+      ele.setAttribute(key, value)
+    })
+    return ele
+  }
+
+  const loadGiscus = (el = document, key) => {
+    const mappingConfig = isShuoshuo
+      ? { 'data-mapping': 'specific', 'data-term': key }
+      : { 'data-mapping': (option && option['data-mapping']) || 'pathname' }
+
+    const giscusConfig = {
+      src: 'https://giscus.app/client.js',
+      'data-repo': '231220075/231220075.github.io',
+      'data-repo-id': 'R_kgDOOA3Tzw',
+      'data-category-id': 'DIC_kwDOOA3Tz84Ct7NB',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true,
+      ...option,
+      ...mappingConfig
+    }
+
+    const scriptElement = createScriptElement(giscusConfig)
+
+    el.querySelector('#giscus-wrap').appendChild(scriptElement)
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyGiscus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const changeGiscusTheme = theme => {
+    const iframe = document.querySelector('#giscus-wrap iframe')
+    if (iframe) {
+      const message = {
+        giscus: {
+          setConfig: {
+            theme: getGiscusTheme(theme)
+          }
+        }
+      }
+      iframe.contentWindow.postMessage(message, 'https://giscus.app')
+    }
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if (isShuoshuo) {
+    'Giscus' === 'Giscus'
+      ? window.shuoshuoComment = { loadComment: loadGiscus }
+      : window.loadOtherComment = loadGiscus
+    return
+  }
+
+  if ('Giscus' === 'Giscus' || !false) {
+    if (false) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment = loadGiscus
+  }
+})()</script></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="30" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search..." type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
