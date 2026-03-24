@@ -79,25 +79,31 @@ esac
 # 创建文章
 echo ""
 echo "📝 正在创建文章..."
-npx hexo new "$title"
+# 目前直接写 Markdown 文件，避免 hexo new 可能卡在配置验证阶段（INFO Validating config）
+# 如果你希望用 Hexo 自动创建，可以手动运行：hexo new "$title"
 
 # 获取当前时间
 current_date=$(date "+%Y-%m-%d %H:%M:%S")
 
-# 生成文章文件路径
-post_file="source/_posts/${title}.md"
+# 生成文章文件路径（安全文件名）
+slug=$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed -E 's/[[:space:]]+/-/g; s/[^a-z0-9\-]//g; s/[-]+/-/g; s/^[-]+//; s/[-]+$//')
+if [ -z "$slug" ]; then
+    slug="post-$(date +%s)"
+fi
+post_file="source/_posts/${slug}.md"
 
 # 创建自定义的 Front Matter
 cat > "$post_file" << EOF
 ---
-title: $title
+title: "$title"
 date: $current_date
 updated: $current_date
 tags:
 $tags_yaml
 categories:
-  - $category
-description: $description$([ -n "$cover" ] && echo -e "\ncover: $cover")
+  - "$category"
+description: "$description"
+$( [ -n "$cover" ] && echo "cover: $cover" )
 top: false
 comments: true
 toc: true

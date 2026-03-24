@@ -5,7 +5,8 @@
   "scripts": {
     "build": "hexo generate",
     "clean": "hexo clean",
-    "deploy": "hexo deploy",
+  "predeploy": "node tools/upload-images.js",
+    "deploy": "npm run predeploy && hexo deploy",
     "server": "hexo server"
   },
   "hexo": {
@@ -16,6 +17,9 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "form-data": "^4.0.4",
+    "fs-extra": "^11.3.1",
+    "glob": "^11.0.3",
     "hexo": "^7.3.0",
     "hexo-butterfly-envelope": "^1.0.15",
     "hexo-deployer-git": "^4.0.0",

@@ -98,6 +98,20 @@ ignore:
 ## Themes: https://hexo.io/themes/
 theme: butterfly
 
+menu:
+  Home: / || fas fa-home
+  List||fas fa-list:
+    Music: /music/ || fas fa-music
+    Movie: /movies/ || fas fa-video
+    Photos: /photos-gallery/ || fas fa-camera
+    Games: /games/ || fas fa-gamepad
+  Upload: /upload/ || fas fa-upload
+  Archives: /archives/ || fas fa-archive
+  Links: /links/ || fas fa-link
+  About: /about/ || fas fa-user
+  Sitemap: /sitemap/ || fas fa-sitemap
+  Comments: /comments/ || fas fa-envelope-open
+
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 

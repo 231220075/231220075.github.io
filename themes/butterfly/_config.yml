@@ -23,6 +23,7 @@ menu:
     Movie: /movies/ || fas fa-video
     Photos: /photos-gallery/ || fas fa-camera
     Games: /games/ || fas fa-gamepad
+  Upload: /upload/ || fas fa-upload
   Archives: /archives/ || fas fa-archive
   Links: /links/ || fas fa-link
   About: /about/ || fas fa-user

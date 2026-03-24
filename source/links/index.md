@@ -60,6 +60,8 @@ layout: "link"
 - [Hexo](https://hexo.io/) - 静态博客框架
 - [Butterfly](https://butterfly.js.org/) - 本站使用的主题
 - [GitHub Pages](https://pages.github.com/) - 免费静态网站托管
+- [ynw](http://49.235.40.116) - 友链dsw
+- [陈皓](https://coolshell.cn/plugins) - 技术大佬
 
 ---
 
