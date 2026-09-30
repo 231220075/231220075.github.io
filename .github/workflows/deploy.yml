@@ -1,0 +1,58 @@
+name: 构建并部署网站
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 构建
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取源码
+        uses: actions/checkout@v4
+
+      - name: 准备 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 本项目零依赖，无需 npm install，构建只需几秒
+      - name: 生成静态网站
+        run: node tools/build.mjs
+
+      - name: 检查产物
+        run: |
+          test -f public/index.html || { echo "缺少 index.html，构建异常"; exit 1; }
+          test -f public/404.html || { echo "缺少 404.html"; exit 1; }
+          echo "产物文件数：$(find public -type f | wc -l)"
+
+      - name: 配置 Pages
+        uses: actions/configure-pages@v5
+
+      - name: 上传产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    name: 部署
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 发布到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,8 +1,20 @@
+# ---- 系统 ----
 .DS_Store
 Thumbs.db
-db.json
-*.log
+
+# ---- 依赖与构建产物 ----
 node_modules/
 public/
+*.log
+
+# ---- Hexo 时代遗留 ----
 .deploy*/
+db.json
+.hexo-backup/
+.image_map.json
 _multiconfig.yml
+.trash/
+
+# ---- 编辑器 ----
+.vscode/
+.idea/

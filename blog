@@ -1,0 +1,306 @@
+#!/usr/bin/env bash
+# ============================================================================
+#  Summer Flower 博客管理脚本
+#  用法：./blog <命令>
+# ============================================================================
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT"
+
+# ---------- 找到可用的 node ----------
+find_node() {
+  if command -v node >/dev/null 2>&1; then echo "node"; return; fi
+  for p in "$HOME"/.workbuddy/binaries/node/versions/*/bin/node /opt/homebrew/bin/node /usr/local/bin/node; do
+    [ -x "$p" ] && { echo "$p"; return; }
+  done
+  echo ""
+}
+NODE="$(find_node)"
+
+GREEN='\033[0;32m'; YELLOW='\033[0;33m'; RED='\033[0;31m'; BLUE='\033[0;34m'; DIM='\033[2m'; NC='\033[0m'
+info()  { printf "${BLUE}▸${NC} %s\n" "$1"; }
+ok()    { printf "${GREEN}✔${NC} %s\n" "$1"; }
+warn()  { printf "${YELLOW}!${NC} %s\n" "$1"; }
+err()   { printf "${RED}✘${NC} %s\n" "$1" >&2; }
+
+require_node() {
+  if [ -z "$NODE" ]; then
+    err "没有找到 Node.js。请先安装（https://nodejs.org）后重试。"
+    exit 1
+  fi
+}
+
+usage() {
+  cat <<'EOF'
+
+  Summer Flower 博客管理
+
+  常用命令
+    ./blog new "文章标题"     新建一篇文章（自动生成文件和时间）
+    ./blog dev                本地预览（改文章自动刷新）
+    ./blog build              生成静态网站到 public/
+    ./blog publish "说明"     一键发布：构建 + 提交 + 推送到 GitHub
+    ./blog status             查看当前状态（有没有未提交的改动）
+    ./blog clean              清空构建产物
+
+  首次使用
+    ./blog setup              连接 GitHub 仓库并完成第一次推送
+
+  其它
+    ./blog help               显示这份帮助
+    ./blog rm "文章标题"      删除一篇文章（会先备份到 .trash/）
+
+  小贴士
+    · 文章都放在 content/posts/ 目录下，用 Markdown 编写
+    · 页面（关于、友链等）放在 content/pages/ 目录下
+    · 网站标题、导航、社交链接在 site.config.mjs 里修改
+    · 图片放在 assets/photos/ 里，文章中用 /photos/文件名.jpg 引用
+
+EOF
+}
+
+cmd_new() {
+  require_node
+  local title="${1:-}"
+  if [ -z "$title" ]; then
+    read -r -p "文章标题: " title
+  fi
+  [ -z "$title" ] && { err "标题不能为空"; exit 1; }
+
+  # 文件名：去掉路径分隔符
+  local slug="${title//\//-}"
+  slug="${slug//\\/-}"
+  local file="content/posts/${slug}.md"
+
+  if [ -e "$file" ]; then
+    err "已经存在同名文章：$file"
+    exit 1
+  fi
+
+  local now
+  now="$("$NODE" -e 'const d=new Date();const p=n=>String(n).padStart(2,"0");console.log(d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds()))')"
+
+  cat > "$file" <<EOF
+---
+title: ${title}
+date: ${now}
+# 下面几项按需填写，不写就用默认值
+# tags:
+#   - 技术
+# categories:
+#   - 学习记录
+# description: 一句话摘要，会显示在首页列表里
+# cover: /photos/avatar.jpg
+---
+
+在这里开始写正文吧。
+
+## 小标题
+
+正文支持 **加粗**、*斜体*、\`行内代码\`、[链接](https://example.com)、图片：
+
+\`\`\`bash
+# 代码块示例
+echo "hello"
+\`\`\`
+EOF
+
+  ok "已创建：$file"
+  echo ""
+  echo "  接下来："
+  echo "    1. 编辑这个文件（任何 Markdown 编辑器都可以，推荐 Typora / VS Code）"
+  echo "    2. 运行 ./blog dev 在浏览器里预览"
+  echo "    3. 运行 ./blog publish 发布上线"
+  echo ""
+  printf "  现在就打开编辑？[y/N] "
+  read -r answer
+  if [ "${answer:-n}" = "y" ] || [ "${answer:-n}" = "Y" ]; then
+    if command -v open >/dev/null 2>&1; then open "$file"; else "${EDITOR:-vi}" "$file"; fi
+  fi
+}
+
+cmd_build() {
+  require_node
+  info "构建中…"
+  "$NODE" tools/build.mjs
+  ok "产物在 public/ 目录"
+}
+
+cmd_dev() {
+  require_node
+  info "首次构建…"
+  "$NODE" tools/build.mjs >/dev/null
+  "$NODE" tools/server.mjs "${1:-4000}"
+}
+
+cmd_clean() {
+  require_node
+  info "清理构建产物…"
+  rm -rf public
+  ok "已清理 public/"
+}
+
+cmd_status() {
+  echo ""
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    warn "当前目录还不是 git 仓库"
+    exit 0
+  fi
+  local branch remote
+  branch="$(git branch --show-current 2>/dev/null || echo '未知')"
+  remote="$(git remote get-url origin 2>/dev/null || echo '')"
+  printf "  分支      : %s\n" "$branch"
+  printf "  远程仓库  : %s\n" "${remote:-未配置}"
+  printf "  文章数量  : %s\n" "$(find content/posts -name '*.md' 2>/dev/null | wc -l | tr -d ' ')"
+  echo ""
+  local changes
+  changes="$(git status --porcelain | wc -l | tr -d ' ')"
+  if [ "$changes" = "0" ]; then
+    ok "没有未提交的改动"
+  else
+    warn "有 $changes 个文件未提交："
+    git status --short | head -20 | sed 's/^/    /'
+    echo ""
+    echo "  运行 ./blog publish 提交并发布"
+  fi
+  echo ""
+}
+
+cmd_publish() {
+  require_node
+  local message="${1:-}"
+
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    err "当前目录不是 git 仓库"
+    exit 1
+  fi
+
+  local remote
+  remote="$(git remote get-url origin 2>/dev/null || true)"
+  if [ -z "$remote" ]; then
+    warn "还没有配置远程仓库，正在为你添加 GitHub 地址…"
+    git remote add origin https://github.com/231220075/231220075.github.io.git
+    ok "已设置 origin = https://github.com/231220075/231220075.github.io.git"
+  fi
+
+  info "1/3 本地构建，先确认没有错误…"
+  "$NODE" tools/build.mjs
+
+  info "2/3 提交改动…"
+  if [ -z "$(git status --porcelain)" ]; then
+    warn "没有需要提交的改动"
+  else
+    git add -A
+    if [ -z "$message" ]; then
+      message="更新站点 $(date '+%Y-%m-%d %H:%M')"
+    fi
+    git commit -q -m "$message"
+    ok "已提交：$message"
+  fi
+
+  info "3/3 推送到 GitHub…"
+  local branch
+  branch="$(git branch --show-current)"
+  if git push -u origin "$branch" 2>/dev/null; then
+    ok "推送完成"
+    echo ""
+    echo "  🌐 网站地址：https://231220075.github.io"
+    echo "  ${DIM}GitHub Actions 会在约 1 分钟后自动完成部署${NC}"
+  else
+    echo ""
+    err "推送失败。常见原因："
+    echo "    · 这是第一次推送，需要先执行：（把下面的命令复制运行）"
+    echo "        git fetch origin && git branch --set-upstream-to=origin/$branch $branch"
+    echo "        或：git pull origin $branch --allow-unrelated-histories"
+    echo "    · 没有 GitHub 权限，检查 SSH key 或 Personal Access Token"
+    echo "    · 网络问题，多试一次"
+    exit 1
+  fi
+  echo ""
+}
+
+cmd_setup() {
+  require_node
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    err "当前目录不是 git 仓库"
+    exit 1
+  fi
+
+  echo ""
+  info "1/4 配置远程仓库"
+  local remote
+  remote="$(git remote get-url origin 2>/dev/null || true)"
+  if [ -z "$remote" ]; then
+    git remote add origin https://github.com/231220075/231220075.github.io.git
+    remote="https://github.com/231220075/231220075.github.io.git"
+  fi
+  ok "origin = $remote"
+
+  info "2/4 首次本地构建（确保新站点能正常生成）"
+  "$NODE" tools/build.mjs
+
+  info "3/4 提交全部改动"
+  git add -A
+  if [ -n "$(git status --porcelain)" ]; then
+    git commit -q -m "refactor: 迁移为自建零依赖静态站点，不再依赖 Hexo"
+    ok "已提交"
+  else
+    ok "没有需要提交的改动"
+  fi
+
+  info "4/4 推送到 GitHub"
+  echo ""
+  warn "注意：远程 main 分支现在存的是 Hexo 生成的旧网页，"
+  warn "      而本地是全新的源码结构，两者历史无关，需要覆盖远程分支。"
+  warn "      旧网页已备份在 .hexo-backup/ 目录，可随时查看。"
+  echo ""
+  printf "  确认覆盖远程 main 分支？[y/N] "
+  read -r answer
+  if [ "${answer:-n}" != "y" ] && [ "${answer:-n}" != "Y" ]; then
+    warn "已取消。改动都还在本地，随时可以重新运行 ./blog setup"
+    exit 0
+  fi
+
+  if git push -u origin main --force; then
+    ok "推送完成"
+    echo ""
+    echo "  🌐 网站地址：https://231220075.github.io"
+    echo ""
+    warn "最后一步（只做一次）："
+    echo "    打开 https://github.com/231220075/231220075.github.io/settings/pages"
+    echo "    把 Build and deployment → Source 改成 GitHub Actions，保存。"
+    echo "    之后网站会自动部署，约 1 分钟上线。"
+  else
+    err "推送失败，请检查网络或 GitHub 权限"
+    exit 1
+  fi
+  echo ""
+}
+
+cmd_rm() {
+  local title="${1:-}"
+  [ -z "$title" ] && { err "请提供文章标题，例如：./blog rm \"我的旧文章\""; exit 1; }
+  local file="content/posts/${title}.md"
+  if [ ! -f "$file" ]; then
+    err "找不到文章：$file"
+    exit 1
+  fi
+  mkdir -p .trash
+  mv "$file" ".trash/${title}.$(date '+%Y%m%d%H%M%S').md"
+  ok "已移除（备份在 .trash/）：$title"
+  echo "  运行 ./blog publish 让线上生效"
+}
+
+case "${1:-help}" in
+  new|n)     shift; cmd_new "$@" ;;
+  build|b)   shift; cmd_build "$@" ;;
+  dev|s)     shift; cmd_dev "$@" ;;
+  publish|p) shift; cmd_publish "$@" ;;
+  status)    shift; cmd_status "$@" ;;
+  clean)     shift; cmd_clean "$@" ;;
+  setup)     shift; cmd_setup "$@" ;;
+  rm|del)    shift; cmd_rm "$@" ;;
+  help|-h|--help) usage ;;
+  *) err "未知命令：$1"; usage; exit 1 ;;
+esac
