@@ -14,9 +14,9 @@ cd ~/Desktop/code/blog
 ./blog setup
 ```
 
-这个命令会连接 GitHub 仓库、构建一次、提交并推送。过程中会提示你确认覆盖远程分支——**确认即可**，旧的 Hexo 网页已经完整备份在 `.hexo-backup/` 目录里。
+这个命令会连接 GitHub 仓库、构建一次、提交并推送。过程中会提示你确认覆盖远程分支——**确认即可**：旧网页已备份在本地 `.hexo-backup/` 目录，脚本还会自动在远程建一个 `legacy-hexo-site` 分支做第二份备份。
 
-推送完成后，还剩最后一步（GitHub 网站上的操作）：
+推送完成后，脚本会自动检查并切换 GitHub Pages 的构建方式（需要本机 `gh` 已登录，已登录就全自动）。如果提示切换失败，手动做一次即可：
 
 1. 打开 https://github.com/231220075/231220075.github.io/settings/pages
 2. 找到 **Build and deployment → Source**
@@ -25,7 +25,7 @@ cd ~/Desktop/code/blog
 
 完成后网站会在 1 分钟内自动上线。以后每次 `./blog publish`，GitHub 都会自动重新构建部署，你不用再管。
 
-> ⚠️ 切换 Source 的瞬间旧网站会短暂不可访问，等第一次自动部署完成就恢复。
+> ⚠️ 从「Deploy from a branch」切到「GitHub Actions」的瞬间，旧网站会短暂不可访问，等第一次自动部署完成（约 1 分钟）就恢复。这是唯一一次需要动 GitHub 设置。
 
 ---
 
@@ -198,10 +198,14 @@ nav: [
 
 | 现象 | 原因与处理 |
 | --- | --- |
-| `./blog publish` 推送失败 | 检查网络；确认已登录 GitHub（SSH key 或 token） |
+| `./blog publish` 推送失败，提示历史不一致 | 脚本会自动检测并询问是否覆盖远程分支；确认后它会先备份再覆盖，无需手敲 git 命令 |
+| `./blog publish` 提示没有权限 | 检查网络；确认已登录 GitHub（`gh auth status`，或配置 SSH key / token） |
+| 推送卡住不动 | 首次推送要上传全部图片（十几 MB），慢是正常的，脚本会显示进度，别按 Ctrl+C |
 | 本地预览看不到新内容 | 按 `Ctrl+C` 退出后重新运行 `./blog dev` |
 | 网页样式错乱 | 强制刷新：`Cmd + Shift + R` |
 | 推送后网站没更新 | 打开 https://github.com/231220075/231220075.github.io/actions 看构建日志 |
+| 网站打开是 404 | GitHub Pages 的 Source 不是 GitHub Actions，见本文第一节 |
+| 想找回旧的 Hexo 版网页 | 本地 `.hexo-backup/`，或 GitHub 上的 `legacy-hexo-site` 分支 |
 | 想撤销一次发布 | `git log --oneline` 找到上一次的提交号，`git revert <提交号>` 后 `./blog publish` |
 
 ---

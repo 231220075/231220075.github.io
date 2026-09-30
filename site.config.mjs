@@ -79,6 +79,15 @@ export default {
     mapping: 'pathname',
   },
 
+  // ---------- 旧地址跳转（选填） ----------
+  // 迁移前的旧链接如果被人收藏过，可以在这里写「旧地址」:「新地址」，
+  // 构建时会自动生成一个跳转页，用户访问旧地址会自动跳到新地址。
+  legacyRedirects: {
+    '/archives/page/2/': '/archives/',
+    '/search.xml': '/search.json',
+    '/sitemap.txt': '/sitemap.xml',
+  },
+
   // ---------- 页脚 ----------
   footer: {
     since: 2025,

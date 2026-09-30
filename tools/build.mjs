@@ -53,9 +53,15 @@ function link(u) {
   return String(u).split('/').map((seg) => encodeURIComponent(seg)).join('/')
 }
 
-/** 标签 / 分类的目录名（去掉路径分隔符，避免生成嵌套目录） */
+/** 标签 / 分类的目录名（去掉路径分隔符与空格，避免生成嵌套目录）
+ *  空格换成连字符：GitHub Pages → GitHub-Pages（与旧站 Hexo 的 URL 保持一致） */
 function termSlug(name) {
-  return String(name).replace(/[/\\:*?"<>|]/g, '-').trim() || 'unknown'
+  return String(name)
+    .replace(/[/\\:*?"<>|]/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .trim() || 'unknown'
 }
 
 function termUrl(kind, name) {
@@ -569,7 +575,7 @@ function buildArchives(posts) {
     </div>
     ${years.map((y) => `<section class="archive-year">
       <div class="archive-year-head">
-        <span class="year">${y}</span>
+        <span class="year"><a href="/archives/${y}/">${y}</a></span>
         <span class="count">${byYear.get(y).length} 篇</span>
         <span class="line"></span>
       </div>
@@ -586,6 +592,94 @@ function buildArchives(posts) {
 </div>`
 
   write('archives/index.html', renderShell({ title: '归档', url: '/archives/', content }))
+
+  /* 年 / 月归档子页，沿用旧站的 URL 规则：/archives/2025/、/archives/2025/08/ */
+  const listHtml = (list) => `<ul class="archive-list">
+        ${list.map((p) => `<li class="archive-item">
+          <a href="${link(p.url)}">
+            <span class="date">${pad(p.date.getMonth() + 1)}-${pad(p.date.getDate())}</span>
+            <span class="name">${escapeHtml(p.title)}</span>
+          </a>
+        </li>`).join('\n')}
+      </ul>`
+
+  for (const y of years) {
+    const yPosts = byYear.get(y)
+    const byMonth = new Map()
+    yPosts.forEach((p) => {
+      const m = p.date.getMonth() + 1
+      if (!byMonth.has(m)) byMonth.set(m, [])
+      byMonth.get(m).push(p)
+    })
+    const months = [...byMonth.keys()].sort((a, b) => b - a)
+
+    write(`archives/${y}/index.html`, renderShell({
+      title: `${y} 年归档`,
+      url: `/archives/${y}/`,
+      description: `${y} 年的全部文章`,
+      content: `<div class="container">
+  <div class="page-box">
+    <div class="page-head">
+      <h1>${y} 年归档</h1>
+      <p>共 ${yPosts.length} 篇 · <a href="/archives/">查看全部归档</a></p>
+    </div>
+    ${months.map((m) => `<section class="archive-year">
+      <div class="archive-year-head">
+        <span class="year"><a href="/archives/${y}/${pad(m)}/">${y} 年 ${pad(m)} 月</a></span>
+        <span class="count">${byMonth.get(m).length} 篇</span>
+        <span class="line"></span>
+      </div>
+      ${listHtml(byMonth.get(m))}
+    </section>`).join('\n')}
+  </div>
+</div>`,
+    }))
+
+    for (const m of months) {
+      write(`archives/${y}/${pad(m)}/index.html`, renderShell({
+        title: `${y} 年 ${pad(m)} 月归档`,
+        url: `/archives/${y}/${pad(m)}/`,
+        description: `${y} 年 ${pad(m)} 月的全部文章`,
+        content: `<div class="container">
+  <div class="page-box">
+    <div class="page-head">
+      <h1>${y} 年 ${pad(m)} 月</h1>
+      <p>共 ${byMonth.get(m).length} 篇 · <a href="/archives/${y}/">${y} 年归档</a> · <a href="/archives/">全部归档</a></p>
+    </div>
+    ${listHtml(byMonth.get(m))}
+  </div>
+</div>`,
+      }))
+    }
+  }
+}
+
+/** 旧地址跳转页：把 site.config.mjs 里 legacyRedirects 的每一项生成一个跳转页 */
+function buildLegacyRedirects() {
+  const map = config.legacyRedirects || {}
+  let n = 0
+  for (const [from, to] of Object.entries(map)) {
+    const clean = String(from).replace(/^\/+|\/+$/g, '')
+    if (!clean) continue
+    const target = link(to)
+    const abs = config.siteUrl.replace(/\/$/, '') + target
+    write(`${clean}/index.html`, `<!DOCTYPE html>
+<html lang="${config.lang || 'zh-CN'}">
+<head>
+<meta charset="utf-8">
+<title>页面已移动</title>
+<link rel="canonical" href="${escapeHtml(abs)}">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url=${escapeHtml(target)}">
+<script>location.replace(${JSON.stringify(target)})</script>
+</head>
+<body>
+<p>这个地址已经变了，正在前往 <a href="${escapeHtml(target)}">${escapeHtml(target)}</a>…</p>
+</body>
+</html>`)
+    n += 1
+  }
+  return n
 }
 
 function buildTermPage(kind, posts, terms) {
@@ -854,6 +948,7 @@ function main() {
   buildHome(posts)
   posts.forEach((p) => buildPost(p, posts))
   buildArchives(posts)
+  buildLegacyRedirects()
   buildTermPage('tags', posts, tags)
   buildTermPage('categories', posts, categories)
   buildStaticPages(pages)

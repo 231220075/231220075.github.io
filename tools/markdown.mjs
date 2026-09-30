@@ -68,6 +68,15 @@ export function parseFrontMatter(raw) {
         listBuffer = []
         continue
       }
+      // 行内数组写法：[a, b, c]（Hexo / YAML 都支持）
+      if (/^\[[\s\S]*\]$/.test(value)) {
+        const inner = value.slice(1, -1).trim()
+        data[key] = inner === ''
+          ? []
+          : inner.split(',').map((s) => s.trim().replace(/^["']|["']$/g, '')).filter((s) => s !== '')
+        key = null
+        continue
+      }
       value = value.replace(/^["']|["']$/g, '')
       if (/^(true|false)$/i.test(value)) data[key] = value.toLowerCase() === 'true'
       else if (/^-?\d+(\.\d+)?$/.test(value)) data[key] = Number(value)
