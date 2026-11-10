@@ -1,4 +1,6 @@
-/* Summer Flower — small commands, readable posts. */
+import { readDirectory, resolveFile, completePath, unquote } from './filesystem.mjs'
+
+/* Summer Flower — read-only blog shell. */
 (function () {
   'use strict'
   var SITE = window.__SITE__ || {}
@@ -40,7 +42,7 @@
     })
     document.querySelectorAll('.nav-link').forEach(function (a) {
       var href = a.getAttribute('href')
-      var active = href === '/' ? location.pathname === '/' || /^\/page\//.test(location.pathname) : location.pathname.startsWith(href)
+      var active = href === '/' ? location.pathname === '/' : location.pathname.startsWith(href)
       if (active) { a.classList.add('active'); a.setAttribute('aria-current', 'page') }
     })
   }
@@ -48,34 +50,56 @@
   function initTerminal() {
     var form = document.querySelector('.command-form')
     if (!form) return
+    var terminal = form.closest('.terminal')
     var input = form.querySelector('input')
-    var output = document.querySelector('.command-output')
+    var output = terminal.querySelector('.command-output')
+    var directories = SITE.directories || []
+    var cwd = terminal.dataset.cwd || '/'
     var history = [], cursor = 0, pending = '', revision = 0, indexPromise
     var routes = {
-      ls: '/', posts: '/', home: '/', archive: '/archives/', archives: '/archives/',
-      tags: '/tags/', categories: '/categories/', whoami: '/about/', about: '/about/',
-      links: '/links/', rss: '/atom.xml', github: SITE.github, email: 'mailto:' + SITE.email
+      home: '/', archive: '/archives/', archives: '/archives/', tags: '/tags/',
+      categories: '/categories/', whoami: '/about/', about: '/about/', proj: '/proj/',
+      links: '/links/', github: SITE.github, email: 'mailto:' + SITE.email
     }
     var commands = [
-      ['help', '全部功能'], ['ls', '最新文章'], ['archive', '归档'], ['tags', '标签'],
-      ['categories', '分类'], ['whoami', '关于'], ['links', '友链'],
-      ['search <关键词>', '搜索全文'], ['open <标题>', '打开文章'],
-      ['rss', '订阅'], ['github', '代码'], ['email', '联系'],
-      ['theme [dark|light|auto]', '切换主题'], ['clear', '清空输出']
+      ['ls [目录]', '分类 / 文章'], ['cd <目录>', '进入；.. 返回'], ['pwd', '当前目录'],
+      ['open <文件 / 标题>', '文章'], ['proj', '项目'], ['search <关键词>', '搜索全文'],
+      ['archive', '归档'], ['tags', '标签'], ['categories', '分类'], ['whoami', '关于'],
+      ['links', '友链'], ['github', '代码'], ['email', '联系'],
+      ['theme [dark|light|auto]', '主题'], ['clear', '清空'], ['help', '帮助']
     ]
-    var names = commands.map(function (c) { return c[0].split(' ')[0] }).concat(['posts', 'home', 'about', 'archives'])
-
+    var names = commands.map(function (c) { return c[0].split(' ')[0] }).concat(['posts', 'home', 'about', 'archives', 'cat', 'grep'])
+    function hasRoute(name) { return Object.prototype.hasOwnProperty.call(routes, name) }
+    function quote(value) { return JSON.stringify(value) }
     function show(html, command) {
       output.hidden = false
       output.innerHTML = (command ? '<p class="command-echo">$ ' + escapeHtml(command) + '</p>' : '') + html
     }
     function clear() { revision++; output.hidden = true; output.replaceChildren() }
+    function setDirectory(pathname) {
+      cwd = pathname
+      terminal.querySelector('[data-prompt-path]').textContent = cwd === '/' ? '~' : '~' + cwd
+      terminal.querySelector('[data-current-path]').textContent = cwd === '/' ? '~/' : '~' + cwd + '/'
+    }
+    function list(target, command, changeDirectory) {
+      try {
+        var result = readDirectory(directories, cwd, target)
+        if (changeDirectory) setDirectory(result.path)
+        var parent = result.path === '/' ? '' : '<a class="file-entry parent-entry" href="/categories/" data-command="cd /"><span class="pixel-folder" aria-hidden="true"></span><span>../</span></a>'
+        show('<div class="file-list' + (result.path === '/' ? ' directory-list' : '') + '">' + parent + result.entries.map(function (entry) {
+          if (entry.type === 'directory') {
+            return '<a class="file-entry directory-entry" href="' + escapeHtml(entry.url) + '" data-command="' + escapeHtml('cd ' + quote('/' + entry.name)) + '"><span class="pixel-folder" aria-hidden="true"></span><span>' + escapeHtml(entry.name) + '/</span><span class="entry-meta">' + entry.files.length + '</span></a>'
+          }
+          return '<a class="file-entry post-entry" href="' + escapeHtml(entry.url) + '" title="' + escapeHtml(entry.title) + '"><span class="pixel-file" aria-hidden="true"></span><span>' + escapeHtml(entry.name) + '</span><time class="entry-meta">' + escapeHtml(entry.date) + '</time></a>'
+        }).join('') + (result.entries.length ? '' : '<p>空目录。</p>') + '</div>', command)
+      } catch (e) { show('<p>' + escapeHtml(e.message) + '</p>', command) }
+    }
     function help() {
       show('<div class="help-list">' + commands.map(function (c) {
         var name = c[0].split(' ')[0]
-        if (routes[name]) return '<a href="' + escapeHtml(routes[name]) + '">' + escapeHtml(c[0]) + '<span>' + c[1] + '</span></a>'
+        if (hasRoute(name)) return '<a href="' + escapeHtml(routes[name]) + '">' + escapeHtml(c[0]) + '<span>' + c[1] + '</span></a>'
         return '<button type="button" class="help-command" data-command="' + escapeHtml(c[0]) + '">' + escapeHtml(c[0]) + '<span>' + c[1] + '</span></button>'
-      }).join('') + '</div><p class="shortcut-note">/ 或 ⌘/Ctrl K 聚焦 · ↑ ↓ 历史 · Tab 补全 · Esc 清空</p>', 'help')
+      }).join('') + '</div><p class="shortcut-note">/ · ⌘/Ctrl K 聚焦 · ↑ ↓ 历史 · Tab 补全 · Esc 清空</p>', 'help')
     }
     function loadIndex() {
       if (!indexPromise) indexPromise = fetch(SITE.searchPath || '/search.json').then(function (r) {
@@ -92,7 +116,9 @@
       }).join('')
     }
     async function find(query, open, command, token) {
-      if (!query) { show('<p>' + (open ? 'open &lt;标题&gt;' : 'search &lt;关键词&gt;') + '</p>', command); return }
+      if (!query) { show('<p>' + (open ? 'open &lt;文件 / 标题&gt;' : 'search &lt;关键词&gt;') + '</p>', command); return }
+      var file = open && resolveFile(directories, cwd, query)
+      if (file) { location.assign(file.url); return }
       show('<p>搜索中…</p>', command)
       try {
         var index = await loadIndex()
@@ -114,7 +140,7 @@
           var excerpt = item.excerpt || item.content.slice(0, 100)
           return '<a class="search-result" href="' + escapeHtml(item.url) + '"><div class="r-title">' + highlight(item.title, query) + '</div><div class="r-excerpt">' + highlight(excerpt, query) + '</div></a>'
         }).join(''), command)
-      } catch (e) { if (token === revision) show('<p>索引加载失败，请重试。</p>', command) }
+      } catch (e) { if (token === revision) show('<p>索引加载失败。</p>', command) }
     }
     function execute(raw) {
       var command = raw.trim()
@@ -122,31 +148,36 @@
       var token = ++revision
       history.push(command); cursor = history.length; pending = ''; input.value = ''
       var parts = command.match(/^(\S+)(?:\s+([\s\S]*))?$/)
-      var name = parts[1].toLowerCase(), arg = (parts[2] || '').trim()
+      var name = parts[1].toLowerCase(), arg = unquote(parts[2] || '')
       if (name === 'clear') { clear(); return }
       if (name === 'help') { help(); return }
-      if (routes[name]) { location.assign(routes[name]); return }
+      if (name === 'ls') { list(arg, command, false); return }
+      if (name === 'cd' || name === 'posts') { list(name === 'posts' ? '/' : arg || '/', command, true); return }
+      if (name === 'pwd') { show('<p>' + escapeHtml(cwd) + '</p>', command); return }
+      if (hasRoute(name)) { location.assign(routes[name]); return }
       if (name === 'search' || name === 'grep' || name === 'open' || name === 'cat') {
         find(arg, name === 'open' || name === 'cat', command, token); return
       }
       if (name === 'theme') {
         if (arg && !['dark', 'light', 'auto'].includes(arg)) { show('<p>theme [dark|light|auto]</p>', command); return }
         var mode = arg || (document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')
-        applyTheme(mode, true); show('<p>theme: ' + mode + '</p>', command); return
+        applyTheme(mode, true); show('<p>' + mode + '</p>', command); return
       }
-      show('<p>未知命令。输入 <button class="text-btn accent" data-command="help">help</button>。</p>', command)
+      show('<p>未知命令。<button class="text-btn accent" data-command="help">help</button></p>', command)
     }
     form.addEventListener('submit', function (e) { e.preventDefault(); execute(input.value) })
     document.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-command]')
       if (!btn) return
+      e.preventDefault()
       var command = btn.dataset.command
-      form.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+      form.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
       if (command.includes('<') || command.includes('[')) {
         input.value = command.split(' ')[0] + ' '; input.focus()
       } else { execute(command); input.focus() }
     })
     input.addEventListener('keydown', function (e) {
+      if (e.isComposing) return
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault()
         if (cursor === history.length) pending = input.value
@@ -154,9 +185,10 @@
         input.value = cursor === history.length ? pending : history[cursor]
         requestAnimationFrame(function () { input.setSelectionRange(input.value.length, input.value.length) })
       }
-      if (e.key === 'Tab' && input.value && !input.value.includes(' ')) {
-        var matches = names.filter(function (name) { return name.startsWith(input.value.toLowerCase()) })
-        if (matches.length === 1) { e.preventDefault(); input.value = matches[0] + ' ' }
+      if (e.key === 'Tab' && input.value) {
+        var match = /^(ls|cd|open|cat)\s+([\s\S]*)$/.exec(input.value)
+        var matches = match ? completePath(directories, cwd, match[2], match[1] === 'cd').map(function (path) { return match[1] + ' ' + quote(path) }) : names.filter(function (name) { return name.startsWith(input.value.toLowerCase()) }).map(function (name) { return name + ' ' })
+        if (matches.length === 1) { e.preventDefault(); input.value = matches[0] }
       }
       if (e.key === 'Escape') { input.value = ''; clear(); input.blur() }
     })
@@ -164,9 +196,10 @@
       var active = document.activeElement
       var typing = active && (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName))
       if ((e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
-        e.preventDefault(); input.focus(); form.scrollIntoView({ block: 'center' })
+        e.preventDefault(); input.focus(); form.scrollIntoView({ block: 'nearest' })
       }
     })
+    try { setDirectory(readDirectory(directories, '/', cwd).path) } catch { setDirectory('/') }
   }
 
   /* ---------- 阅读进度 ---------- */

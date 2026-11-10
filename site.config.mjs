@@ -6,9 +6,8 @@
 export default {
   // ---------- 基本信息 ----------
   title: 'Summer Flower',
-  subtitle: '代码、系统与日常。',
   description:
-    'forever 的个人博客，记录代码、系统与日常。',
+    'forever 的文章与项目。',
   keywords: ['博客', '技术', '计算机', '摄影', 'forever', 'Summer Flower'],
   author: 'forever',
   email: '231220075@smail.nju.edu.cn',
@@ -21,19 +20,32 @@ export default {
   basePath: '',
 
   // ---------- 外观 ----------
-  avatar: '/photos/avatar.jpg',
-  favicon: '/img/favicon.ico',
-  /** 首页每页文章数 */
-  postsPerPage: 8,
+  favicon: '/img/terminal.svg',
   /** 主题色（用于页面高亮、按钮） */
   accent: '#a3e08c',
 
   // ---------- 导航 ----------
   // 次要入口通过 help 访问。
   nav: [
-    { name: './posts', url: '/' },
-    { name: './archive', url: '/archives/' },
-    { name: './about', url: '/about/' },
+    { name: 'proj', url: '/proj/' },
+  ],
+
+  projects: [
+    {
+      name: 'edge-orchestrator',
+      url: 'https://github.com/231220075/edge-orchestrator',
+      description: 'Rust 分布式任务编排。libp2p 组网、Raft 节点管理、CAS 工作区分发与虚拟机执行。',
+    },
+    {
+      name: 'git',
+      url: 'https://github.com/231220075/git',
+      description: '与同伴用 Rust 实现轻量 Git，包含对象存储、索引、提交与分支操作。',
+    },
+    {
+      name: 'mega',
+      url: 'https://github.com/gitmono-dev/mega',
+      description: 'Rust Git 兼容 monorepo。参与 Tag、Diff、提交历史和在线编辑等功能。',
+    },
   ],
 
   // ---------- 功能开关 ----------
