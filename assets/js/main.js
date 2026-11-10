@@ -74,6 +74,7 @@ import { readDirectory, resolveFile, completePath, unquote } from './filesystem.
     function show(html, command) {
       output.hidden = false
       output.innerHTML = (command ? '<p class="command-echo">$ ' + escapeHtml(command) + '</p>' : '') + html
+      output.scrollTop = 0
     }
     function clear() { revision++; output.hidden = true; output.replaceChildren() }
     function setDirectory(pathname) {

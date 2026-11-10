@@ -149,7 +149,10 @@ function renderTerminal({ home = false, cwd = '/' } = {}) {
     <input id="command-input" class="command-input" name="command" placeholder="help" aria-label="输入命令，help 查看帮助" spellcheck="false" autocapitalize="off" autocorrect="off">
     <button class="command-run" type="submit" aria-label="执行命令">↵</button>
   </form>
+  <div class="terminal-workspace">
   <div class="command-output" role="region" aria-label="命令输出" aria-live="polite"${home ? '' : ' hidden'}>${home ? `<p class="command-echo">$ ls</p><div class="file-list directory-list">${folders || '<p>空目录。</p>'}</div>` : ''}</div>
+  ${home ? '<aside class="pixel-garden" aria-hidden="true"><div class="pixel-garden-art"></div></aside>' : ''}
+  </div>
   <div class="terminal-status"><span data-current-path>${escapeHtml(cwd === '/' ? '~/' : '~' + cwd + '/')}</span><span>${new Set(directories.flatMap(dir => dir.files.map(file => file.url))).size} posts</span></div>
 </section>`
 }
@@ -318,11 +321,20 @@ function buildHome() {
   write('index.html', renderShell({ title: '', bodyClass: 'is-home', url: '/', content: '' }))
 }
 
+function projectArt(name) {
+  const shapes = {
+    'edge-orchestrator': '<path d="M44 24h8v32h-8zM16 40h64v8H16z"/><path d="M32 4h32v24H32zM4 44h24v28H4zm64 0h24v28H68z"/>',
+    git: '<path d="M24 12h8v52h-8zm8 20h32v8H32zm24-20h8v20h-8z"/><path d="M16 4h24v16H16zm32 0h24v16H48zM16 60h24v16H16z"/>',
+    mega: '<path d="M44 20h8v20h-8zM12 36h72v8H12zm0 8h8v16h-8zm32 0h8v16h-8zm32 0h8v16h-8z"/><path d="M32 0h32v24H32zM4 56h24v24H4zm32 0h24v24H36zm32 0h24v24H68z"/>',
+  }
+  return `<svg viewBox="0 0 96 80" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true">${shapes[name] || shapes.git}</svg>`
+}
+
 function buildProjects() {
   write('proj/index.html', renderShell({
     title: 'proj', url: '/proj/',
     content: `<div class="container"><section class="page-box projects"><div class="page-head"><h1>proj/</h1></div>
-    ${config.projects.map(project => `<article class="project"><h2><a href="${escapeHtml(project.url)}" target="_blank" rel="noopener">${escapeHtml(project.name)} <span aria-hidden="true">↗</span></a></h2><p>${escapeHtml(project.description)}</p></article>`).join('')}
+    <div class="project-grid">${config.projects.map(project => `<article class="project"><div class="project-visual" aria-hidden="true">${projectArt(project.name)}</div><h2>${escapeHtml(project.name)}</h2><p>${escapeHtml(project.description)}</p><a class="project-repo" href="${escapeHtml(project.url)}" target="_blank" rel="noopener">${escapeHtml(project.url.replace('https://github.com/', ''))} <span aria-hidden="true">↗</span></a></article>`).join('')}</div>
     </section></div>`,
   }))
 }
@@ -345,6 +357,7 @@ function buildPost(post, posts) {
     : '<span class="placeholder"></span>'
 
   const related = config.features.relatedPosts ? relatedPosts(post, posts) : ''
+  const toc = config.features.toc ? renderToc(post.headings) : ''
 
   const article = `<article class="article">
   <header class="article-header">
@@ -364,9 +377,9 @@ function buildPost(post, posts) {
 </article>`
 
   const content = `<div class="container">
-  <div class="post-layout">
+  <div class="post-layout${toc ? '' : ' no-toc'}">
     ${article}
-    ${config.features.toc ? renderToc(post.headings) : ''}
+    ${toc}
   </div>
   ${related}
   ${post.comments ? giscusBlock() : ''}

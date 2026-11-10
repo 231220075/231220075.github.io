@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 352" shape-rendering="crispEdges">
+  <g fill="#000">
+    <path opacity=".16" d="M16 24h8v8h-8zm208 24h8v8h-8zM40 80h4v4h-4zm168 72h8v8h-8zM24 192h8v8h-8zm200 64h4v4h-4zM8 320h240v4H8z"/>
+    <path opacity=".28" d="M120 24h16v16h-16zM76 44h16v16H76zm88 0h16v16h-16zM56 84h16v16H56zm128 0h16v16h-16zM76 124h16v16H76zm88 0h16v16h-16zm-44 20h16v16h-16z"/>
+    <path fill-rule="evenodd" d="M112 48h32v16h16v16h16v32h-16v16h-16v16h-32v-16H96v-16H80V80h16V64h16zM112 80h32v32h-32z"/>
+    <path opacity=".4" d="M112 80h32v32h-32z"/>
+    <path d="M120 144h16v112h-16zM88 176h16v16h16v16h-32v-16H72v-32h16zM152 208h16v-16h16v-32h-16v16h-16v16h-16v32h16z"/>
+    <path opacity=".45" d="M68 248h120v16H68zm8 16h104v32H76zm16 32h72v16H92z"/>
+    <path d="M100 272h8v8h8v8h-8v8h-8v-8h8v-8h-8zm28 16h20v8h-20z"/>
+    <path opacity=".3" d="M40 312h16v8H40zm160 0h16v8h-16zM56 288h8v8h-8zm136 0h8v8h-8z"/>
+  </g>
+</svg>
