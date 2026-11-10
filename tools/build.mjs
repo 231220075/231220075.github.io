@@ -13,7 +13,8 @@ import { renderMarkdown, parseFrontMatter, extractText, escapeHtml } from './mar
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const OUT = path.join(ROOT, 'public')
+const DEST = path.join(ROOT, 'public')
+const OUT = path.join(ROOT, `.blog-build-${process.pid}`)
 
 /* ================================================================== */
 /* 工具                                                                */
@@ -42,10 +43,6 @@ function fmtDate(d, style) {
   if (style === 'iso') return `${y}-${mo}-${da}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}+08:00`
   if (style === 'short') return `${mo}-${da}`
   return `${y}-${mo}-${da}`
-}
-
-function encodePath(p) {
-  return p.split('/').map((seg) => encodeURIComponent(seg)).join('/')
 }
 
 /** 生成可安全放进 href 的地址（中文/空格/特殊字符会被编码） */
@@ -82,7 +79,7 @@ function copyDir(src, dest) {
     const s = path.join(src, entry.name)
     const d = path.join(dest, entry.name)
     if (entry.isDirectory()) copyDir(s, d)
-    else fs.copyFileSync(s, d)
+    else fs.writeFileSync(d, fs.readFileSync(s))
   }
 }
 
@@ -107,39 +104,11 @@ const S = (d, extra) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${extra || ''}>${d}</svg>`
 
 const ICONS = {
-  home: S('<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/>'),
-  compass: S('<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>'),
-  music: S('<path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/>'),
-  film: S('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h18M3 15h18"/>'),
-  camera: S('<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.4"/>'),
-  gamepad: S('<rect x="2.5" y="7" width="19" height="10" rx="4"/><path d="M7.5 10.5v3M6 12h3M15.5 11.5h.01M17.5 13.5h.01"/>'),
-  robot: S('<rect x="4" y="8" width="16" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9.5 16h5"/>'),
-  archive: S('<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><path d="M10 12h4"/>'),
-  folder: S('<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
-  tag: S('<path d="M20.6 13.4 12 22l-9-9 8.6-8.6a2 2 0 0 1 1.4-.6H19a2 2 0 0 1 2 2v7.2a2 2 0 0 1-.4 1.4z"/><circle cx="16.5" cy="7.5" r="1.2"/>'),
-  link: S('<path d="M10.5 13.5a3.5 3.5 0 0 0 5 0l3-3a3.54 3.54 0 0 0-5-5l-1 1"/><path d="M13.5 10.5a3.5 3.5 0 0 0-5 0l-3 3a3.54 3.54 0 0 0 5 5l1-1"/>'),
-  message: S('<path d="M20 15a3 3 0 0 1-3 3H8l-5 3V6a3 3 0 0 1 3-3h11a3 3 0 0 1 3 3z"/><path d="M8 9h8M8 13h5"/>'),
-  user: S('<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>'),
-  search: S('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>'),
-  sun: S('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>'),
-  moon: S('<path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>'),
-  monitor: S('<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/>'),
+  book: S('<path d="M4 5h16v15H4zM8 5v15"/>'),
   arrowUp: S('<path d="M12 19V5M6 11l6-6 6 6"/>'),
-  calendar: S('<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/>'),
-  clock: S('<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>'),
-  book: S('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 3v18"/>'),
-  github: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.37-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.4 9.4 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.03 10.03 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>',
-  mail: S('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>'),
-  rss: S('<path d="M5 19h.01"/><path d="M5 12a7 7 0 0 1 7 7"/><path d="M5 5a14 14 0 0 1 14 14"/>'),
-  x: S('<path d="M18 6 6 18M6 6l12 12"/>'),
-  menu: S('<path d="M4 7h16M4 12h16M4 17h16"/>'),
-  arrowRight: S('<path d="M5 12h14M13 6l6 6-6 6"/>'),
-  chevronDown: S('<path d="m6 9 6 6 6-6"/>'),
-  list: S('<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>'),
-  eye: S('<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>'),
-  sparkles: S('<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.4 6.4l2.8 2.8M14.8 14.8l2.8 2.8M17.6 6.4l-2.8 2.8M9.2 14.8l-2.8 2.8"/>'),
-  heart: S('<path d="M12 20s-7-4.5-7-9.5A3.9 3.9 0 0 1 12 7.6 3.9 3.9 0 0 1 19 10.5c0 5-7 9.5-7 9.5z"/>'),
-  globe: S('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/>'),
+  folder: S('<path d="M3 7h6l2 2h10v11H3z"/>'),
+  tag: S('<path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="7" cy="7" r="1"/>'),
+  message: S('<path d="M3 4h18v14H8l-5 3z"/>'),
 }
 
 const icon = (name) => ICONS[name] || ICONS.book
@@ -150,75 +119,50 @@ const icon = (name) => ICONS[name] || ICONS.book
 
 const accentCss = `:root{--accent:${config.accent};}`
 
-const themeBoot = `(function(){try{var m=localStorage.getItem('sf-theme')||'auto';var d=m==='dark'||(m==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();`
+const themeBoot = `(function(){try{var m=localStorage.getItem('sf-theme')||'dark';var d=m==='dark'||(m==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();`
 
 function siteScript() {
   return `window.__SITE__=${JSON.stringify({
     features: config.features,
     searchPath: '/search.json',
+    github: config.github,
+    email: config.email,
   })};`
-}
-
-function renderNav(current) {
-  const items = config.nav.map((item) => {
-    if (item.children && item.children.length) {
-      const sub = item.children.map((c) =>
-        `<a href="${c.url}">${icon(c.icon)}<span>${escapeHtml(c.name)}</span></a>`).join('')
-      return `<div class="nav-item">
-  <a class="nav-link" href="${item.children[0].url}">${icon(item.icon)}<span>${escapeHtml(item.name)}</span>${icon('chevronDown')}</a>
-  <div class="nav-dropdown">${sub}</div>
-</div>`
-    }
-    return `<div class="nav-item">
-  <a class="nav-link" href="${item.url}">${icon(item.icon)}<span>${escapeHtml(item.name)}</span></a>
-</div>`
-  }).join('\n')
-
-  return `<nav class="nav" id="site-nav">
-${items}
-</nav>`
 }
 
 function renderHeader() {
   return `<header class="site-header">
   <div class="header-inner">
-    <a class="brand" href="/">
-      <img src="${config.avatar}" alt="${escapeHtml(config.author)}">
-      <span class="brand-name">${escapeHtml(config.title)}</span>
-    </a>
-    ${renderNav()}
+    <a class="brand" href="/" aria-label="${escapeHtml(config.title)} 首页"><span class="brand-prompt">&gt;_</span> <span>summer<span class="brand-slash">/</span>flower</span></a>
+    <nav class="nav" aria-label="主导航">${config.nav.map((item) => `<a class="nav-link" href="${item.url}">${escapeHtml(item.name)}</a>`).join('')}</nav>
     <div class="header-actions">
-      ${config.features.search ? `<button class="icon-btn" type="button" data-search-open aria-label="搜索">${icon('search')}</button>` : ''}
-      ${config.features.darkMode ? `<button class="icon-btn" type="button" data-theme-toggle aria-label="切换主题">
-        <span class="ico-auto">${icon('monitor')}</span>
-        <span class="ico-sun" style="display:none">${icon('sun')}</span>
-        <span class="ico-moon" style="display:none">${icon('moon')}</span>
-      </button>` : ''}
-      <button class="icon-btn menu-toggle" type="button" data-menu-toggle aria-label="菜单" aria-expanded="false">${icon('menu')}</button>
+      <button type="button" class="text-btn" data-command="help">help</button>
+      ${config.features.darkMode ? '<button class="text-btn theme-toggle" type="button" data-theme-toggle aria-label="切换主题">light</button>' : ''}
     </div>
   </div>
 </header>`
 }
 
+function renderTerminal() {
+  return `<section class="terminal" aria-label="博客命令行">
+  <form class="command-form" autocomplete="off">
+    <label class="prompt" for="command-input"><span class="prompt-user">${escapeHtml(config.author)}</span><span class="prompt-path">:~</span> $</label>
+    <input id="command-input" class="command-input" name="command" placeholder="help" aria-label="输入命令，help 查看帮助" spellcheck="false" autocapitalize="off" autocorrect="off">
+    <button class="command-run" type="submit" aria-label="执行命令">↵</button>
+  </form>
+  <div class="command-output" role="region" aria-label="命令输出" aria-live="polite" hidden></div>
+  <noscript><p class="terminal-noscript"><a href="/help/">help → 全部功能</a></p></noscript>
+</section>`
+}
+
 function renderFooter() {
   const year = new Date().getFullYear()
   const since = config.footer.since
-  const range = year > since ? `${since}–${year}` : String(year)
-  return `<footer class="site-footer">
-  <div class="footer-inner">
-    <div>© ${range} ${escapeHtml(config.author)} · Powered by 自建静态站点</div>
-    <div class="footer-links">
-      <a href="/archives/">归档</a>
-      <a href="/tags/">标签</a>
-      <a href="/categories/">分类</a>
-      <a href="/sitemap/">网站地图</a>
-      <a href="/atom.xml">RSS</a>
-      <a href="${config.github}" target="_blank" rel="noopener">GitHub</a>
-      <a href="mailto:${config.email}">Email</a>
-    </div>
-    ${config.footer.icp ? `<div>${escapeHtml(config.footer.icp)}</div>` : ''}
-  </div>
-</footer>`
+  return `<footer class="site-footer"><div class="footer-inner">
+    <span>© ${since}${year > since ? `–${year}` : ''} ${escapeHtml(config.author)}</span>
+    <div class="footer-links"><a href="/atom.xml">rss</a><a href="${config.github}" target="_blank" rel="noopener">github ↗</a><a href="mailto:${config.email}">email ↗</a></div>
+    ${config.footer.icp ? `<span>${escapeHtml(config.footer.icp)}</span>` : ''}
+  </div></footer>`
 }
 
 function renderShell({ title, description, url, content, bodyClass, extraHead }) {
@@ -227,7 +171,7 @@ function renderShell({ title, description, url, content, bodyClass, extraHead })
   const canonical = absUrl(url)
 
   return `<!DOCTYPE html>
-<html lang="${config.lang}" data-theme="light">
+<html lang="${config.lang}" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -235,7 +179,7 @@ function renderShell({ title, description, url, content, bodyClass, extraHead })
 <meta name="description" content="${escapeHtml(desc)}">
 <meta name="author" content="${escapeHtml(config.author)}">
 <meta name="keywords" content="${escapeHtml((config.keywords || []).join(','))}">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#111413">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="${escapeHtml(title || config.title)}">
@@ -245,8 +189,6 @@ function renderShell({ title, description, url, content, bodyClass, extraHead })
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="${config.favicon}">
-<link rel="apple-touch-icon" href="${config.avatar}">
-<link rel="manifest" href="/manifest.json">
 <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="${escapeHtml(config.title)}">
 <link rel="stylesheet" href="/css/style.css">
 <style>${accentCss}</style>
@@ -259,6 +201,7 @@ ${extraHead || ''}
 <div class="progress-bar"></div>
 ${renderHeader()}
 <main class="site-main" id="main">
+${bodyClass === 'is-home' ? '' : `<div class="container">${renderTerminal()}</div>`}
 ${content}
 </main>
 ${renderFooter()}
@@ -267,18 +210,7 @@ ${renderFooter()}
   <button class="lightbox-close" type="button" aria-label="关闭">✕</button>
   <img src="" alt="">
 </div>
-${config.features.search ? `<div class="search-mask">
-  <div class="search-panel">
-    <div class="search-input-wrap">
-      ${icon('search')}
-      <input class="search-input" type="search" placeholder="搜索文章…" aria-label="搜索">
-      <span class="search-kbd">Esc</span>
-    </div>
-    <div class="search-results"></div>
-  </div>
-</div>` : ''}
 <script src="/js/main.js" defer></script>
-<script src="/js/pwa-install.js" defer></script>
 </body>
 </html>`
 }
@@ -296,6 +228,7 @@ function loadPosts() {
       const raw = fs.readFileSync(path.join(dir, file), 'utf8')
       const stat = fs.statSync(path.join(dir, file))
       const { data, content } = parseFrontMatter(raw)
+      if (data.draft === true) return null
       const slug = file.replace(/\.md$/, '')
       const date = toDate(data.date, stat.mtime)
       const { html, headings } = renderMarkdown(content)
@@ -319,6 +252,7 @@ function loadPosts() {
         url: `/${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())}/${slug}/`,
       }
     })
+    .filter(Boolean)
     .sort((a, b) => b.date - a.date)
 }
 
@@ -350,23 +284,15 @@ function loadPages() {
 /* ================================================================== */
 
 function postCard(post) {
-  const cover = post.cover
-    ? `<div class="post-card-cover"><img src="${post.cover}" alt="${escapeHtml(post.title)}" loading="lazy"></div>`
-    : ''
-  const tags = post.tags.slice(0, 3).map((t) =>
-    `<a class="tag-chip" href="${link(termUrl('tags', t))}">${escapeHtml(t)}</a>`).join('')
-
+  const tags = post.tags.slice(0, 2).map((t) => `<a class="post-tag" href="${link(termUrl('tags', t))}">#${escapeHtml(t)}</a>`).join(' ')
   return `<article class="post-card">
+  <time class="post-date" datetime="${fmtDate(post.date)}">${fmtDate(post.date)}</time>
   <div class="post-card-body">
     <h3 class="post-card-title"><a href="${link(post.url)}">${escapeHtml(post.title)}</a></h3>
     <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
-    <div class="post-card-meta">
-      <span class="meta-item">${icon('calendar')}${fmtDate(post.date)}</span>
-      <span class="meta-item">${icon('clock')}${post.minutes} 分钟</span>
-      ${tags ? `<span class="tag-chips">${tags}</span>` : ''}
-    </div>
+    <div class="post-card-meta">${tags}<span>${post.minutes} min read</span></div>
   </div>
-  ${cover}
+  <a class="post-arrow" href="${link(post.url)}" aria-label="阅读 ${escapeHtml(post.title)}">↗</a>
 </article>`
 }
 
@@ -398,7 +324,7 @@ function renderToc(headings) {
   const list = (headings || []).filter((h) => h.level >= 2 && h.level <= 4)
   if (!list.length) return ''
   return `<aside class="toc" aria-label="目录">
-  <p class="toc-title">目录</p>
+  <p class="toc-title"># 目录</p>
   <ol>
     ${list.map((h) => `<li class="lvl-${h.level}"><a href="#${h.id}">${escapeHtml(h.text)}</a></li>`).join('\n')}
   </ol>
@@ -431,36 +357,29 @@ function buildHome(posts) {
   for (let page = 1; page <= totalPages; page++) {
     const slice = posts.slice((page - 1) * perPage, page * perPage)
     const hero = page === 1 ? `<section class="hero">
-    <img class="hero-avatar" src="${config.avatar}" alt="${escapeHtml(config.author)}">
-    <div class="hero-text">
-      <h1 class="hero-title">${escapeHtml(config.title)}</h1>
-      <p class="hero-sub">${escapeHtml(config.subtitle)}</p>
-      <div class="hero-meta">
-        <a href="${config.github}" target="_blank" rel="noopener">${icon('github')} GitHub</a>
-        <a href="mailto:${config.email}">${icon('mail')} 邮箱</a>
-        <a href="/atom.xml">${icon('rss')} RSS</a>
-        <span>${icon('book')} ${posts.length} 篇文章</span>
-      </div>
-    </div>
+    <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> ${escapeHtml(config.author)} / personal log</p>
+    <h1 class="hero-title">${escapeHtml(config.title)}<span class="accent">.</span></h1>
+    <p class="hero-sub">${escapeHtml(config.subtitle)}</p>
+    <div class="hero-note"><span>// 保持好奇，持续记录。</span><a href="/about/">whoami ↗</a></div>
   </section>` : ''
 
     const content = `<div class="container">
   ${hero}
+  ${renderTerminal()}
   <div class="section-head">
-    <h2>${page === 1 ? '最新文章' : `第 ${page} 页`}</h2>
-    <span class="count">共 ${posts.length} 篇</span>
-    <span class="line"></span>
+    <h2><span class="muted">$</span> ls ./posts</h2>
+    <span class="count">${posts.length} entries${page > 1 ? ` / page ${page}` : ''}</span>
   </div>
-  <div class="post-list">
-    ${slice.map(postCard).join('\n')}
-  </div>
+  <div class="post-list">${slice.length ? slice.map(postCard).join('\n') : '<p class="empty-state">暂无文章。</p>'}</div>
   ${pagination(page, totalPages, '/')}
+  <a class="archive-link" href="/archives/">查看全部归档 <span>→</span></a>
 </div>`
 
     const file = page === 1 ? 'index.html' : `page/${page}/index.html`
     const url = page === 1 ? '/' : `/page/${page}/`
     write(file, renderShell({
       title: page === 1 ? '' : `第 ${page} 页`,
+      bodyClass: 'is-home',
       url,
       content,
     }))
@@ -488,11 +407,12 @@ function buildPost(post, posts) {
 
   const article = `<article class="article">
   <header class="article-header">
+    <a class="back-link" href="/">← posts</a>
     <h1 class="article-title">${escapeHtml(post.title)}</h1>
     <div class="article-meta">
       <span class="meta-item">${icon('calendar')}${fmtDate(post.date)}</span>
-      ${fmtDate(post.updated) !== fmtDate(post.date) ? `<span class="meta-item">${icon('clock')}更新于 ${fmtDate(post.updated)}</span>` : ''}
-      <span class="meta-item">${icon('book')}${post.minutes} 分钟阅读</span>
+      ${fmtDate(post.updated) !== fmtDate(post.date) ? `<span class="meta-item">${icon('clock')}updated ${fmtDate(post.updated)}</span>` : ''}
+      <span class="meta-item">${icon('book')}${post.minutes} min read</span>
     </div>
     ${tags || cats ? `<div class="article-tags tag-chips">${cats}${tags}</div>` : ''}
   </header>
@@ -557,21 +477,12 @@ function buildArchives(posts) {
   })
   const years = [...byYear.keys()].sort((a, b) => b - a)
 
-  const tagCount = new Set(posts.flatMap((p) => p.tags)).size
-  const catCount = new Set(posts.flatMap((p) => p.categories)).size
-  const totalMinutes = posts.reduce((s, p) => s + p.minutes, 0)
-
   const content = `<div class="container">
   <div class="page-box">
     <div class="page-head">
-      <h1>归档</h1>
-      <p>按时间倒序浏览全部文章</p>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="num">${posts.length}</div><div class="label">篇文章</div></div>
-      <div class="stat-card"><div class="num">${catCount}</div><div class="label">个分类</div></div>
-      <div class="stat-card"><div class="num">${tagCount}</div><div class="label">个标签</div></div>
-      <div class="stat-card"><div class="num">${totalMinutes}</div><div class="label">分钟阅读量</div></div>
+      <p class="eyebrow">$ ls -R ./posts</p>
+      <h1>归档<span class="accent">.</span></h1>
+      <p>${posts.length} entries · 按时间排序</p>
     </div>
     ${years.map((y) => `<section class="archive-year">
       <div class="archive-year-head">
@@ -736,7 +647,7 @@ function collectTerms(posts, key) {
 }
 
 function buildStaticPages(pages) {
-  const SKIP = new Set(['archives'])
+  const SKIP = new Set(['archives', 'sitemap'])
   pages.forEach((page) => {
     if (SKIP.has(page.slug)) return
     const toc = config.features.toc ? renderToc(page.headings) : ''
@@ -766,31 +677,25 @@ function buildStaticPages(pages) {
   })
 }
 
-/** 留言板（全站留言集中在一个 Discussion 里） */
-function buildComments() {
-  const g = config.giscus || {}
-  if (!g.enable) return
-  write('comments/index.html', renderShell({
-    title: '留言板',
-    url: '/comments/',
-    description: '欢迎在这里留言',
-    content: `<div class="container">
-  <div class="page-box">
-    <div class="page-head">
-      <h1>留言板</h1>
-      <p>用 GitHub 账号登录后即可留言</p>
-    </div>
-    <section class="comments" style="margin-top:0;border:0;padding:0">
-      <div class="giscus-wrap" data-giscus
-        data-repo="${g.repo}"
-        data-repo-id="${g.repoId}"
-        data-category="${g.category}"
-        data-category-id="${g.categoryId}"
-        data-mapping="specific"
-        data-term="留言板"></div>
-    </section>
-  </div>
-</div>`,
+function buildHelp() {
+  write('help/index.html', renderShell({
+    title: 'help', url: '/help/',
+    content: `<div class="container page-box"><div class="page-head"><h1>help<span class="accent">.</span></h1><p>在命令框输入，或点击链接。</p></div>
+    <div class="help-list">
+      <a href="/">ls / posts <span>最新文章</span></a>
+      <a href="/archives/">archive <span>全部归档</span></a>
+      <a href="/tags/">tags <span>标签</span></a>
+      <a href="/categories/">categories <span>分类</span></a>
+      <a href="/about/">whoami / about <span>关于</span></a>
+      <a href="/links/">links <span>友链</span></a>
+      <a href="/atom.xml">rss <span>订阅</span></a>
+      <a href="${config.github}">github <span>代码</span></a>
+      <a href="mailto:${config.email}">email <span>联系</span></a>
+      <p>search &lt;关键词&gt; <span>搜索全文</span></p>
+      <p>open &lt;标题&gt; <span>打开文章</span></p>
+      <p>theme [dark|light|auto] <span>切换主题</span></p>
+      <p>clear <span>清空输出</span></p>
+    </div><p class="shortcut-note">/ 或 ⌘/Ctrl K 聚焦 · ↑ ↓ 历史 · Tab 补全 · Esc 清空</p></div>`,
   }))
 }
 
@@ -801,8 +706,8 @@ function build404() {
     content: `<div class="container">
   <div class="err-wrap">
     <div class="err-code">404</div>
-    <h1>这个页面好像走丢了</h1>
-    <p>你访问的地址不存在，或者已经被移动过。</p>
+    <h1>command not found</h1>
+    <p>页面不存在。输入 help 查看入口。</p>
     <p>
       <a class="btn" href="/">${icon('home')} 回到首页</a>
       <a class="btn ghost" href="/archives/">${icon('archive')} 看看归档</a>
@@ -834,7 +739,7 @@ function buildFeed(posts) {
   <link href="${absUrl('/atom.xml')}" rel="self"/>
   <link href="${absUrl('/')}"/>
   <id>${absUrl('/')}</id>
-  <updated>${fmtDate(posts[0] ? posts[0].updated : new Date(), 'iso')}</updated>
+  <updated>${fmtDate(posts.length ? new Date(Math.max(...posts.map((p) => p.updated.getTime()))) : new Date(), 'iso')}</updated>
   <author><name>${escapeHtml(config.author)}</name></author>
 ${items}
 </feed>
@@ -849,7 +754,8 @@ function buildSitemap(posts, pages) {
     { url: '/categories/', date: new Date(), priority: '0.6' },
     { url: '/tags/', date: new Date(), priority: '0.6' },
     ...posts.map((p) => ({ url: p.url, date: p.updated, priority: '0.9' })),
-    ...pages.map((p) => ({ url: p.url, date: p.date, priority: '0.5' })),
+    { url: '/help/', date: new Date(), priority: '0.5' },
+    ...pages.filter((p) => !['archives', 'sitemap'].includes(p.slug)).map((p) => ({ url: p.url, date: p.date, priority: '0.5' })),
   ]
 
   write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
@@ -878,9 +784,9 @@ function buildSearchIndex(posts, pages) {
       date: fmtDate(p.date),
       excerpt: p.excerpt,
       tags: p.tags,
-      content: p.plain.slice(0, 3000),
+      content: p.plain,
     })),
-    ...pages.map((p) => ({
+    ...pages.filter((p) => !['archives', 'sitemap'].includes(p.slug)).map((p) => ({
       title: p.title,
       url: link(p.url),
       date: fmtDate(p.date),
@@ -901,6 +807,7 @@ function copyAssets() {
   copyDir(path.join(ROOT, 'assets', 'js'), path.join(OUT, 'js'))
   copyDir(path.join(ROOT, 'assets', 'img'), path.join(OUT, 'img'))
   copyDir(path.join(ROOT, 'assets', 'photos'), path.join(OUT, 'photos'))
+  // Retain media referenced by existing posts, without the gallery page.
   copyDir(path.join(ROOT, 'assets', 'photos-gallery'), path.join(OUT, 'photos-gallery'))
   copyDir(path.join(ROOT, 'static'), OUT)
 
@@ -928,8 +835,8 @@ function removeDir(dir) {
 }
 
 function clean() {
-  if (path.basename(OUT) !== 'public' || !OUT.startsWith(ROOT)) {
-    throw new Error('拒绝清理非 public 目录：' + OUT)
+  if (path.dirname(OUT) !== ROOT || path.basename(OUT) !== `.blog-build-${process.pid}`) {
+    throw new Error('拒绝清理未知目录：' + OUT)
   }
   removeDir(OUT)
 }
@@ -952,7 +859,7 @@ function main() {
   buildTermPage('tags', posts, tags)
   buildTermPage('categories', posts, categories)
   buildStaticPages(pages)
-  buildComments()
+  buildHelp()
   build404()
   buildFeed(posts)
   buildSitemap(posts, pages)
@@ -968,9 +875,18 @@ function main() {
     return n
   }
 
-  console.log(`✅ 构建完成 ${Date.now() - t0}ms`)
-  console.log(`   文章 ${posts.length} 篇 · 页面 ${pages.length} 个 · 标签 ${tags.length} 个 · 分类 ${categories.length} 个`)
-  console.log(`   产物 ${count(OUT)} 个文件 → public/`)
+  const fileCount = count(OUT)
+  const backup = path.join(ROOT, `.blog-build-previous-${process.pid}`)
+  // Keep the last successful site available until every output is ready.
+  if (fs.existsSync(DEST)) fs.renameSync(DEST, backup)
+  try {
+    fs.renameSync(OUT, DEST)
+  } catch (error) {
+    if (fs.existsSync(backup)) fs.renameSync(backup, DEST)
+    throw error
+  }
+  removeDir(backup)
+  console.log(`built ${posts.length} posts · ${fileCount} files · ${Date.now() - t0}ms → public/`)
 }
 
-main()
+try { main() } finally { clean() }

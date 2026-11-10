@@ -43,7 +43,6 @@ let clients = []
 
 function broadcast() {
   clients.forEach((res) => { try { res.write('data: reload\n\n') } catch (e) {} })
-  clients = []
 }
 
 function safeJoin(base, target) {
@@ -134,30 +133,46 @@ function runBuild() {
   })
 }
 
-const WATCH = ['content', 'assets', 'static', 'site.config.mjs']
+const WATCH = ['content', 'assets', 'static', 'tools', 'site.config.mjs']
 let timer = null
 
 function watchAll() {
-  const handler = (event, filename) => {
-    if (filename && filename.includes('.DS_Store')) return
+  function snapshot() {
+    const files = []
+    function visit(file) {
+      if (/\.DS_Store$|\.tmp$/.test(file)) return
+      const stat = fs.statSync(file)
+      if (stat.isDirectory()) {
+        for (const name of fs.readdirSync(file).sort()) visit(path.join(file, name))
+      } else files.push(`${file}:${stat.size}:${stat.mtimeMs}`)
+    }
+    for (const target of WATCH) {
+      const file = path.join(ROOT, target)
+      if (fs.existsSync(file)) visit(file)
+    }
+    return files.join('\n')
+  }
+  let previous = snapshot()
+  const handler = () => {
     clearTimeout(timer)
     timer = setTimeout(() => {
-      console.log(`\n🔄 检测到改动，重新构建…`)
-      runBuild()
+      try {
+        const next = snapshot()
+        if (next === previous) return
+        previous = next
+        console.log('rebuilding…')
+        runBuild()
+      } catch (error) { console.error(`watch: ${error.message}`) }
     }, 250)
   }
   for (const target of WATCH) {
-    const p = path.join(ROOT, target)
-    if (!fs.existsSync(p)) continue
-    try { fs.watch(p, { recursive: true }, handler) } catch (e) { fs.watch(p, handler) }
+    const file = path.join(ROOT, target)
+    if (!fs.existsSync(file)) continue
+    try { fs.watch(file, { recursive: true }, handler) } catch { fs.watch(file, handler) }
   }
 }
 
-server.listen(PORT, () => {
-  console.log('')
-  console.log(`  🚀 本地预览已启动：http://localhost:${PORT}`)
-  console.log('  ✍️  修改 content/ 里的文章会自动重新构建并刷新页面')
-  console.log('  ⏹  按 Ctrl+C 停止')
-  console.log('')
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`preview http://127.0.0.1:${PORT} · Ctrl+C 停止`)
   watchAll()
 })

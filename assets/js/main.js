@@ -1,85 +1,171 @@
-/* ==========================================================================
-   Summer Flower —— 前端交互（无任何第三方依赖）
-   ========================================================================== */
+/* Summer Flower — small commands, readable posts. */
 (function () {
   'use strict'
-
   var SITE = window.__SITE__ || {}
   var FEATURES = SITE.features || {}
 
-  /* ---------- 主题切换 ---------- */
-  function initTheme() {
-    var KEY = 'sf-theme'
-    var root = document.documentElement
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    })
+  }
+
+  function applyTheme(mode, persist) {
+    if (!['dark', 'light', 'auto'].includes(mode)) mode = 'dark'
+    var actual = mode === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode
+    document.documentElement.dataset.theme = actual
     var btn = document.querySelector('[data-theme-toggle]')
-    if (!btn) return
-
-    var ICONS = { auto: '.ico-auto', light: '.ico-sun', dark: '.ico-moon' }
-    var LABELS = { auto: '跟随系统', light: '亮色模式', dark: '暗色模式' }
-
-    function apply(mode) {
-      if (!ICONS[mode]) mode = 'auto'
-      var theme = mode === 'auto'
-        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : mode
-
-      root.setAttribute('data-theme', theme)
-      var meta = document.querySelector('meta[name="theme-color"]')
-      if (meta) meta.setAttribute('content', theme === 'dark' ? '#0e1015' : '#ffffff')
-
-      btn.setAttribute('data-mode', mode)
-      btn.setAttribute('aria-label', LABELS[mode])
-      btn.setAttribute('title', LABELS[mode])
-
-      Object.keys(ICONS).forEach(function (key) {
-        var el = btn.querySelector(ICONS[key])
-        if (el) el.style.display = key === mode ? '' : 'none'
-      })
+    if (btn) {
+      btn.dataset.mode = mode
+      btn.textContent = actual === 'dark' ? 'light' : 'dark'
+      btn.setAttribute('aria-label', actual === 'dark' ? '切换亮色' : '切换暗色')
     }
-
-    var saved = 'auto'
-    try { saved = localStorage.getItem(KEY) || 'auto' } catch (e) {}
-    apply(saved)
-
-    btn.addEventListener('click', function () {
-      var order = ['auto', 'light', 'dark']
-      var cur = btn.getAttribute('data-mode') || 'auto'
-      var next = order[(order.indexOf(cur) + 1) % order.length]
-      try { localStorage.setItem(KEY, next) } catch (e) {}
-      apply(next)
-      if (window.__syncGiscus) window.__syncGiscus()
-    })
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-      if ((btn.getAttribute('data-mode') || 'auto') === 'auto') apply('auto')
-    })
+    var meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) meta.content = actual === 'dark' ? '#111413' : '#f5f6f0'
+    if (persist) { try { localStorage.setItem('sf-theme', mode) } catch (e) {} }
+    if (window.__syncGiscus) window.__syncGiscus()
+    return mode
   }
 
-  /* ---------- 移动端菜单 ---------- */
-  function initMenu() {
-    var toggle = document.querySelector('[data-menu-toggle]')
-    var nav = document.querySelector('.nav')
-    if (!toggle || !nav) return
-    toggle.addEventListener('click', function (e) {
-      e.stopPropagation()
-      var open = nav.classList.toggle('open')
-      toggle.setAttribute('aria-expanded', String(open))
+  function initTheme() {
+    var saved = 'dark'
+    try { saved = localStorage.getItem('sf-theme') || 'dark' } catch (e) {}
+    applyTheme(saved)
+    var btn = document.querySelector('[data-theme-toggle]')
+    if (btn) btn.addEventListener('click', function () {
+      applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true)
     })
-    document.addEventListener('click', function (e) {
-      if (!nav.contains(e.target) && !toggle.contains(e.target)) nav.classList.remove('open')
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      if (btn && btn.dataset.mode === 'auto') applyTheme('auto')
     })
-    nav.addEventListener('click', function (e) {
-      if (e.target.tagName === 'A') nav.classList.remove('open')
-    })
-  }
-
-  /* ---------- 导航高亮 ---------- */
-  function initNavActive() {
-    var path = location.pathname
-    document.querySelectorAll('.nav-link, .nav-dropdown a').forEach(function (a) {
+    document.querySelectorAll('.nav-link').forEach(function (a) {
       var href = a.getAttribute('href')
-      if (!href) return
-      if (href === '/' ? path === '/' : path.indexOf(href) === 0) a.classList.add('active')
+      var active = href === '/' ? location.pathname === '/' || /^\/page\//.test(location.pathname) : location.pathname.startsWith(href)
+      if (active) { a.classList.add('active'); a.setAttribute('aria-current', 'page') }
+    })
+  }
+
+  function initTerminal() {
+    var form = document.querySelector('.command-form')
+    if (!form) return
+    var input = form.querySelector('input')
+    var output = document.querySelector('.command-output')
+    var history = [], cursor = 0, pending = '', revision = 0, indexPromise
+    var routes = {
+      ls: '/', posts: '/', home: '/', archive: '/archives/', archives: '/archives/',
+      tags: '/tags/', categories: '/categories/', whoami: '/about/', about: '/about/',
+      links: '/links/', rss: '/atom.xml', github: SITE.github, email: 'mailto:' + SITE.email
+    }
+    var commands = [
+      ['help', '全部功能'], ['ls', '最新文章'], ['archive', '归档'], ['tags', '标签'],
+      ['categories', '分类'], ['whoami', '关于'], ['links', '友链'],
+      ['search <关键词>', '搜索全文'], ['open <标题>', '打开文章'],
+      ['rss', '订阅'], ['github', '代码'], ['email', '联系'],
+      ['theme [dark|light|auto]', '切换主题'], ['clear', '清空输出']
+    ]
+    var names = commands.map(function (c) { return c[0].split(' ')[0] }).concat(['posts', 'home', 'about', 'archives'])
+
+    function show(html, command) {
+      output.hidden = false
+      output.innerHTML = (command ? '<p class="command-echo">$ ' + escapeHtml(command) + '</p>' : '') + html
+    }
+    function clear() { revision++; output.hidden = true; output.replaceChildren() }
+    function help() {
+      show('<div class="help-list">' + commands.map(function (c) {
+        var name = c[0].split(' ')[0]
+        if (routes[name]) return '<a href="' + escapeHtml(routes[name]) + '">' + escapeHtml(c[0]) + '<span>' + c[1] + '</span></a>'
+        return '<button type="button" class="help-command" data-command="' + escapeHtml(c[0]) + '">' + escapeHtml(c[0]) + '<span>' + c[1] + '</span></button>'
+      }).join('') + '</div><p class="shortcut-note">/ 或 ⌘/Ctrl K 聚焦 · ↑ ↓ 历史 · Tab 补全 · Esc 清空</p>', 'help')
+    }
+    function loadIndex() {
+      if (!indexPromise) indexPromise = fetch(SITE.searchPath || '/search.json').then(function (r) {
+        if (!r.ok) throw new Error('index')
+        return r.json()
+      }).catch(function (err) { indexPromise = null; throw err })
+      return indexPromise
+    }
+    function highlight(text, query) {
+      var terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+      var pattern = terms.map(function (t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }).join('|')
+      return String(text).split(new RegExp('(' + pattern + ')', 'gi')).map(function (piece) {
+        return terms.includes(piece.toLowerCase()) ? '<mark>' + escapeHtml(piece) + '</mark>' : escapeHtml(piece)
+      }).join('')
+    }
+    async function find(query, open, command, token) {
+      if (!query) { show('<p>' + (open ? 'open &lt;标题&gt;' : 'search &lt;关键词&gt;') + '</p>', command); return }
+      show('<p>搜索中…</p>', command)
+      try {
+        var index = await loadIndex()
+        if (token !== revision) return
+        var terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+        var entries = index.map(function (item) {
+          var title = item.title.toLowerCase()
+          var haystack = [item.title, item.content, (item.tags || []).join(' ')].join(' ').toLowerCase()
+          var score = title === query.toLowerCase() ? 100 : 0
+          terms.forEach(function (term) { if (title.includes(term)) score += 12 })
+          return { item: item, score: score, match: terms.every(function (term) { return (open ? title : haystack).includes(term) }) }
+        }).filter(function (x) { return x.match }).sort(function (a, b) { return b.score - a.score })
+        if (open && entries.length && (entries.length === 1 || entries[0].score >= 100)) {
+          location.assign(entries[0].item.url); return
+        }
+        if (!entries.length) { show('<p>无结果。</p>', command); return }
+        show(entries.slice(0, 20).map(function (x) {
+          var item = x.item
+          var excerpt = item.excerpt || item.content.slice(0, 100)
+          return '<a class="search-result" href="' + escapeHtml(item.url) + '"><div class="r-title">' + highlight(item.title, query) + '</div><div class="r-excerpt">' + highlight(excerpt, query) + '</div></a>'
+        }).join(''), command)
+      } catch (e) { if (token === revision) show('<p>索引加载失败，请重试。</p>', command) }
+    }
+    function execute(raw) {
+      var command = raw.trim()
+      if (!command) return
+      var token = ++revision
+      history.push(command); cursor = history.length; pending = ''; input.value = ''
+      var parts = command.match(/^(\S+)(?:\s+([\s\S]*))?$/)
+      var name = parts[1].toLowerCase(), arg = (parts[2] || '').trim()
+      if (name === 'clear') { clear(); return }
+      if (name === 'help') { help(); return }
+      if (routes[name]) { location.assign(routes[name]); return }
+      if (name === 'search' || name === 'grep' || name === 'open' || name === 'cat') {
+        find(arg, name === 'open' || name === 'cat', command, token); return
+      }
+      if (name === 'theme') {
+        if (arg && !['dark', 'light', 'auto'].includes(arg)) { show('<p>theme [dark|light|auto]</p>', command); return }
+        var mode = arg || (document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')
+        applyTheme(mode, true); show('<p>theme: ' + mode + '</p>', command); return
+      }
+      show('<p>未知命令。输入 <button class="text-btn accent" data-command="help">help</button>。</p>', command)
+    }
+    form.addEventListener('submit', function (e) { e.preventDefault(); execute(input.value) })
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-command]')
+      if (!btn) return
+      var command = btn.dataset.command
+      form.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+      if (command.includes('<') || command.includes('[')) {
+        input.value = command.split(' ')[0] + ' '; input.focus()
+      } else { execute(command); input.focus() }
+    })
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault()
+        if (cursor === history.length) pending = input.value
+        cursor = Math.max(0, Math.min(history.length, cursor + (e.key === 'ArrowUp' ? -1 : 1)))
+        input.value = cursor === history.length ? pending : history[cursor]
+        requestAnimationFrame(function () { input.setSelectionRange(input.value.length, input.value.length) })
+      }
+      if (e.key === 'Tab' && input.value && !input.value.includes(' ')) {
+        var matches = names.filter(function (name) { return name.startsWith(input.value.toLowerCase()) })
+        if (matches.length === 1) { e.preventDefault(); input.value = matches[0] + ' ' }
+      }
+      if (e.key === 'Escape') { input.value = ''; clear(); input.blur() }
+    })
+    document.addEventListener('keydown', function (e) {
+      var active = document.activeElement
+      var typing = active && (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName))
+      if ((e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
+        e.preventDefault(); input.focus(); form.scrollIntoView({ block: 'center' })
+      }
     })
   }
 
@@ -152,7 +238,7 @@
       var text = code.innerText
       var done = function () {
         var old = btn.textContent
-        btn.textContent = '已复制 ✓'
+        btn.textContent = 'copied'
         btn.classList.add('done')
         setTimeout(function () { btn.textContent = old; btn.classList.remove('done') }, 1600)
       }
@@ -175,14 +261,19 @@
     var box = document.querySelector('.lightbox')
     if (!box) return
     var img = box.querySelector('img')
+    var previousFocus
     function open(src, alt) {
+      previousFocus = document.activeElement
       img.src = src
       img.alt = alt || ''
       box.classList.add('show')
+      box.querySelector('button').focus()
       document.body.style.overflow = 'hidden'
     }
     function close() {
+      var wasOpen = box.classList.contains('show')
       box.classList.remove('show')
+      if (wasOpen && previousFocus) previousFocus.focus()
       document.body.style.overflow = ''
     }
     document.addEventListener('click', function (e) {
@@ -192,138 +283,9 @@
         open(target.getAttribute('src'), target.getAttribute('alt'))
       }
     })
+    box.addEventListener('keydown', function (e) { if (e.key === 'Tab') { e.preventDefault(); box.querySelector('button').focus() } })
     box.addEventListener('click', close)
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close() })
-  }
-
-  /* ---------- 本地搜索 ---------- */
-  function initSearch() {
-    if (!FEATURES.search) return
-    var mask = document.querySelector('.search-mask')
-    var input = document.querySelector('.search-input')
-    var results = document.querySelector('.search-results')
-    if (!mask || !input || !results) return
-
-    var index = null
-    var loading = false
-    var cursor = -1
-
-    function load() {
-      if (index || loading) return
-      loading = true
-      fetch(SITE.searchPath || '/search.json')
-        .then(function (r) { return r.json() })
-        .then(function (data) { index = data; loading = false; if (input.value) search(input.value) })
-        .catch(function () { loading = false; results.innerHTML = '<div class="search-empty">搜索索引加载失败</div>' })
-    }
-
-    function open() {
-      mask.classList.add('show')
-      document.body.style.overflow = 'hidden'
-      input.focus()
-      input.select()
-      load()
-    }
-    function close() {
-      mask.classList.remove('show')
-      document.body.style.overflow = ''
-      cursor = -1
-    }
-
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"]/g, function (c) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]
-      })
-    }
-
-    function highlight(text, terms) {
-      var out = escapeHtml(text)
-      terms.forEach(function (t) {
-        if (!t) return
-        var re = new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi')
-        out = out.replace(re, '<em>$1</em>')
-      })
-      return out
-    }
-
-    function search(query) {
-      var q = query.trim().toLowerCase()
-      cursor = -1
-      if (!q) {
-        results.innerHTML = '<div class="search-empty">输入关键词搜索文章标题与正文</div>'
-        return
-      }
-      if (!index) {
-        results.innerHTML = '<div class="search-empty">正在加载索引…</div>'
-        return
-      }
-      var terms = q.split(/\s+/).filter(Boolean)
-      var scored = []
-      index.forEach(function (item) {
-        var title = (item.title || '').toLowerCase()
-        var content = (item.content || '').toLowerCase()
-        var score = 0
-        terms.forEach(function (t) {
-          if (title.indexOf(t) > -1) score += 12
-          var idx = content.indexOf(t)
-          if (idx > -1) {
-            score += 4
-            var count = content.split(t).length - 1
-            score += Math.min(count, 6)
-          }
-        })
-        if (score > 0) scored.push({ item: item, score: score })
-      })
-      scored.sort(function (a, b) { return b.score - a.score })
-      var list = scored.slice(0, 20)
-
-      if (!list.length) {
-        results.innerHTML = '<div class="search-empty">没有找到与「' + escapeHtml(query) + '」相关的内容</div>'
-        return
-      }
-
-      results.innerHTML = list.map(function (entry) {
-        var item = entry.item
-        var excerpt = item.excerpt || (item.content || '').slice(0, 110)
-        return '<a class="search-result" href="' + item.url + '">' +
-          '<div class="r-title">' + highlight(item.title, terms) + '</div>' +
-          '<div class="r-excerpt">' + highlight(excerpt, terms) + '</div>' +
-          '</a>'
-      }).join('')
-    }
-
-    document.addEventListener('click', function (e) {
-      if (e.target.closest('[data-search-open]')) { e.preventDefault(); open() }
-      if (e.target === mask) close()
-    })
-    input.addEventListener('input', function () { search(input.value) })
-
-    document.addEventListener('keydown', function (e) {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault(); open(); return
-      }
-      if (e.key === '/' && !mask.classList.contains('show') &&
-        !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) {
-        e.preventDefault(); open(); return
-      }
-      if (!mask.classList.contains('show')) return
-      if (e.key === 'Escape') { close(); return }
-      var items = Array.prototype.slice.call(results.querySelectorAll('.search-result'))
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        e.preventDefault()
-        if (!items.length) return
-        cursor += e.key === 'ArrowDown' ? 1 : -1
-        if (cursor < 0) cursor = items.length - 1
-        if (cursor >= items.length) cursor = 0
-        items.forEach(function (el, i) { el.classList.toggle('active', i === cursor) })
-        items[cursor].scrollIntoView({ block: 'nearest' })
-      }
-      if (e.key === 'Enter' && cursor > -1 && items[cursor]) {
-        location.href = items[cursor].getAttribute('href')
-      }
-    })
-
-    results.innerHTML = '<div class="search-empty">输入关键词搜索文章标题与正文</div>'
   }
 
   /* ---------- 评论（Giscus，按需注入并同步主题） ---------- */
@@ -366,7 +328,6 @@
     })
 
     window.__syncGiscus = function () {
-      if (!config) return
       var iframe = document.querySelector('iframe.giscus-frame')
       if (!iframe || !iframe.contentWindow) return
       iframe.contentWindow.postMessage(
@@ -376,33 +337,10 @@
     }
   }
 
-  /* ---------- 新窗口打开外链 ---------- */
-  function initExternalLinks() {
-    document.querySelectorAll('.article-body a[href^="http"]').forEach(function (a) {
-      var sameHost = false
-      try { sameHost = new URL(a.href).hostname === location.hostname } catch (e) {}
-      if (!sameHost) {
-        a.setAttribute('target', '_blank')
-        a.setAttribute('rel', 'noopener noreferrer')
-      }
-    })
-  }
 
-  /* ---------- 启动 ---------- */
   function boot() {
-    initTheme()
-    initMenu()
-    initNavActive()
-    initProgress()
-    initBackTop()
-    initToc()
-    initCopy()
-    initLightbox()
-    initSearch()
-    initGiscus()
-    initExternalLinks()
+    initTheme(); initTerminal(); initProgress(); initBackTop(); initToc(); initCopy(); initLightbox(); initGiscus()
   }
-
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot)
   else boot()
 })()

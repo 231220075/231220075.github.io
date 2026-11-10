@@ -6,9 +6,9 @@
 export default {
   // ---------- 基本信息 ----------
   title: 'Summer Flower',
-  subtitle: 'Let life be beautiful like summer flowers, and death like autumn leaves',
+  subtitle: '代码、系统与日常。',
   description:
-    'this is forever’s blog, and I plan to share some photos and cs learning stories, wish can help you and make your day.',
+    'forever 的个人博客，记录代码、系统与日常。',
   keywords: ['博客', '技术', '计算机', '摄影', 'forever', 'Summer Flower'],
   author: 'forever',
   email: '231220075@smail.nju.edu.cn',
@@ -26,29 +26,14 @@ export default {
   /** 首页每页文章数 */
   postsPerPage: 8,
   /** 主题色（用于页面高亮、按钮） */
-  accent: '#3b82f6',
+  accent: '#a3e08c',
 
   // ---------- 导航 ----------
-  // children 为二级菜单；icon 用内置图标名（见 assets/js/icons.js）
+  // 次要入口通过 help 访问。
   nav: [
-    { name: '首页', url: '/', icon: 'home' },
-    {
-      name: '发现',
-      icon: 'compass',
-      children: [
-        { name: '音乐', url: '/music/', icon: 'music' },
-        { name: '电影', url: '/movies/', icon: 'film' },
-        { name: '相册', url: '/photos-gallery/', icon: 'camera' },
-        { name: '小游戏', url: '/games/', icon: 'gamepad' },
-      ],
-    },
-    { name: 'AI 助手', url: '/browser/', icon: 'robot' },
-    { name: '归档', url: '/archives/', icon: 'archive' },
-    { name: '分类', url: '/categories/', icon: 'folder' },
-    { name: '标签', url: '/tags/', icon: 'tag' },
-    { name: '友链', url: '/links/', icon: 'link' },
-    { name: '留言板', url: '/comments/', icon: 'message' },
-    { name: '关于', url: '/about/', icon: 'user' },
+    { name: './posts', url: '/' },
+    { name: './archive', url: '/archives/' },
+    { name: './about', url: '/about/' },
   ],
 
   // ---------- 功能开关 ----------
@@ -66,7 +51,7 @@ export default {
     /** 阅读进度条 */
     readingProgress: true,
     /** 相关文章推荐 */
-    relatedPosts: true,
+    relatedPosts: false,
   },
 
   /** 评论系统（Giscus，基于 GitHub Discussions） */

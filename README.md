@@ -1,223 +1,116 @@
-# Summer Flower · 博客使用手册
+# Summer Flower
 
-> 网站地址：**https://231220075.github.io**
-> 这是一个纯静态网站，由自己写的生成器构建，**不再依赖 Hexo**，也不需要安装一堆 npm 包。
+forever 的个人博客。Markdown 写作，零依赖 Node.js 构建，GitHub Pages 托管。
 
----
+## 写作
 
-## 一、上线（只需要做一次）
+需要 Node.js 20+。
 
-在终端里执行：
-
-```bash
-cd ~/Desktop/code/blog
-./blog setup
-```
-
-这个命令会连接 GitHub 仓库、构建一次、提交并推送。过程中会提示你确认覆盖远程分支——**确认即可**：旧网页已备份在本地 `.hexo-backup/` 目录，脚本还会自动在远程建一个 `legacy-hexo-site` 分支做第二份备份。
-
-推送完成后，脚本会自动检查并切换 GitHub Pages 的构建方式（需要本机 `gh` 已登录，已登录就全自动）。如果提示切换失败，手动做一次即可：
-
-1. 打开 https://github.com/231220075/231220075.github.io/settings/pages
-2. 找到 **Build and deployment → Source**
-3. 选择 **GitHub Actions**（不要选 "Deploy from a branch"）
-4. 保存
-
-完成后网站会在 1 分钟内自动上线。以后每次 `./blog publish`，GitHub 都会自动重新构建部署，你不用再管。
-
-> ⚠️ 从「Deploy from a branch」切到「GitHub Actions」的瞬间，旧网站会短暂不可访问，等第一次自动部署完成（约 1 分钟）就恢复。这是唯一一次需要动 GitHub 设置。
-
----
-
-## 二、日常写作：三个命令就够了
-
-打开「终端」，进入博客目录：
-
-```bash
-cd ~/Desktop/code/blog
-```
-
-### 1. 写一篇新文章
-
-```bash
-./blog new "我的新文章标题"
-```
-
-会在 `content/posts/` 里生成一个 `.md` 文件，用任何编辑器打开写就行。
-推荐 [Typora](https://typora.io)（所见即所得）或 VS Code（免费）。
-
-### 2. 本地看效果
-
-```bash
+```sh
+./blog new "Rust 笔记" --tags Rust,Git --edit
+./blog edit "Rust 笔记"
 ./blog dev
+./blog publish "post: Rust 笔记"
 ```
 
-浏览器打开 http://localhost:4000 。
-**改文章保存后网页会自动刷新**，看够了按 `Ctrl + C` 退出。
+`new` 生成最小文章模板，无交互确认。`edit` 支持标题、文件名、路径或唯一关键词；保存有变化时自动记录 `updated`。使用 `VISUAL` / `EDITOR` 指定编辑器，例如 `export EDITOR="code --wait"`；macOS 未设置时使用默认应用并等待编辑结束。
 
-### 3. 发布上线
+在其他编辑器里改好文章后：
 
-```bash
+```sh
+./blog update "Rust 笔记"
+```
+
+只更新 `updated`，保留原 `date`、文件名和文章 URL。时间采用执行环境的本地时区。
+
+```sh
+./blog new "还没写完" --draft
+./blog list
+./blog update "还没写完" --no-draft
 ./blog publish
 ```
 
-自动完成「构建 → 提交 → 推送」，等 1 分钟左右网站就更新了。
+草稿不进入页面、搜索、归档、RSS 或 sitemap；本地预览同样隐藏草稿。`--no-draft` 表示准备发布，实际推送仍需 `publish`。
 
----
+## 命令
 
-## 三、其它命令
+运行 `./blog help` 查看全部选项。
 
 | 命令 | 作用 |
 | --- | --- |
-| `./blog status` | 看看有没有还没发布的改动 |
-| `./blog build` | 只构建，不发布（产物在 `public/`） |
-| `./blog rm "文章标题"` | 删除文章（会先备份到 `.trash/`） |
-| `./blog clean` | 清空构建产物 |
-| `./blog setup` | 首次连接 GitHub 仓库（只跑一次） |
-| `./blog help` | 查看帮助 |
+| `new "标题"` | 新建；支持 `--tags`、`--category`、`--description`、`--slug`、`--draft`、`--edit` |
+| `edit "标题或文件名"` | 编辑并自动更新时间 |
+| `update "标题或文件名"` | 记录更新时间；支持 `--edit`、`--draft`、`--no-draft` |
+| `list [关键词]` | 查找文章，包含草稿 |
+| `dev [端口]` | 本地预览，默认 <http://localhost:4000>，保存后自动刷新 |
+| `build` | 生成到 `public/` |
+| `publish ["说明"]` | 构建、提交当前仓库改动、正常推送到 origin |
+| `status` | 查看 Git 改动 |
+| `rm "标题或文件名"` | 移到 `.trash/` |
+| `clean` | 清空构建产物 |
+| `setup` | 首次配置 origin，不推送 |
 
+`publish` 沿用 GitHub Actions 部署；仅推送到 `main` 会触发当前部署工作流。推送冲突时停止并保留 Git 错误。脚本不覆盖远程历史。
+
+## 文章格式
+
+```yaml
 ---
-
-## 四、目录结构
-
-```
-blog/
-├── blog                    ← 你用的命令入口
-├── site.config.mjs         ← 网站配置（站名、导航、社交链接…）
-├── content/
-│   ├── posts/              ← 所有文章（Markdown）
-│   └── pages/              ← 固定页面：关于、友链、音乐、游戏…
-├── assets/
-│   ├── css/style.css       ← 主题样式
-│   ├── js/main.js          ← 主题交互
-│   ├── photos/             ← 图片（文章配图、头像）
-│   ├── img/
-│   └── photos-gallery/     ← 相册大图
-├── static/                 ← 原样复制的文件（404 页、manifest…）
-├── tools/
-│   ├── markdown.mjs        ← Markdown 渲染器
-│   ├── build.mjs           ← 站点生成器
-│   └── server.mjs          ← 本地预览服务器
-├── .github/workflows/      ← GitHub 自动部署配置
-└── public/                 ← 构建产物（自动生成，不用管）
-```
-
----
-
-## 五、写文章格式说明
-
-文件开头的一段 `---` 之间叫「front matter」，用来写文章信息：
-
-````markdown
----
-title: 我的新文章标题
-date: 2026-09-30 12:00:00
+title: "Rust 笔记"
+date: 2026-11-10 12:00:00
+updated: 2026-11-10 13:00:00
 tags:
-  - 技术
   - Rust
 categories:
-  - 学习记录
-description: 一句话摘要，会显示在首页列表里
-cover: /photos/avatar.jpg
+  - 技术
+description: 一句话摘要
+draft: false
 ---
-
-正文从这里开始。
-
-## 二级标题
-
-支持 **加粗**、*斜体*、`行内代码`、[链接](https://example.com)。
-
-插入图片：
-
-![](/photos/我的图片.jpg)
-
-插入代码：
-
-```javascript
-console.log('hello')
-```
-````
-
-**可用的字段**（都可以不写）：
-
-| 字段 | 说明 |
-| --- | --- |
-| `title` | 文章标题，不写就用文件名 |
-| `date` | 发布时间，决定排序位置 |
-| `tags` | 标签，一行一个，前面加 `- ` |
-| `categories` | 分类，同上 |
-| `description` | 摘要，显示在首页卡片上 |
-| `cover` | 封面图，显示在首页卡片右侧 |
-| `comments` | 设为 `false` 可关闭该文章的评论区 |
-
-> 文章网址按 `年份/月/日/文件名/` 生成，修改文件名会导致网址变化，**发布后尽量不要改文件名**。
-
----
-
-## 六、常见修改
-
-### 改网站标题 / 副标题 / 导航菜单
-
-编辑 `site.config.mjs`，改完 `./blog publish`。
-
-```js
-title: 'Summer Flower',
-subtitle: '你想要的一句话简介',
-nav: [
-  { name: '首页', url: '/', icon: 'home' },
-  // 增删这里的条目即可调整导航栏
-  // 图标可选：home compass music film camera gamepad robot archive
-  //          folder tag link message user book globe
-],
 ```
 
-### 加图片
+`title`、`date` 由新建命令填写，其余按需使用。正文支持常用 Markdown、代码高亮和复制、图片放大、表格、音视频 HTML。图片放在 `assets/photos/`，引用为 `![](/photos/文件.jpg)`。
 
-1. 把图片放进 `assets/photos/`
-2. 文章里写 `![](/photos/文件名.jpg)`
-3. `./blog publish`
+已发布文章的网址为 `/年份/月/日/文件名/`，避免改动 `date` 和文件名。`updated` 不影响排序和 URL。首页使用纯文本列表，已有 `cover` 字段仍可保留。
 
-### 新增一个固定页面（比如「项目」）
+## 站内终端
 
-1. 复制 `content/pages/about.md` 为 `content/pages/projects.md`
-2. 修改里面的标题和内容
-3. 在 `site.config.mjs` 的 `nav` 里加一行：`{ name: '项目', url: '/projects/', icon: 'book' }`
+主导航保留文章、归档、关于。输入 `help` 或点击顶部 `help` 展开全部功能；无 JavaScript 时可访问 `/help/`。
 
-### 换头像
+- `ls` / `posts`：最新文章
+- `archive`、`tags`、`categories`：归档、标签、分类
+- `whoami` / `about`、`links`：关于、友链
+- `search 关键词`（别名 `grep`）：全文搜索
+- `open 标题`（别名 `cat`）：打开唯一匹配的文章；多条结果可点击选择
+- `rss`、`github`、`email`：订阅与联系
+- `theme dark|light|auto`：主题；默认暗色并记住选择
+- `clear`：清空输出
 
-替换 `assets/photos/avatar.jpg` 即可（文件名保持不变）。
+快捷键：`/` 或 `⌘/Ctrl K` 聚焦，`↑ ↓` 历史，`Tab` 补全唯一命令，`Esc` 清空。
 
-### 改主题配色
+## 结构
 
-编辑 `assets/css/style.css` 最上面的 `:root { --accent: … }`，
-或在 `site.config.mjs` 里改 `accent` 字段。
+```text
+blog                      命令入口
+site.config.mjs           站名、导航、评论与功能开关
+content/posts/            文章
+content/pages/            关于、友链
+assets/css/style.css      终端主题
+assets/js/main.js         命令与阅读交互
+assets/photos/            配图
+static/                   原样复制的资源
+tools/cli.mjs              写作与发布命令
+tools/build.mjs            静态生成器
+tools/markdown.mjs         Markdown 渲染器
+tools/server.mjs           预览与自动刷新
+public/                   构建产物，Git 忽略
+.github/workflows/        GitHub Pages 部署
+```
 
----
+发现、AI 助手、独立娱乐页、留言板、上传页、PWA 安装已移除；保留文章评论、RSS、目录和阅读进度。已有文章与配图保留。
 
-## 七、出问题了怎么办
+## 验证
 
-| 现象 | 原因与处理 |
-| --- | --- |
-| `./blog publish` 推送失败，提示历史不一致 | 脚本会自动检测并询问是否覆盖远程分支；确认后它会先备份再覆盖，无需手敲 git 命令 |
-| `./blog publish` 提示没有权限 | 检查网络；确认已登录 GitHub（`gh auth status`，或配置 SSH key / token） |
-| 推送卡住不动 | 首次推送要上传全部图片（十几 MB），慢是正常的，脚本会显示进度，别按 Ctrl+C |
-| 本地预览看不到新内容 | 按 `Ctrl+C` 退出后重新运行 `./blog dev` |
-| 网页样式错乱 | 强制刷新：`Cmd + Shift + R` |
-| 推送后网站没更新 | 打开 https://github.com/231220075/231220075.github.io/actions 看构建日志 |
-| 网站打开是 404 | GitHub Pages 的 Source 不是 GitHub Actions，见本文第一节 |
-| 想找回旧的 Hexo 版网页 | 本地 `.hexo-backup/`，或 GitHub 上的 `legacy-hexo-site` 分支 |
-| 想撤销一次发布 | `git log --oneline` 找到上一次的提交号，`git revert <提交号>` 后 `./blog publish` |
-
----
-
-## 八、这套方案为什么不依赖 Hexo 了
-
-| 项目 | 以前（Hexo） | 现在 |
-| --- | --- | --- |
-| 依赖 | 30+ 个 npm 包，环境一换就跑不起来 | **零依赖**，只用 Node.js 原生模块 |
-| 构建 | `hexo clean && hexo generate && hexo deploy` | `./blog publish` 一条命令 |
-| 部署 | 本地构建后推送 `public/` | GitHub Actions 云端自动构建部署 |
-| 改样式 | 要改主题的 pug / styl 文件 | 只改 `assets/css/style.css` |
-| 外部资源 | FontAwesome、APlayer、Fancybox 等 CDN | 全部本地化，无 CDN 依赖 |
-
-只要 Node.js 还在，这个网站就永远能构建出来。
+```sh
+node --test tools/cli.test.mjs
+./blog build
+```

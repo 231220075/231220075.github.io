@@ -21,3 +21,6 @@ _multiconfig.yml
 
 # ---- 本地工作笔记（不发布到公开仓库）----
 .workbuddy/
+
+# Temporary output for successful-build swaps
+.blog-build-*/

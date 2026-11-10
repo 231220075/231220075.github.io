@@ -45,6 +45,16 @@ export function slugify(text) {
 /* ------------------------------------------------------------------ */
 
 /** 解析 --- 包裹的 YAML 头，只支持常见简单类型 */
+function parseScalar(value) {
+  if (/^".*"$/.test(value)) {
+    try { return JSON.parse(value) } catch { return value.slice(1, -1) }
+  }
+  if (/^'.*'$/.test(value)) return value.slice(1, -1).replace(/''/g, "'")
+  if (/^(true|false)$/i.test(value)) return value.toLowerCase() === 'true'
+  if (/^-?\d+(\.\d+)?$/.test(value)) return Number(value)
+  return value
+}
+
 export function parseFrontMatter(raw) {
   const text = String(raw).replace(/^\uFEFF/, '').replace(/\r\n/g, '\n')
   const match = /^---\n([\s\S]*?)\n---\s*(?:\n|$)/.exec(text)
@@ -73,17 +83,14 @@ export function parseFrontMatter(raw) {
         const inner = value.slice(1, -1).trim()
         data[key] = inner === ''
           ? []
-          : inner.split(',').map((s) => s.trim().replace(/^["']|["']$/g, '')).filter((s) => s !== '')
+          : inner.split(',').map((s) => parseScalar(s.trim())).filter((s) => s !== '')
         key = null
         continue
       }
-      value = value.replace(/^["']|["']$/g, '')
-      if (/^(true|false)$/i.test(value)) data[key] = value.toLowerCase() === 'true'
-      else if (/^-?\d+(\.\d+)?$/.test(value)) data[key] = Number(value)
-      else data[key] = value
+      data[key] = parseScalar(value)
       key = null
     } else if (/^\s*-\s+/.test(line) && listBuffer) {
-      listBuffer.push(line.replace(/^\s*-\s+/, '').trim().replace(/^["']|["']$/g, ''))
+      listBuffer.push(parseScalar(line.replace(/^\s*-\s+/, '').trim()))
     }
   }
   if (listBuffer && key) data[key] = listBuffer
