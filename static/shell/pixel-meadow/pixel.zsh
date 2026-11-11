@@ -1,4 +1,4 @@
-# Pixel Meadow v1 — loaded at the end of ~/.zshrc; interactive zsh only.
+# Meadow v2 — native zsh + maintained upstream tools; no font dependency.
 [[ -o interactive && ${TERM:-dumb} != dumb && ${PIXEL_SHELL_DISABLE:-0} != 1 ]] || return
 
 # Optional overrides survive updates. Set a flag to 1 to disable one module.
@@ -54,15 +54,17 @@ if [[ ${PIXEL_DISABLE_HELPERS:-0} != 1 ]]; then
   mkcd() { (( $# == 1 )) || { print -u2 'usage: mkcd <directory>'; return 2; }; mkdir -p -- "$1" && cd -- "$1"; }
   (( $+commands[eza] )) && {
     alias l='eza --group-directories-first'
-    alias ll='eza -lh --git --group-directories-first --time-style=long-iso'
-    alias la='eza -lah --git --group-directories-first --time-style=long-iso'
+    alias ll='eza -lh --group-directories-first --time-style=long-iso'
+    alias la='eza -lah --group-directories-first --time-style=long-iso'
     alias lt='eza --tree --level=2 --group-directories-first'
   }
   (( $+commands[bat] )) && alias c='bat --theme=ansi --paging=auto --style=numbers,changes,header'
   (( $+commands[dust] )) && alias usage='dust -d 2 -r'
   (( $+commands[duf] )) && alias disks='duf --only local --theme ansi'
   (( $+commands[btop] )) && alias monitor='btop --config "$HOME/.config/pixel-shell/btop.conf"'
-  (( $+commands[fastfetch] )) && alias sysinfo='fastfetch --config "$HOME/.config/pixel-shell/fastfetch.jsonc"'
+  (( $+commands[fastfetch] )) && alias sysinfo='fastfetch --config "$HOME/.config/pixel-shell/fastfetch.jsonc" --structure os:host:kernel:uptime:shell:terminal:cpu:gpu:memory:swap:disk:battery'
+  # Full status is an explicit request; the prompt and ordinary listings stay fast.
+  alias gs='git status --short --branch --untracked-files=no --ignore-submodules=all'
 fi
 
 # [fzf] Safe shell integration provided by upstream; previews treat names as data.
@@ -95,10 +97,16 @@ if [[ ${PIXEL_DISABLE_AUTOSUGGEST:-0} != 1 && -r $_pixel_brew/share/zsh-autosugg
   source "$_pixel_brew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 fi
 
-# [prompt] ASCII symbols work with Monocraft and do not need Nerd Fonts.
+# [prompt] ASCII symbols work with the system monospace font.
 if [[ ${PIXEL_DISABLE_PROMPT:-0} != 1 ]] && (( $+commands[starship] )); then
   export STARSHIP_CONFIG="$PIXEL_SHELL_HOME/starship.toml"
   eval "$(starship init zsh)"
+fi
+
+# [banner] Fastfetch chooses a small logo for the current OS. No network modules.
+# Login shells with a real output terminal only; scripts and regular subshells stay quiet.
+if [[ ${PIXEL_DISABLE_BANNER:-0} != 1 && -o login && -t 1 ]] && (( $+commands[fastfetch] )); then
+  command fastfetch --config "$PIXEL_SHELL_HOME/fastfetch.jsonc"
 fi
 
 # Always keep syntax highlighting after widgets and other plugin initialization.

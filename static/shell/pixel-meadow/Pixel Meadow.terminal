@@ -1203,7 +1203,7 @@
 	AgEAAAAAAAAAKgAAAAAAAAAAAAAAAAAADcs=
 	</data>
 	<key>BackgroundAlpha</key>
-	<real>1</real>
+	<real>1.0</real>
 	<key>BackgroundColor</key>
 	<data>
 	YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMS
@@ -1360,21 +1360,21 @@
 	<integer>0</integer>
 	<key>Font</key>
 	<data>
-	YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMS
-	AAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGkCwwVFlUkbnVsbNQNDg8QERIT
-	FFZOU1NpemVYTlNmRmxhZ3NWTlNOYW1lViRjbGFzcyNAMAAAAAAAABAQgAKAA1lNb25v
-	Y3JhZnTSFxgZGlokY2xhc3NuYW1lWCRjbGFzc2VzVk5TRm9udKIZG1hOU09iamVjdAgR
-	GiQpMjdJTFFTWF5nbnd+hY6QkpSeo663vsEAAAAAAAABAQAAAAAAAAAcAAAAAAAAAAAA
-	AAAAAAAAyg==
+	YnBsaXN0MDDUAQIDBAUGGBtZJGFyY2hpdmVyWCRvYmplY3RzVCR0b3BYJHZlcnNpb25f
+	EA9OU0tleWVkQXJjaGl2ZXKkBwgRElUkbnVsbNQJCgsMDQ4PEFYkY2xhc3NWTlNOYW1l
+	Vk5TU2l6ZVhOU2ZGbGFnc4ADgAIjQCoAAAAAAAAQEF5TRk1vbm8tUmVndWxhctITFBUW
+	WCRjbGFzc2VzWiRjbGFzc25hbWWiFhdWTlNGb250WE5TT2JqZWN00RkaVHJvb3SAARIA
+	AYagCBEbJCkyRElPWF9mbXZ4eoOFlJmirbC3wMPIygAAAAAAAAEBAAAAAAAAABwAAAAA
+	AAAAAAAAAAAAAADP
 	</data>
 	<key>FontAntialias</key>
-	<false/>
+	<true/>
 	<key>FontWidthSpacing</key>
-	<real>1</real>
+	<real>1.0</real>
 	<key>OptionAsMetaKey</key>
 	<true/>
 	<key>ProfileCurrentVersion</key>
-	<real>2.0899999999999999</real>
+	<real>2.09</real>
 	<key>SelectionColor</key>
 	<data>
 	YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMS

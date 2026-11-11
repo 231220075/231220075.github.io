@@ -3,7 +3,7 @@ add_newline = true
 scan_timeout = 20
 command_timeout = 500
 palette = 'meadow'
-format = '[+](bold leaf) $directory$git_branch$git_status$python$cmd_duration$status$line_break$character'
+format = '$directory$git_branch$python$cmd_duration$status$line_break$character'
 continuation_prompt = '[. . ](muted)'
 
 [palettes.meadow]
@@ -18,7 +18,7 @@ muted = '8'
 style = 'bold water'
 format = '[$path]($style)[$read_only]($read_only_style) '
 truncation_length = 3
-truncate_to_repo = true
+truncate_to_repo = false
 read_only = ' [RO]'
 read_only_style = 'error'
 
@@ -28,18 +28,8 @@ format = '[$symbol$branch]($style) '
 style = 'flower'
 
 [git_status]
-format = '([$all_status$ahead_behind]($style) )'
-style = 'sun'
-conflicted = 'conflict '
-ahead = 'up${count} '
-behind = 'down${count} '
-diverged = 'up${ahead_count}/down${behind_count} '
-untracked = '?${count} '
-stashed = 'stash${count} '
-modified = '!${count} '
-staged = '+${count} '
-renamed = '>${count} '
-deleted = '-${count} '
+# Large repositories must never trigger a worktree scan while drawing a prompt.
+disabled = true
 
 [python]
 symbol = 'py:'

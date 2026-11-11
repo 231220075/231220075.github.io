@@ -1,21 +1,36 @@
-# Pixel Meadow v1
+# Meadow v2
 
-macOS system zsh + Homebrew, with a pixel-style Terminal.app profile.
+Native zsh with Starship, zsh-users plugins, fzf, zoxide and focused CLI tools.
+Uses macOS SF Mono 13 pt with antialiasing. No custom font is installed.
+Historical directory/profile names remain `pixel-shell` / `Pixel Meadow` so
+existing paths and rollback references continue to work.
 
-1. Read `install.py`, `pixel.zsh`, and `rollback.py` before running them.
-2. Run `python3 install.py` to snapshot your current config and add a managed
-   block to `.zshrc`. Existing content is retained. Symlinked entry points
-   are rejected so a dotfile manager can remain in control.
-3. Run `brew bundle --file=Brewfile` to install the tools and Monocraft font.
-4. Open `Pixel Meadow.terminal`, then select it as the default and startup
-   profile in Terminal settings. The installer does not change these settings.
-5. Open a new terminal window and run `pixel-help`.
+The prompt reads the path and Git branch; `git_status` is disabled. Ordinary
+`ll`/`la` listings do not scan Git. Use `gs` for tracked-file status, or
+`git status` for a complete check including new files and submodules.
+Login terminals show Fastfetch's automatically selected small OS logo and
+six local facts. `sysinfo` displays the fuller machine summary on demand.
 
-Runtime files live in `~/.config/pixel-shell/`. Uncomment a disable flag in
-`local.zsh` and open a new window to switch off one module. Edit `starship.toml`
-for the prompt, `btop.conf` for `monitor`, and `fastfetch.jsonc` for `sysinfo`.
-No Nerd Font is required. Monocraft is installed separately from Homebrew;
-the font itself is not distributed in this package. Chinese uses font fallback.
+For a fresh installation, review `pixel.zsh`, then:
+
+```sh
+brew bundle --file=Brewfile
+mkdir -p ~/.config/pixel-shell
+cp pixel.zsh starship.toml fastfetch.jsonc btop.conf help.txt rollback.py Brewfile "Pixel Meadow.terminal" ~/.config/pixel-shell/
+```
+
+Create `~/.config/pixel-shell/local.zsh` from `local.zsh` only if it does not
+already exist. Back up `.zshrc` and append the managed block from the manual
+once. Do not duplicate it on machines which already use v1. Open the included
+`.terminal` profile and select it in Terminal settings. Existing Terminal
+windows can cache the old font; quit and reopen Terminal or reimport the file.
+
+The unused v1 installer and Swift profile generator have been removed.
+The package is simply the files above, an optional local switch template,
+the checksum list and this guide. No setup process runs during shell startup.
+
+Daily guide: `pixel-help`. Edit switches with `pixel-config`, then open a new
+shell. `PIXEL_DISABLE_BANNER=1` switches off the startup logo.
 
 Recovery:
 
@@ -26,23 +41,12 @@ python3 ~/.config/pixel-shell/rollback.py
 python3 ~/.config/pixel-shell/rollback.py --apply
 ```
 
-The rollback preview changes nothing. `--apply` saves the current `.zshrc`
-and removes only the managed block. `--terminal` also restores the original
-default/startup profile pointers if they are still set to Pixel Meadow.
-For Terminal preference changes, quit Terminal first and run the command
-from another command environment, or choose the old profiles in its UI.
-Packages, history, navigation records, and configuration files are retained.
+The rollback script previews by default; `--apply` removes only the managed
+`.zshrc` block, preserving other settings and saving a pre-rollback copy.
+`--terminal` also restores the original default/startup profile pointers if
+still set to Pixel Meadow and the original backup reference exists.
+Packages, history and navigation records are retained. The v2 manual lists
+separate steps for reverting the font and Python/Ruby initialization edits.
 
-If compinit reports insecure directories, use `autoload -Uz compaudit;
-compaudit` to inspect the exact paths. Do not bypass the audit or recursively
-change Homebrew permissions. This installer does not change permissions.
-
-`make-terminal.swift` generates the included profile from declared colors
-and the installed font. To regenerate it on macOS with Swift available:
-
-```sh
-swift make-terminal.swift "Pixel Meadow.terminal"
-```
-
-The full change and rollback manual is published at:
+Full change log, install block, measurements and rollback manual:
 https://231220075.github.io/2026/11/11/macos-zsh-pixel-meadow/

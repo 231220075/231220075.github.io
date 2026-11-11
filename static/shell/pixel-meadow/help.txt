@@ -1,4 +1,4 @@
-PIXEL MEADOW — quick guide
+MEADOW v2 — quick guide (SF Mono 13 pt, no custom font required)
 
 Tab          Completion menu; Tab/arrow keys select, Enter confirms
 Right arrow  Accept a gray history suggestion at end of line
@@ -14,13 +14,15 @@ Ctrl-L       Clear screen
 z blog       Jump to a directory visited before; zi blog opens a picker
 .. / ...     Move up one / two directories
 mkcd NAME    Make a directory and enter it
-l / ll / la  Colored listing / details with Git / include hidden files
+l / ll / la  Colored listing / details / include hidden files (no Git scan)
+gs           Tracked-file Git status, ignoring submodules and new files
+git status   Full status including untracked files, on demand
 lt [DIR]     Tree view limited to two levels
 c FILE       Highlighted code; q exits a pager if one appears
 usage [DIR]  Disk usage tree, depth 2 (dust)
 disks        Local filesystem capacity and usage (duf)
 monitor      CPU / RAM / network / disks / processes (btop); q quits
-sysinfo      One-shot machine summary with pixel art (fastfetch)
+sysinfo      Full machine summary with an OS-specific ASCII logo (fastfetch)
 ncdu -r DIR  Existing read-only interactive disk browser; q quits
 
 pixel-help   Show this guide
@@ -32,4 +34,5 @@ Recovery (open a NEW shell to remove already-loaded widgets):
 
 Config: ~/.config/pixel-shell/
 Backups: ~/.local/state/pixel-shell/backups/
+Login banner: small OS logo + six local system facts; PIXEL_DISABLE_BANNER=1 disables it.
 ls, cat, cd, du, df, top and find keep their original behavior.
