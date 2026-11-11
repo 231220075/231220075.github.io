@@ -1,0 +1,66 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+add_newline = true
+scan_timeout = 20
+command_timeout = 500
+palette = 'meadow'
+format = '[+](bold leaf) $directory$git_branch$git_status$python$cmd_duration$status$line_break$character'
+continuation_prompt = '[. . ](muted)'
+
+[palettes.meadow]
+leaf = '2'
+water = '6'
+flower = '5'
+sun = '3'
+error = '1'
+muted = '8'
+
+[directory]
+style = 'bold water'
+format = '[$path]($style)[$read_only]($read_only_style) '
+truncation_length = 3
+truncate_to_repo = true
+read_only = ' [RO]'
+read_only_style = 'error'
+
+[git_branch]
+symbol = 'git:'
+format = '[$symbol$branch]($style) '
+style = 'flower'
+
+[git_status]
+format = '([$all_status$ahead_behind]($style) )'
+style = 'sun'
+conflicted = 'conflict '
+ahead = 'up${count} '
+behind = 'down${count} '
+diverged = 'up${ahead_count}/down${behind_count} '
+untracked = '?${count} '
+stashed = 'stash${count} '
+modified = '!${count} '
+staged = '+${count} '
+renamed = '>${count} '
+deleted = '-${count} '
+
+[python]
+symbol = 'py:'
+format = '[${symbol}${virtualenv}]($style) '
+style = 'sun'
+detect_extensions = []
+detect_files = []
+detect_folders = []
+
+[cmd_duration]
+min_time = 2000
+format = '[took $duration]($style) '
+style = 'muted'
+
+[status]
+disabled = false
+symbol = 'exit:'
+format = '[$symbol$status]($style) '
+style = 'error'
+
+[character]
+success_symbol = '[>>](bold leaf)'
+error_symbol = '[>>](bold error)'
+vimcmd_symbol = '[<<](bold flower)'

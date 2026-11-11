@@ -1,0 +1,35 @@
+PIXEL MEADOW — quick guide
+
+Tab          Completion menu; Tab/arrow keys select, Enter confirms
+Right arrow  Accept a gray history suggestion at end of line
+Up / Down    Search history by the text already typed
+Ctrl-R       Fuzzy search history (Enter inserts; press Enter again to run)
+Ctrl-T       Insert file path(s), with code preview; Tab selects multiple
+Esc, then C  Fuzzy directory picker (Option-C if Option sends Esc+)
+Ctrl-A / E   Beginning / end of line
+Ctrl-U / K   Remove before / after cursor; Ctrl-Y pastes it back
+Ctrl-W       Remove previous word
+Ctrl-L       Clear screen
+
+z blog       Jump to a directory visited before; zi blog opens a picker
+.. / ...     Move up one / two directories
+mkcd NAME    Make a directory and enter it
+l / ll / la  Colored listing / details with Git / include hidden files
+lt [DIR]     Tree view limited to two levels
+c FILE       Highlighted code; q exits a pager if one appears
+usage [DIR]  Disk usage tree, depth 2 (dust)
+disks        Local filesystem capacity and usage (duf)
+monitor      CPU / RAM / network / disks / processes (btop); q quits
+sysinfo      One-shot machine summary with pixel art (fastfetch)
+ncdu -r DIR  Existing read-only interactive disk browser; q quits
+
+pixel-help   Show this guide
+pixel-config Edit local module switches (uses EDITOR, or vi)
+
+Recovery (open a NEW shell to remove already-loaded widgets):
+  PIXEL_SHELL_DISABLE=1 /bin/zsh -l
+  /bin/zsh -f                     # bypass .zshrc entirely
+
+Config: ~/.config/pixel-shell/
+Backups: ~/.local/state/pixel-shell/backups/
+ls, cat, cd, du, df, top and find keep their original behavior.
