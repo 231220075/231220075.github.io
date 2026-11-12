@@ -9,7 +9,7 @@ tags:
 categories:
   - 技术实践
 description: "基于 Starship、zsh-users、fzf 和 Fastfetch，保留轻量交互，修复大仓库提示符延迟，并记录使用、清理与回退方法。"
-updated: 2026-11-11 10:05:41
+updated: 2026-11-12 14:57:03
 ---
 
 这篇文章记录本机的 shell 改造，也作为使用和回退手册。**当前版本为 Meadow v2：使用系统 SF Mono 13 pt，提示符只显示路径、Git 分支、虚拟环境与必要状态，开启终端时显示操作系统对应的小型 ASCII 图标。**
@@ -150,6 +150,18 @@ Tab 补全使用 zsh 自带 compinit 和 zsh-completions，保留权限检查、
 **单独回退：**在 `local.zsh` 中分别设置 `PIXEL_DISABLE_COMPLETION`、`PIXEL_DISABLE_KEYS`、`PIXEL_DISABLE_HISTORY`、`PIXEL_DISABLE_FZF`、`PIXEL_DISABLE_AUTOSUGGEST` 或 `PIXEL_DISABLE_HIGHLIGHT` 为 `1`。删除、注释或改为 `0` 则恢复。保存后新开窗口，避免在已经加载插件的窗口反复 source。
 
 第一版曾将 `/opt/homebrew/share` 从 775 改为 755，使 compinit 权限检查通过；本次保留该设置，不绕过审计。需要重建补全缓存时，只处理 `~/.cache/pixel-shell/` 下对应的 zcompdump。
+
+### 关闭错误按键的闪屏反馈（2026-11-12）
+
+空输入行按下方向键、查找不存在的历史或补全没有匹配项时，保持输入行不动，不鸣响、不闪屏。zsh 配置加入：
+
+```zsh
+unsetopt BEEP HIST_BEEP LIST_BEEP
+```
+
+同时关闭 Terminal 的 Pixel Meadow 描述文件中的声音铃声与视觉铃声（`Bell = false`、`VisualBell = false`），避免其他程序发出的铃声触发整窗闪烁。命令真正执行失败时，错误文字和退出码照常显示。
+
+新 shell 自动生效；已经打开的窗口可以直接运行上面的 `unsetopt` 命令，无需重载全部插件。若要恢复，删除配置中的这一行，并在新 shell 中使用 `setopt BEEP HIST_BEEP LIST_BEEP`；Terminal 的视觉/声音铃声可在描述文件的高级设置中重新开启。
 
 ## 5. 目录、代码和系统查询
 

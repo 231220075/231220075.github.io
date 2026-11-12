@@ -8,6 +8,9 @@ typeset -g PIXEL_SHELL_HOME="$HOME/.config/pixel-shell"
 typeset -g _pixel_brew=/opt/homebrew
 [[ -d $_pixel_brew ]] || _pixel_brew=/usr/local
 
+# Ignore invalid editing/history/completion keys without a bell or screen flash.
+unsetopt BEEP HIST_BEEP LIST_BEEP
+
 # [history] Keep the existing history file, including macOS Terminal sessions.
 if [[ ${PIXEL_DISABLE_HISTORY:-0} != 1 ]]; then
   HISTFILE=${HISTFILE:-$HOME/.zsh_history}
