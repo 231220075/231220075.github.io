@@ -3,9 +3,10 @@ title: 云原生结课project
 date: 2025-08-12 15:52:32
 updated: 2025-08-12 15:52:32
 tags:
-  - 学习
+  - Java
+  - 云原生
 categories:
-  - 学习记录
+  - 技术
 description: 顺手上传暑课项目
 top: false
 comments: true

@@ -3,10 +3,10 @@ title: 用rust复刻git
 date: 2025-08-07 10:56:14
 updated: 2025-08-07 10:56:14
 tags:
-  - rust
-  - git
+  - Rust
+  - Git
 categories:
-  - 学习记录
+  - 技术
 description: 本文将介绍用rust复刻git的历程，也纪念我第一次合作开发的经历
 cover: /photos/arknight.jpg
 top: false

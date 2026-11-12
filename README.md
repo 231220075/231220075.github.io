@@ -7,7 +7,7 @@ Markdown 博客，零依赖 Node.js 构建，GitHub Pages 托管。
 需要 Node.js 20+。
 
 ```sh
-./blog new "Rust 笔记" --category 学习记录 --tags Rust --edit
+./blog new "Rust 笔记" --category 技术 --tags Rust --edit
 ./blog edit "Rust 笔记"
 ./blog dev
 ./blog publish "post: Rust 笔记"
@@ -18,7 +18,7 @@ Markdown 博客，零依赖 Node.js 构建，GitHub Pages 托管。
 在外部编辑器修改后，运行 `./blog update "Rust 笔记"` 记录更新时间。原 `date`、文件名和文章 URL 保持不变。
 
 ```sh
-./blog new "还没写完" --category 学习记录 --draft
+./blog new "还没写完" --category 技术 --draft
 ./blog list
 ./blog update "还没写完" --no-draft
 ```
@@ -31,7 +31,7 @@ Markdown 博客，零依赖 Node.js 构建，GitHub Pages 托管。
 
 ```sh
 ls
-cd 学习记录
+cd 技术
 ls
 open "用rust复刻git.md"
 cd ..
@@ -59,7 +59,7 @@ title: "Rust 笔记"
 date: 2026-11-10 12:00:00
 updated: 2026-11-10 13:00:00
 categories:
-  - 学习记录
+  - 技术
 tags:
   - Rust
 draft: false
@@ -67,6 +67,8 @@ draft: false
 ```
 
 文章位于 `content/posts/`，网址按 `/年份/月/日/文件名/` 生成。发布后避免改动 `date` 和文件名。图片放在 `assets/photos/`，引用为 `![](/photos/文件.jpg)`。
+
+分类按内容分为 `技术`、`随笔`、`面试`，每篇选一个。标签只标具体主题，优先复用 `Rust`、`Git`、`Java`、`前端`、`网络`、`云原生`、`终端`、`开源`、`博客`；没有合适主题时留空，不重复分类。合并前的分类和标签地址通过 `site.config.mjs` 保留跳转。
 
 ## 维护
 

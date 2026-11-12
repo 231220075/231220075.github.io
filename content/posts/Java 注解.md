@@ -3,9 +3,9 @@ title: Java 注解
 date: 2025-08-12 16:18:13
 updated: 2025-08-12 16:18:13
 tags:
-  - JAVA
+  - Java
 categories:
-  - 技术学习
+  - 技术
 description: yys-project中延伸学习Java注解，上传一下
 top: false
 comments: true

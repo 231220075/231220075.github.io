@@ -3,10 +3,10 @@ title: R2CN开源项目
 date: 2025-08-29 12:59:26
 updated: 2025-08-29 12:59:26
 tags:
-  - rust
+  - Rust
   - 开源
 categories:
-  - 技术学习
+  - 技术
 description: 经开源软件论坛的介绍，尝试参与一个R2CN的开源项目，提交了PR。
 cover: /photos/r2cn.png
 top: false

@@ -2,12 +2,9 @@
 title: "macOS zsh 实用改造手册：清晰字体、快速提示符与系统查询"
 date: 2026-11-11 09:28:04
 tags:
-  - macOS
-  - zsh
-  - 效率工具
   - 终端
 categories:
-  - 技术实践
+  - 技术
 description: "基于 Starship、zsh-users、fzf 和 Fastfetch，保留轻量交互，修复大仓库提示符延迟，并记录使用、清理与回退方法。"
 updated: 2026-11-12 14:57:03
 ---

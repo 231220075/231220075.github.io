@@ -3,9 +3,9 @@ title: csnet 期末周复习
 date: 2025-08-12 15:33:42
 updated: 2025-08-12 15:33:42
 tags:
-  - 学习
+  - 网络
 categories:
-  - 学习记录
+  - 技术
 description: 期末周复习自用，站建好了上传一下
 top: false
 comments: true
