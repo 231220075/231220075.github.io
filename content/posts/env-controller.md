@@ -7,11 +7,14 @@ tags:
 categories:
   - "技术"
 description: "从 mise 和 mise_gui 出发，记录工作区环境分析、已有 zsh 会话导入，以及版本管理与可恢复卸载的设计和验证。"
+updated: 2026-11-18 21:23:01
 ---
 
 平时切换项目，经常要核对 Node、Python 和 Rust 的版本。拿 Node 来说，安装清单里即使有一个满足 `package.json` 要求的版本，当前终端也可能执行另一个。换到 Python，还要弄清虚拟环境基于哪个解释器。Rust 则多了一层，`rustc` 可能先经过 rustup，再根据当前目录和临时变量选择工具链。
 
 这就是 Env Controller 的起因。我想在 macOS 上选一个工作区，看清它实际会用到哪些开发工具、版本是否满足要求，以及这个结果从哪里来。切换或卸载版本之前，我也想知道会改到哪里，哪些项目可能受影响。
+
+[GitHub 源码](https://github.com/231220075/env-controller) · [下载 0.3.0 macOS arm64 预览包](https://github.com/231220075/env-controller/releases/download/v0.3.0/EnvController-0.3.0-macos-arm64-preview.zip) · [发布说明与 SHA-256](https://github.com/231220075/env-controller/releases/tag/v0.3.0)
 
 ## 从 mise 和 mise_gui 开始
 
