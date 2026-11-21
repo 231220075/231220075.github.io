@@ -11,12 +11,21 @@ The prompt reads the path and Git branch; `git_status` is disabled. Ordinary
 Login terminals show Fastfetch's automatically selected small OS logo and
 six local facts. `sysinfo` displays the fuller machine summary on demand.
 
+The macOS `local-only` helper prevents automatic cloud downloads for the
+prompt, file pickers and quick queries. A Git branch can be omitted while
+its metadata is in iCloud. `cloudcheck DIR` lists placeholders, including
+those under `.git`. To keep an active repository local, select Keep
+Downloaded in Finder. Use `usage` for allocated blocks and `usage --logical`
+for file sizes. `disks` starts with the Data volume, and `disks --all` shows
+the available space of every local volume.
+
 For a fresh installation, review `pixel.zsh`, then:
 
 ```sh
 brew bundle --file=Brewfile
 mkdir -p ~/.config/pixel-shell
 cp pixel.zsh starship.toml fastfetch.jsonc btop.conf help.txt rollback.py Brewfile "Pixel Meadow.terminal" ~/.config/pixel-shell/
+/usr/bin/clang -O2 local-only.c -o ~/.config/pixel-shell/local-only
 ```
 
 Create `~/.config/pixel-shell/local.zsh` from `local.zsh` only if it does not
@@ -25,9 +34,10 @@ once. Do not duplicate it on machines which already use v1. Open the included
 `.terminal` profile and select it in Terminal settings. Existing Terminal
 windows can cache the old font; quit and reopen Terminal or reimport the file.
 
-The unused v1 installer and Swift profile generator have been removed.
-The package is simply the files above, an optional local switch template,
-the checksum list and this guide. No setup process runs during shell startup.
+Compile `local-only.c` once on macOS with Command Line Tools. On systems
+without the helper, the commands use their normal file access policy.
+`PIXEL_ALLOW_MATERIALIZE=1` restores that policy in new shells. No compiler
+runs during shell startup.
 
 Daily guide: `pixel-help`. Edit switches with `pixel-config`, then open a new
 shell. `PIXEL_DISABLE_BANNER=1` switches off the startup logo.

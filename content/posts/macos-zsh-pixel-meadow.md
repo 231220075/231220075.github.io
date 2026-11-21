@@ -5,8 +5,8 @@ tags:
   - 终端
 categories:
   - 技术
-description: "基于 Starship、zsh-users、fzf 和 Fastfetch，保留轻量交互，修复大仓库提示符延迟，并记录使用、清理与回退方法。"
-updated: 2026-11-12 14:57:03
+description: "记录 macOS zsh 与 CLI 的安装、使用和回退，以及 Mega 的 Git 索引刷新卡顿与 iCloud 占位文件排查。"
+updated: 2026-11-21 18:10:24
 ---
 
 这篇文章记录本机的 shell 改造，也作为使用和回退手册。**当前版本为 Meadow v2：使用系统 SF Mono 13 pt，提示符只显示路径、Git 分支、虚拟环境与必要状态，开启终端时显示操作系统对应的小型 ASCII 图标。**
@@ -27,6 +27,7 @@ disks               # 文件系统容量和剩余空间
 monitor             # 运行状态面板；q 退出
 sysinfo             # 完整机器摘要和当前操作系统的图标
 gs                  # 主动查看已跟踪文件的 Git 状态
+cloudcheck .        # 查找当前目录和 .git 下的云占位项
 ```
 
 ## 这次保留哪些开源基础
@@ -105,7 +106,45 @@ gs                   # 已跟踪文件；跳过未跟踪文件和子模块检查
 git status           # 完整状态，包括新文件与子模块
 ```
 
-`gs` 等价于 `git status --short --branch --untracked-files=no --ignore-submodules=all`，因此**不能用它判断是否有新文件尚未加入 Git**。完整状态查询仍可能随仓库规模花费较长时间，但发生在主动请求时。
+`gs` 运行 `git --no-optional-locks status --short --branch --untracked-files=no --ignore-submodules=all`，只显示已跟踪文件的状态。在装有本地读取助手的 Mac 上，它会快速报错而非等待占位文件下载。完整状态仍通过 `git status` 查看。
+
+### iCloud 文件读取与索引刷新
+
+开启 iCloud 桌面同步后，工作区文件和隐藏的 `.git` 都可能只留下占位。2026 年 11 月 21 日排查 Mega 时，2,700 个索引路径中有 1,493 个带 macOS 的 `SF_DATALESS` 标志。Git Trace2 显示，读取索引和预加载文件元数据只用了几毫秒，随后停在 `refresh`。诊断命令在 16 秒时被中止。采样显示 Git 主线程阻塞在 `read()`，同时检查到它打开的 `CanvasComment.tsx` 仍是占位。一个只有几百字节的占位文件单独读取也等了超过 20 秒。[Git 索引刷新说明](https://git-scm.com/docs/git-status#_background_refresh) · [Apple 占位文件技术说明](https://developer.apple.com/documentation/technotes/tn3150-getting-ready-for-data-less-files)
+
+一次下载要处理许多文件，`.git` 内还可能有较大的 pack，Mega 的一个 pack 就约 113 MB。前台查询必须等它用到的文件可以读取才会继续，因此即使某个文件很小，也可能遇到较长的等待。耗时还取决于同步队列和网络，无法单凭文件总大小估算。
+
+在 Finder 对 Mega 原目录开启「保留下载」后，工作区和 `.git` 的占位项都降到了 0。核对 `HEAD` 和暂存区条目与排查前的快照一致。普通 `git status` 连跑三次分别为 **528 ms、21 ms、19 ms**，均正常退出。后续用与排查前相同的 `git --no-optional-locks status` 连跑三次为 **20–28 ms**。
+
+### 其他仓库的抽查
+
+下面是同一台 Mac 在同一天的抽查结果。前三行的工作区按文件系统枚举，跳过常见构建目录。Rust Git 这一行按索引列出的已跟踪路径核对，两种计数口径已分别标明。
+
+| 仓库 | 工作区占位项 | `.git` 占位项 | Git 实测 |
+| --- | ---: | ---: | --- |
+| gem5 | 10,903 / 10,949 | 28 | 状态查询超过 5 秒 |
+| CubeSandbox | 3,827 / 3,830 | 28 | 定位 Git 目录超过 3 秒 |
+| rig | 3,331 / 4,256 | 468 | 定位 Git 目录超过 3 秒 |
+| Rust Git | 54 / 57 个已跟踪路径 | 20 | 状态查询超过 5 秒 |
+
+`gem5`、`CubeSandbox` 和 `rig` 的 `.git/HEAD`、`.git/config`、`.git/index` 都是占位，所以连 Git 识别仓库的第一步都可能等待。这里的「超过」表示测量达到设定上限，随后中止了命令。这些仓库只做了抽查和限时验证。
+
+已有仓库可以先运行 `cloudcheck .` 检查工作区和 `.git`，也可以运行 `cloudcheck .git` 单查 Git 元数据。命令会列出占位目录并停止向下读取。常用仓库可提前在 Finder 选择「保留下载」，待落盘后再跑完整状态。新仓库可以直接放在不参与云同步的本机目录。[Apple 的下载与保留下载说明](https://support.apple.com/en-mt/guide/mac-help/mchl1a02d711/27/mac/27)
+
+### CLI 的本地读取模式
+
+配置包中的 `local-only.c` 用 macOS 的进程级 I/O 策略禁止被调用的进程触发占位文件下载。Starship、fzf 的候选和预览，以及 `l`、`ll`、`la`、`lt`、`c`、`gs`、`usage` 和 `cloudcheck` 都使用这个助手。Git 分支信息暂不可读时，提示符可以先显示路径。fzf 的文件预览和 `c 文件` 遇到占位文件会提示用 Finder 下载。`gs` 需要本地元数据仍可用，完整查询用原来的 `git status`。[Apple 的进程级 I/O 策略说明](https://developer.apple.com/documentation/technotes/tn3150-getting-ready-for-data-less-files)
+
+| 实测场景 | 原配置 | 新配置 |
+| --- | --- | --- |
+| `gem5` 的 Starship 提示符 | 超过 4 秒 | 34–61 ms |
+| 项目组的 Ctrl-T 文件候选 | 超过 5 秒 | 约 69 ms |
+| `c` 打开占位文件 | Rust Git 样本超过 5 秒 | `gem5` 样本约 26 ms 显示下载提示 |
+| `gem5` 空间用量 | 约 264 KiB 本机占用 | `usage` 仍显示占用，`usage --logical` 显示约 286 MiB 的逻辑大小 |
+
+这些是本机的限时复现实测，包含不同的命令和启动开销。Ctrl-T 和 Alt-C 用真实按键复测过，确认能预览、能进入所选目录，`gem5` 的测试文件在预览后仍是占位。另核对了 `ll`、`lt`、`disks` 的三种视图、zoxide 跳转、`sysinfo` 输出，以及 `monitor` 启动后可按 `q` 返回 shell。
+
+如果想让快捷查询恢复系统默认的下载行为，在 `local.zsh` 加入 `PIXEL_ALLOW_MATERIALIZE=1` 后开新窗口。
 
 **单独回退：**编辑 `starship.toml` 重新加入 `$git_status` 并取消禁用即可；大仓库会重新承担查询成本。只想关闭整个提示符，则在 `local.zsh` 中设 `PIXEL_DISABLE_PROMPT=1`。
 
@@ -140,7 +179,7 @@ Tab 补全使用 zsh 自带 compinit 和 zsh-completions，保留权限检查、
 | `Ctrl-L` | 清屏 |
 | `Option-B` / `Option-F` | 按词移动 |
 
-文件枚举使用 fd，包含隐藏文件、排除 `.git`，并保留默认 ignore 规则。临时查找被忽略的文件可运行 `fd --hidden --no-ignore --exclude .git | fzf`。路径有空格、中文或单引号时，预览和插入会按数据处理路径。
+文件枚举使用 fd，在当前文件系统查找，跳过 `.git`、`node_modules`、`target`、`.venv`、`.next`、`.cache`。在家目录打开选择器只向下查四层，并跳过隐藏项和 `Library`。需要查更深的位置，先进入相应项目。fd 仍使用本地可读的 ignore 文件，未下载的规则暂时不可用。右侧预览对占位文件显示下载提示。
 
 历史沿用原文件，内存和保存容量均为 50,000 条，开启去重与跨窗口共享。行首加空格会让该条命令不进入 zsh 历史；这不会改变程序本身的日志行为。
 
@@ -169,17 +208,20 @@ unsetopt BEEP HIST_BEEP LIST_BEEP
 | `mkcd "notes/新目录"` | 创建目录并进入 | 含空格时加引号 |
 | `l` / `ll` / `la` | 普通 / 详细 / 包含隐藏文件的 eza 列表 | 不查询 Git |
 | `lt [目录]` | 两层目录树 | 限制输出深度 |
-| `c 文件` | bat 高亮、行号和分页 | q 退出分页；`--paging=never` 禁止分页 |
-| `usage [目录]` | dust 空间树和占比 | 等价于 `dust -d 2 -r` |
-| `disks` | duf 本地文件系统表格和容量条 | 等价于 `duf --only local --theme ansi` |
+| `c 文件` | bat 高亮、行号和分页 | 占位文件提示下载，`--paging=never` 禁止分页 |
+| `usage [目录]` | 本机实际分配的磁盘块 | 限当前文件系统，显示两层和最多 25 项 |
+| `usage --logical [目录]` | 逻辑文件大小 | 包括占位文件已知的原始大小 |
+| `disks` | macOS Data 卷余量 | duf 无结果时用 df，`disks --all` 看全部本地卷，`disks 路径` 查指定路径 |
+| `cloudcheck [目录]` | 查 macOS 云占位文件 | 检查文件标记，遇到占位目录即停止向下查找 |
 | `monitor` | btop 的 CPU、内存、网络、磁盘、进程面板 | 两秒刷新，q 退出 |
 | `sysinfo` | 完整机器摘要 | 使用自动 OS 图标 |
 | `ncdu -r 目录` | 原先已安装的只读空间浏览器 | q 退出 |
 
 ```sh
 usage ~/Downloads
+usage --logical .
 dust -F -n 15 .               # 查看大文件
-duf /System/Volumes/Data      # 查看用户数据卷
+disks --all
 c --paging=never ~/.zshrc
 ```
 
@@ -214,6 +256,7 @@ fi
 
 ```text
 pixel.zsh             模块初始化和工具别名
+local-only            在本机编译的 macOS 读取助手
 local.zsh             个人开关，pixel-config 打开它
 starship.toml         精简提示符
 fastfetch.jsonc       自动 OS 图标和开屏摘要
@@ -254,10 +297,11 @@ python3 ~/.config/pixel-shell/rollback.py --apply  # 备份当前文件后移除
 
 回退脚本只处理 `.zshrc` 中 `# >>> pixel-shell >>>` 到 `# <<< pixel-shell <<<` 的块，保留其他设置和后续个人编辑。`--terminal --apply` 还可以把仍指向 Pixel Meadow 的默认/启动描述文件恢复成第一版之前的 Basic。Terminal 正在运行时可能缓存偏好，图形界面选回 Basic 最直接。
 
-### 找到两个版本的备份
+### 找到各版本的备份
 
 - 第一版之前：`~/.local/state/pixel-shell/backups/20261111-091237/`。
-- 本次修改之前：`~/.local/state/pixel-shell/backups/20261111-095827-v2/`，包含 `zshrc-before`、`config-before/`、Terminal 偏好、包清单差集及性能记录。
+- 第二版之前：`~/.local/state/pixel-shell/backups/20261111-095827-v2/`，包含 `zshrc-before`、`config-before/`、Terminal 偏好、包清单差集及性能记录。
+- 本地读取改动之前：本机备份目录中带 `-local-io` 后缀的一项保存了旧 `pixel.zsh` 与 `help.txt`。复制回配置目录并重开终端，即可回到原先的快捷命令。
 
 这些是本机私有备份，没有随博客上传。如果要精确回到本次修改前的 `.zshrc`，先保留当前文件，再复制备份：
 
@@ -272,7 +316,7 @@ cp -p ~/.local/state/pixel-shell/backups/20261111-095827-v2/zshrc-before ~/.zshr
 
 ### 配置下载和在其他机器上使用
 
-[完整配置包](/shell/pixel-meadow.zip)、[校验清单](/shell/pixel-meadow/SHA256SUMS)、[shell 配置](/shell/pixel-meadow/pixel.zsh)、[提示符配置](/shell/pixel-meadow/starship.toml)、[速查表](/shell/pixel-meadow/help.txt)、[回退脚本](/shell/pixel-meadow/rollback.py)均已更新为 v2。
+新版包含本地读取助手的 C 源码，安装时在 Mac 上编译一次。[完整配置包（ZIP）](/shell/pixel-meadow.zip) · [校验清单](/shell/pixel-meadow/SHA256SUMS) · [助手源码](/shell/pixel-meadow/local-only.c) · [shell 配置](/shell/pixel-meadow/pixel.zsh) · [提示符配置](/shell/pixel-meadow/starship.toml) · [速查表](/shell/pixel-meadow/help.txt) · [回退脚本](/shell/pixel-meadow/rollback.py)
 
 解压后阅读配置和 README，再安装依赖并复制文件；不要覆盖已经存在的 `local.zsh`：
 
@@ -280,6 +324,7 @@ cp -p ~/.local/state/pixel-shell/backups/20261111-095827-v2/zshrc-before ~/.zshr
 brew bundle --file=Brewfile
 mkdir -p ~/.config/pixel-shell
 cp pixel.zsh starship.toml fastfetch.jsonc btop.conf help.txt rollback.py Brewfile "Pixel Meadow.terminal" ~/.config/pixel-shell/
+/usr/bin/clang -O2 local-only.c -o ~/.config/pixel-shell/local-only
 ```
 
 首次配置时，另存自己的 `.zshrc`，创建 `local.zsh`，然后只追加一次：
@@ -292,7 +337,7 @@ fi
 # <<< pixel-shell <<<
 ```
 
-已经使用第一版的机器直接替换模块文件即可，不再追加第二个入口。全新机器如果没有本机的 `backup-path`，回退脚本仍可移除加载块，但 Terminal 的默认描述文件应自行切回之前的选择。其他机器不应照搬本机的 Python/Ruby 初始化或权限修改。
+已安装的机器替换模块文件并编译助手即可。助手只需编译一次，使用 macOS 的 Command Line Tools。没有助手时，命令沿用系统默认的文件读取行为。全新机器如果没有本机的 `backup-path`，回退脚本仍可移除加载块，Terminal 的默认描述文件可在设置内切回之前的选择。
 
 ## 本次验证与测量
 

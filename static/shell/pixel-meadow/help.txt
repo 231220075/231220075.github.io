@@ -4,7 +4,7 @@ Tab          Completion menu; Tab/arrow keys select, Enter confirms
 Right arrow  Accept a gray history suggestion at end of line
 Up / Down    Search history by the text already typed
 Ctrl-R       Fuzzy search history (Enter inserts; press Enter again to run)
-Ctrl-T       Insert file path(s), with code preview; Tab selects multiple
+Ctrl-T       Insert file path(s); Tab selects multiple; preview uses local content
 Esc, then C  Fuzzy directory picker (Option-C if Option sends Esc+)
 Ctrl-A / E   Beginning / end of line
 Ctrl-U / K   Remove before / after cursor; Ctrl-Y pastes it back
@@ -15,12 +15,14 @@ z blog       Jump to a directory visited before; zi blog opens a picker
 .. / ...     Move up one / two directories
 mkcd NAME    Make a directory and enter it
 l / ll / la  Colored listing / details / include hidden files (no Git scan)
-gs           Tracked-file Git status, ignoring submodules and new files
+gs           Local-only tracked-file Git status, skipping submodules and new files
 git status   Full status including untracked files, on demand
 lt [DIR]     Tree view limited to two levels
-c FILE       Highlighted code; q exits a pager if one appears
-usage [DIR]  Disk usage tree, depth 2 (dust)
-disks        Local filesystem capacity and usage (duf)
+c FILE       Highlighted local code; q exits a pager
+usage [DIR]  Allocated blocks on this Mac; stay on one filesystem
+usage --logical [DIR]  Logical file size, including iCloud-only file sizes
+disks        macOS Data volume; use disks --all or disks PATH for other views
+cloudcheck [DIR]  List iCloud/File Provider placeholders, including .git
 monitor      CPU / RAM / network / disks / processes (btop); q quits
 sysinfo      Full machine summary with an OS-specific ASCII logo (fastfetch)
 ncdu -r DIR  Existing read-only interactive disk browser; q quits
@@ -35,4 +37,7 @@ Recovery (open a NEW shell to remove already-loaded widgets):
 Config: ~/.config/pixel-shell/
 Backups: ~/.local/state/pixel-shell/backups/
 Login banner: small OS logo + six local system facts; PIXEL_DISABLE_BANNER=1 disables it.
+The optional local-only macOS helper keeps prompt, picker and quick queries from
+requesting cloud downloads. Use Finder's Download Now or Keep Downloaded for
+active projects. PIXEL_ALLOW_MATERIALIZE=1 disables the guard in a new shell.
 ls, cat, cd, du, df, top and find keep their original behavior.

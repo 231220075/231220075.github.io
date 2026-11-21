@@ -8,6 +8,24 @@ typeset -g PIXEL_SHELL_HOME="$HOME/.config/pixel-shell"
 typeset -g _pixel_brew=/opt/homebrew
 [[ -d $_pixel_brew ]] || _pixel_brew=/usr/local
 
+# The macOS helper is compiled once at install time, never at shell start.
+typeset -g _meadow_local_bin=''
+if [[ $OSTYPE == darwin* && ${PIXEL_ALLOW_MATERIALIZE:-0} != 1 && -x $PIXEL_SHELL_HOME/local-only ]]; then
+  _meadow_local_bin="$PIXEL_SHELL_HOME/local-only"
+fi
+_meadow_local() {
+  if [[ -n $_meadow_local_bin ]]; then
+    command "$_meadow_local_bin" "$@"
+  else
+    # Without the macOS helper, discard its optional file prechecks.
+    while [[ $1 == --check-file ]]; do
+      (( $# >= 3 )) || return 2
+      shift 2
+    done
+    command "$@"
+  fi
+}
+
 # Ignore invalid editing/history/completion keys without a bell or screen flash.
 unsetopt BEEP HIST_BEEP LIST_BEEP
 
@@ -56,34 +74,94 @@ if [[ ${PIXEL_DISABLE_HELPERS:-0} != 1 ]]; then
   alias ...='cd ../..'
   mkcd() { (( $# == 1 )) || { print -u2 'usage: mkcd <directory>'; return 2; }; mkdir -p -- "$1" && cd -- "$1"; }
   (( $+commands[eza] )) && {
-    alias l='eza --group-directories-first'
-    alias ll='eza -lh --group-directories-first --time-style=long-iso'
-    alias la='eza -lah --group-directories-first --time-style=long-iso'
-    alias lt='eza --tree --level=2 --group-directories-first'
+    alias l='_meadow_local eza --group-directories-first'
+    alias ll='_meadow_local eza -lh --group-directories-first --time-style=long-iso'
+    alias la='_meadow_local eza -lah --group-directories-first --time-style=long-iso'
+    alias lt='_meadow_local eza --tree --level=2 --group-directories-first'
   }
-  (( $+commands[bat] )) && alias c='bat --theme=ansi --paging=auto --style=numbers,changes,header'
-  (( $+commands[dust] )) && alias usage='dust -d 2 -r'
-  (( $+commands[duf] )) && alias disks='duf --only local --theme ansi'
+  if (( $+commands[bat] )); then
+    c() {
+      local -a checks=()
+      local last=${argv[-1]-}
+      # The usual `c [options] FILE` form gets an explicit placeholder message.
+      [[ -n $last && $last != '-' && $last != --* ]] && checks=(--check-file "$last")
+      _meadow_local "${checks[@]}" bat --theme=ansi --paging=auto --style=numbers,header "$@"
+    }
+  fi
+  if (( $+commands[dust] )); then
+    usage() {
+      local -a size=()
+      if [[ $1 == --logical ]]; then
+        shift
+        size=(--apparent-size)
+        print -ru2 -- 'Logical file size (includes known sizes of cloud-only files).'
+      else
+        print -ru2 -- 'Local disk blocks (cloud-only files may occupy little or no space).'
+      fi
+      _meadow_local dust -x -d 2 -r -n 25 "${size[@]}" "$@"
+    }
+  fi
+  if (( $+commands[duf] )); then
+    disks() {
+      if [[ $1 == --all ]]; then
+        shift
+        command duf --only local --output mountpoint,avail,usage --theme ansi "$@"
+      elif (( $# == 0 )); then
+        if [[ $OSTYPE == darwin* && -d /System/Volumes/Data ]]; then
+          local table
+          table=$(command duf --only local --only-mp /System/Volumes/Data --theme ansi) || return
+          if [[ -n $table ]]; then
+            print -r -- "$table"
+          else
+            command /bin/df -h /System/Volumes/Data
+          fi
+        else
+          command duf --theme ansi .
+        fi
+      else
+        command duf --theme ansi "$@"
+      fi
+    }
+  fi
+  if [[ $OSTYPE == darwin* ]]; then
+    cloudcheck() {
+      (( $# <= 1 )) || { print -ru2 'usage: cloudcheck [DIR]'; return 2; }
+      local directory=${1:-.}
+      [[ $directory == /* ]] || directory=$PWD/$directory
+      _meadow_local /usr/bin/find -P "$directory" -xdev -flags +dataless -print -prune
+    }
+  fi
   (( $+commands[btop] )) && alias monitor='btop --config "$HOME/.config/pixel-shell/btop.conf"'
   (( $+commands[fastfetch] )) && alias sysinfo='fastfetch --config "$HOME/.config/pixel-shell/fastfetch.jsonc" --structure os:host:kernel:uptime:shell:terminal:cpu:gpu:memory:swap:disk:battery'
   # Full status is an explicit request; the prompt and ordinary listings stay fast.
-  alias gs='git status --short --branch --untracked-files=no --ignore-submodules=all'
+  alias gs='_meadow_local git --no-optional-locks status --short --branch --untracked-files=no --ignore-submodules=all'
 fi
 
 # [fzf] Safe shell integration provided by upstream; previews treat names as data.
 if [[ ${PIXEL_DISABLE_FZF:-0} != 1 ]] && (( $+commands[fzf] )); then
+  typeset _meadow_prefix=''
+  [[ -n $_meadow_local_bin ]] && _meadow_prefix="${(q)_meadow_local_bin} "
   export FZF_DEFAULT_OPTS='--height=55% --layout=reverse --border=sharp --info=inline --color=bg+:8,fg:7,fg+:15,hl:6,hl+:6,pointer:2,marker:5,spinner:2,header:2,prompt:2'
   if (( $+commands[fd] )); then
-    export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
+    typeset _meadow_fd='--one-file-system -E .git -E node_modules -E target -E .venv -E .next -E .cache'
+    typeset _meadow_home='--max-depth 4 -E /Library -E /.Trash'
+    export FZF_CTRL_T_COMMAND="if [ \"\$PWD\" = \"\$HOME\" ]; then ${_meadow_prefix}fd --type f ${_meadow_fd} ${_meadow_home}; else ${_meadow_prefix}fd --type f --hidden ${_meadow_fd}; fi"
+    export FZF_DEFAULT_COMMAND="$FZF_CTRL_T_COMMAND"
+    export FZF_ALT_C_COMMAND="if [ \"\$PWD\" = \"\$HOME\" ]; then ${_meadow_prefix}fd --type d ${_meadow_fd} ${_meadow_home}; else ${_meadow_prefix}fd --type d --hidden ${_meadow_fd}; fi"
+    unset _meadow_fd _meadow_home
   fi
   if (( $+commands[bat] )); then
-    export FZF_CTRL_T_OPTS='--preview "bat --theme=ansi --color=always --style=numbers --line-range=:200 -- {}" --preview-window=right,55%,border-left'
+    typeset _meadow_preview='bat --theme=ansi --color=always --paging=never --style=numbers --line-range=:200 -- {}'
+    [[ -n $_meadow_prefix ]] && _meadow_preview="${_meadow_prefix}--check-file {} $_meadow_preview"
+    export FZF_CTRL_T_OPTS="--preview ${(q)_meadow_preview} --preview-window=right,55%,border-left"
+    unset _meadow_preview
   fi
   if (( $+commands[eza] )); then
-    export FZF_ALT_C_OPTS='--preview "eza --tree --level=2 --color=always -- {}"'
+    typeset _meadow_preview="${_meadow_prefix}eza --tree --level=2 --color=always -- {}"
+    export FZF_ALT_C_OPTS="--preview ${(q)_meadow_preview}"
+    unset _meadow_preview
   fi
+  unset _meadow_prefix
   # fzf restores ZLE options; only initialize its widgets on a real terminal.
   [[ -t 0 ]] && eval "$(fzf --zsh)"
 fi
@@ -104,6 +182,11 @@ fi
 if [[ ${PIXEL_DISABLE_PROMPT:-0} != 1 ]] && (( $+commands[starship] )); then
   export STARSHIP_CONFIG="$PIXEL_SHELL_HOME/starship.toml"
   eval "$(starship init zsh)"
+  # Wrap the command substitutions installed by Starship, preserving its hooks.
+  if [[ -n $_meadow_local_bin ]]; then
+    [[ $PROMPT == '$('* ]] && PROMPT='$(_meadow_local '${PROMPT[3,-1]}
+    [[ $RPROMPT == '$('* ]] && RPROMPT='$(_meadow_local '${RPROMPT[3,-1]}
+  fi
 fi
 
 # [banner] Fastfetch chooses a small logo for the current OS. No network modules.
