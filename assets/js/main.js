@@ -53,6 +53,7 @@ import { readDirectory, resolveFile, completePath, unquote } from './filesystem.
     var terminal = form.closest('.terminal')
     var input = form.querySelector('input')
     var output = terminal.querySelector('.command-output')
+    var homeWorkspace = terminal.classList.contains('terminal-home') ? output.parentElement : null
     var directories = SITE.directories || []
     var cwd = terminal.dataset.cwd || '/'
     var history = [], cursor = 0, pending = '', revision = 0, indexPromise
@@ -74,7 +75,8 @@ import { readDirectory, resolveFile, completePath, unquote } from './filesystem.
     function show(html, command) {
       output.hidden = false
       output.innerHTML = (command ? '<p class="command-echo">$ ' + escapeHtml(command) + '</p>' : '') + html
-      output.scrollTop = 0
+      if (homeWorkspace) homeWorkspace.scrollTop = output.offsetTop
+      else output.scrollTop = 0
     }
     function clear() { revision++; output.hidden = true; output.replaceChildren() }
     function setDirectory(pathname) {

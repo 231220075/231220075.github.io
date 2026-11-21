@@ -8,6 +8,7 @@ export default {
   title: 'Summer Flower',
   description:
     'forever 的文章与项目。',
+  introduction: 'forever，南京大学计算机专业，写 Rust、开发工具和项目实践。',
   keywords: ['博客', '技术', '计算机', '摄影', 'forever', 'Summer Flower'],
   author: 'forever',
   email: '231220075@smail.nju.edu.cn',
@@ -31,6 +32,17 @@ export default {
   ],
 
   projects: [
+    {
+      name: 'Env Controller',
+      url: 'https://github.com/231220075/env-controller',
+      description: 'macOS 开发环境诊断工具，查看工作区实际使用的 Node、Python 和 Rust 版本、来源与项目要求。',
+      featured: true,
+      article: '/2026/11/18/env-controller/',
+      preview: {
+        url: 'https://github.com/231220075/env-controller/releases/download/v0.3.0/EnvController-0.3.0-macos-arm64-preview.zip',
+        label: '下载预览版 · macOS arm64',
+      },
+    },
     {
       name: 'edge-orchestrator',
       url: 'https://github.com/231220075/edge-orchestrator',

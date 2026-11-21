@@ -136,27 +136,38 @@ test('a failed build preserves the last successful site and removes staging file
   assert.deepEqual(fs.readdirSync(f.root).filter(name => name.startsWith('.blog-build-')), [])
 })
 
-test('home is a category terminal, with complete post coverage and no pagination or feed', t => {
+test('home lists the latest published posts and all categories without pagination or a feed', t => {
   const f = fixture(t)
   f.write('多分类笔记', '---\ntitle: 多分类笔记\ndate: 2025-01-02\ncategories:\n  - 学习记录\n  - 技术\n---\nBody')
-  f.write('uncategorized', '---\ntitle: Uncategorized\ndate: 2025-01-02\n---\nBody')
-  f.write('hidden', '---\ntitle: Hidden\ndate: 2025-01-02\ncategories:\n  - Secret\ndraft: true\n---\nBody')
+  f.write('uncategorized', '---\ntitle: Uncategorized\ndate: 2025-01-03\n---\nBody')
+  f.write('env-controller', '---\ntitle: Env Controller\ndate: 2026-11-18\ncategories:\n  - 技术\n---\nBody')
+  f.write('hidden', '---\ntitle: Hidden\ndate: 2027-01-02\ncategories:\n  - Secret\ndraft: true\n---\nBody')
   ok(f.run(['build']))
   const output = path.join(f.root, 'public')
   const home = fs.readFileSync(path.join(output, 'index.html'), 'utf8')
   const main = /<main[\s\S]*?<\/main>/.exec(home)[0]
-  assert.doesNotMatch(main, /post-card|pagination|hero|多分类笔记|Uncategorized/)
+  assert.doesNotMatch(main, /post-card|pagination|pixel-garden/)
+  assert.match(main, /<h1 class="home-intro">forever/)
+  const recent = /<section class="home-recent"[\s\S]*?<\/section>/.exec(main)[0]
+  assert.deepEqual([...recent.matchAll(/class="recent-post" href="([^"]+)"/g)].map(match => match[1]), [
+    '/2026/11/18/env-controller/', '/2025/01/03/uncategorized/',
+  ])
   assert.match(main, /directory-entry/)
   assert.match(main, /学习记录\//)
   const site = JSON.parse(/window\.__SITE__=(.*?);<\/script>/s.exec(home)[1])
   assert.deepEqual(new Set(site.directories.map(d => d.name)), new Set(['学习记录', '技术', '未分类']))
   assert.equal(site.directories.find(d => d.name === '未分类').files[0].name, 'uncategorized.md')
   const files = site.directories.flatMap(d => d.files)
-  assert.equal(new Set(files.map(file => file.url)).size, 2)
+  assert.equal(new Set(files.map(file => file.url)).size, 3)
   assert.equal(files.filter(file => file.name === '多分类笔记.md').length, 2)
   assert.doesNotMatch(home, /Hidden|Secret/)
   for (const name of ['page', 'atom.xml', 'feed.xml']) assert.equal(fs.existsSync(path.join(output, name)), false)
   const proj = fs.readFileSync(path.join(output, 'proj/index.html'), 'utf8')
+  const firstProject = /<article class="project[^>]*>[\s\S]*?<\/article>/.exec(proj)[0]
+  assert.match(firstProject, /<h2>Env Controller<\/h2>/)
+  assert.match(firstProject, /href="\/2026\/11\/18\/env-controller\/">项目文章/)
+  assert.match(firstProject, /href="https:\/\/github\.com\/231220075\/env-controller"[^>]*>GitHub 源码/)
+  assert.match(firstProject, /href="https:\/\/github\.com\/231220075\/env-controller\/releases\/download\//)
   for (const repo of ['231220075/edge-orchestrator', '231220075/git', 'gitmono-dev/mega']) assert.ok(proj.includes('https://github.com/' + repo))
   assert.doesNotMatch(home + proj, /atom\.xml|application\/atom\+xml/)
   fs.writeFileSync(path.join(output, 'atom.xml'), 'old feed')

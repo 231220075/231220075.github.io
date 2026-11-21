@@ -132,7 +132,26 @@ function siteScript() {
   }).replace(/</g, '\\u003c')};`
 }
 
-function renderTerminal({ home = false, cwd = '/' } = {}) {
+function renderHomeOverview(recentPosts) {
+  const entries = recentPosts.map(post => `<li>
+    <a class="recent-post" href="${link(post.url)}">
+      <span class="pixel-file" aria-hidden="true"></span>
+      <span>${escapeHtml(post.title)}</span>
+      <time datetime="${fmtDate(post.date)}">${fmtDate(post.date, 'short')}</time>
+    </a>
+  </li>`).join('\n')
+
+  return `<div class="home-overview">
+    <p class="home-prompt"><span aria-hidden="true">$ </span><a href="/about/">whoami</a></p>
+    <h1 class="home-intro">${escapeHtml(config.introduction)}</h1>
+    ${entries ? `<section class="home-recent" aria-labelledby="recent-posts-title">
+      <h2 id="recent-posts-title"><span aria-hidden="true"># </span>最近文章</h2>
+      <ul>${entries}</ul>
+    </section>` : ''}
+  </div>`
+}
+
+function renderTerminal({ home = false, cwd = '/', recentPosts = [] } = {}) {
   const folders = directories.map(dir => `<a class="file-entry directory-entry" href="${dir.url}" data-command="${escapeHtml('cd ' + JSON.stringify('/' + dir.name))}"><span class="pixel-folder" aria-hidden="true"></span><span>${escapeHtml(dir.name)}/</span><span class="entry-meta">${dir.files.length}</span></a>`).join('')
   return `<section class="terminal${home ? ' terminal-home' : ''}" aria-label="博客命令行" data-cwd="${escapeHtml(cwd)}">
   <div class="terminal-titlebar">
@@ -150,14 +169,14 @@ function renderTerminal({ home = false, cwd = '/' } = {}) {
     <button class="command-run" type="submit" aria-label="执行命令">↵</button>
   </form>
   <div class="terminal-workspace">
+  ${home ? renderHomeOverview(recentPosts) : ''}
   <div class="command-output" role="region" aria-label="命令输出" aria-live="polite"${home ? '' : ' hidden'}>${home ? `<p class="command-echo">$ ls</p><div class="file-list directory-list">${folders || '<p>空目录。</p>'}</div>` : ''}</div>
-  ${home ? '<aside class="pixel-garden" aria-hidden="true"><div class="pixel-garden-art"></div></aside>' : ''}
   </div>
   <div class="terminal-status"><span data-current-path>${escapeHtml(cwd === '/' ? '~/' : '~' + cwd + '/')}</span><span>${new Set(directories.flatMap(dir => dir.files.map(file => file.url))).size} posts</span></div>
 </section>`
 }
 
-function renderShell({ title, description, url, content, bodyClass, extraHead, cwd = '/' }) {
+function renderShell({ title, description, url, content, bodyClass, extraHead, cwd = '/', recentPosts = [] }) {
   const fullTitle = title ? `${escapeHtml(title)} | ${escapeHtml(config.title)}` : escapeHtml(config.title)
   const desc = description || config.description
   const canonical = absUrl(url)
@@ -192,7 +211,7 @@ ${extraHead || ''}
 <a class="skip-link" href="#main">跳到主要内容</a>
 <div class="progress-bar"></div>
 <main class="site-main" id="main">
-<div class="container">${renderTerminal({ home: bodyClass === 'is-home', cwd })}</div>
+<div class="container">${renderTerminal({ home: bodyClass === 'is-home', cwd, recentPosts })}</div>
 ${content}
 </main>
 <button class="back-top" type="button" aria-label="回到顶部">${icon('arrowUp')}</button>
@@ -317,12 +336,13 @@ function giscusBlock(term) {
 /* 页面生成                                                            */
 /* ================================================================== */
 
-function buildHome() {
-  write('index.html', renderShell({ title: '', bodyClass: 'is-home', url: '/', content: '' }))
+function buildHome(posts) {
+  write('index.html', renderShell({ title: '', bodyClass: 'is-home', url: '/', content: '', recentPosts: posts.slice(0, 2) }))
 }
 
 function projectArt(name) {
   const shapes = {
+    'Env Controller': '<path d="M12 16h72v8H12zm0 20h72v8H12zm0 20h72v8H12z" opacity=".35"/><path d="M26 12h12v16H26zm31 20h12v16H57zM38 52h12v16H38z"/>',
     'edge-orchestrator': '<path d="M44 24h8v32h-8zM16 40h64v8H16z"/><path d="M32 4h32v24H32zM4 44h24v28H4zm64 0h24v28H68z"/>',
     git: '<path d="M24 12h8v52h-8zm8 20h32v8H32zm24-20h8v20h-8z"/><path d="M16 4h24v16H16zm32 0h24v16H48zM16 60h24v16H16z"/>',
     mega: '<path d="M44 20h8v20h-8zM12 36h72v8H12zm0 8h8v16h-8zm32 0h8v16h-8zm32 0h8v16h-8z"/><path d="M32 0h32v24H32zM4 56h24v24H4zm32 0h24v24H36zm32 0h24v24H68z"/>',
@@ -331,10 +351,25 @@ function projectArt(name) {
 }
 
 function buildProjects() {
+  const projects = config.projects.map(project => {
+    const article = project.article ? `<a href="${link(project.article)}">项目文章</a>` : ''
+    const repo = project.featured ? 'GitHub 源码' : project.url.replace('https://github.com/', '')
+    const preview = project.preview ? `<a href="${escapeHtml(project.preview.url)}">${escapeHtml(project.preview.label)} <span aria-hidden="true">↓</span></a>` : ''
+
+    return `<article class="project${project.featured ? ' project-featured' : ''}">
+      <div class="project-visual" aria-hidden="true">${projectArt(project.name)}</div>
+      <h2>${escapeHtml(project.name)}</h2>
+      <p>${escapeHtml(project.description)}</p>
+      <div class="project-links">
+        ${article}<a href="${escapeHtml(project.url)}" target="_blank" rel="noopener">${escapeHtml(repo)} <span aria-hidden="true">↗</span></a>${preview}
+      </div>
+    </article>`
+  }).join('\n')
+
   write('proj/index.html', renderShell({
     title: 'proj', url: '/proj/',
     content: `<div class="container"><section class="page-box projects"><div class="page-head"><h1>proj/</h1></div>
-    <div class="project-grid">${config.projects.map(project => `<article class="project"><div class="project-visual" aria-hidden="true">${projectArt(project.name)}</div><h2>${escapeHtml(project.name)}</h2><p>${escapeHtml(project.description)}</p><a class="project-repo" href="${escapeHtml(project.url)}" target="_blank" rel="noopener">${escapeHtml(project.url.replace('https://github.com/', ''))} <span aria-hidden="true">↗</span></a></article>`).join('')}</div>
+    <div class="project-grid">${projects}</div>
     </section></div>`,
   }))
 }
@@ -796,7 +831,7 @@ function main() {
   })
 
   copyAssets()
-  buildHome()
+  buildHome(posts)
   buildProjects()
   posts.forEach((p) => buildPost(p, posts))
   buildArchives(posts)
