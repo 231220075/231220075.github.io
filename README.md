@@ -27,7 +27,7 @@ Markdown 博客，零依赖 Node.js 构建，GitHub Pages 托管。
 
 ## 站内终端
 
-首页显示近三篇已发布文章和可点击的快捷命令，底部提示符可以直接输入。
+首页显示简短的博客信息，双行提示符紧随输出。输入命令后按 Enter。点击 `Posts` 的篇数可以浏览文章。
 
 ```sh
 ls -l ~/posts
@@ -37,13 +37,13 @@ cat "用rust复刻git.md"
 rg 工作区
 ```
 
-- `ls [-l] [目录] [-t 标签]` 浏览虚拟文件。`-l` 显示标题、日期、文件名和标签。`-t` 按标签筛选，忽略大小写。
-- `cd <目录>` 进入目录并列出文件，`pwd` 显示当前位置。文章平铺在 `~/posts/`，也可从 `~/tags/` 和 `~/categories/` 查找。路径支持中文、引号、空格、`~`、`..` 和绝对路径。
+- `ls [-l] [目录] [-t 标签]` 浏览虚拟文件。`-l` 显示权限、日期、文件名和标签。`-t` 按标签筛选，忽略大小写。
+- `cd <目录>` 切换目录，`pwd` 显示当前位置。文章平铺在 `~/posts/`，也可从 `~/tags/` 和 `~/categories/` 查找。路径支持中文、引号、空格、`~`、`..` 和绝对路径。
 - `cat ~/about.md` 和 `cat ~/projects.md` 查看功能页。`cat` 或 `open` 可用文件名或标题打开文章，直接进入文章原网址。
 - `rg <关键词>`（别名 `search`、`grep`）检索标题、标签与正文，从命中处显示上下文。
-- `clear` 清空输出，`reset`（别名 `fastfetch`）回到首页初始视图。`help` 列出命令，`theme [dark|light|auto]` 切换主题。
+- `clear` 清屏，`reset` 恢复初始状态。`fastfetch` 显示博客信息，`help` 列出命令，`theme [dark|light|auto]` 切换主题。
 
-`/` 或 `⌘/Ctrl K` 聚焦输入，`↑ ↓` 浏览当前标签页的命令历史，`Tab` 补全唯一匹配，`Esc` 清空输入。归档、项目、个人页和帮助均有静态链接，关闭 JavaScript 仍可浏览。虚拟目录与搜索索引由构建生成，项目简介配置在 `site.config.mjs`。
+`/` 或 `⌘/Ctrl K` 聚焦输入，`↑ ↓` 浏览当前标签页的命令历史，`Tab` 补全唯一匹配，`Esc` 清空输入。归档、项目和个人页均有静态链接，关闭 JavaScript 仍可浏览。虚拟目录与搜索索引由构建生成，项目简介配置在 `site.config.mjs`。
 
 ## 文章
 
@@ -66,13 +66,13 @@ draft: false
 
 ## 维护
 
-`./blog build` 构建，`./blog dev [端口]` 自动预览，`./blog rm "标题"` 备份至 `.trash/`。构建成功后替换旧产物，失败保留上一版本。`publish` 构建、提交并正常推送；当前 GitHub Actions 工作流在推送 `main` 时部署。
+`./blog build` 构建，`./blog dev [端口]` 自动预览，`./blog rm "标题"` 备份至 `.trash/`。构建先在系统临时目录生成产物，再更新 `public/` 中变动的文件并清除过期文件。`./blog clean` 清空产物，保留 `public/` 目录。`publish` 构建、提交并正常推送；当前 GitHub Actions 工作流在推送 `main` 时部署。
 
 ```sh
 node --test tools/*.test.mjs
 ./blog build
 ```
 
-中文终端使用本地 [Fusion Pixel Font](https://github.com/TakWolf/fusion-pixel-font)，OFL-1.1；字体与许可证位于 `assets/fonts/`。文章正文保留常规字体。
+终端使用系统等宽字体。
 
 项目简介依据仓库 README；Mega 参与内容可见 [Tag](https://github.com/gitmono-dev/mega/pull/1550)、[Diff](https://github.com/gitmono-dev/mega/pull/1650)、[提交历史](https://github.com/gitmono-dev/mega/pull/1689)、[在线编辑](https://github.com/gitmono-dev/mega/pull/1568) 的已合并 PR。

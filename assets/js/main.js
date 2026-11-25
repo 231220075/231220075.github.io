@@ -6,19 +6,15 @@ import { initTerminal } from './terminal.mjs'
   var SITE = window.__SITE__ || {}
   var FEATURES = SITE.features || {}
 
+  var themeMode = 'dark'
+
   function applyTheme(mode, persist) {
     if (!['dark', 'light', 'auto'].includes(mode)) mode = 'dark'
     var actual = mode === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode
     document.documentElement.dataset.theme = actual
-    var btn = document.querySelector('[data-theme-toggle]')
-    if (btn) {
-      btn.hidden = false
-      btn.dataset.mode = mode
-      btn.textContent = actual === 'dark' ? 'light' : 'dark'
-      btn.setAttribute('aria-label', actual === 'dark' ? '切换亮色' : '切换暗色')
-    }
+    themeMode = mode
     var meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) meta.content = actual === 'dark' ? '#111413' : '#f5f6f0'
+    if (meta) meta.content = actual === 'dark' ? '#141d19' : '#f5f6f0'
     if (persist) { try { localStorage.setItem('sf-theme', mode) } catch (e) {} }
     if (window.__syncGiscus) window.__syncGiscus()
     return mode
@@ -28,12 +24,8 @@ import { initTerminal } from './terminal.mjs'
     var saved = 'dark'
     try { saved = localStorage.getItem('sf-theme') || 'dark' } catch (e) {}
     applyTheme(saved)
-    var btn = document.querySelector('[data-theme-toggle]')
-    if (btn) btn.addEventListener('click', function () {
-      applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true)
-    })
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-      if (btn && btn.dataset.mode === 'auto') applyTheme('auto')
+      if (themeMode === 'auto') applyTheme('auto')
     })
   }
 
@@ -183,17 +175,8 @@ import { initTerminal } from './terminal.mjs'
       'data-lang': 'zh-CN',
       'data-loading': 'lazy',
     }
-    var term = host.getAttribute('data-term')
-    if (term) attrs['data-term'] = term
     Object.keys(attrs).forEach(function (k) { s.setAttribute(k, attrs[k]) })
     host.appendChild(s)
-
-    var config = null
-    window.addEventListener('message', function (event) {
-      if (event.origin !== 'https://giscus.app') return
-      if (!(event.data && event.data.giscus)) return
-      if (!config) config = event.data.giscus
-    })
 
     window.__syncGiscus = function () {
       var iframe = document.querySelector('iframe.giscus-frame')

@@ -4,6 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 import { parseFrontMatter } from './markdown.mjs'
+import { cleanOutput } from './output.mjs'
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url))
 const POSTS = path.join(ROOT, 'content/posts')
@@ -199,7 +200,7 @@ try {
     }
     case 'publish': publish(); break
     case 'status': run('git', ['status', '--short']); break
-    case 'clean': fs.rmSync(path.join(ROOT, 'public'), { recursive: true, force: true }); console.log('cleaned public/'); break
+    case 'clean': cleanOutput(ROOT); console.log('cleaned public/'); break
     case 'rm': {
       const { positional } = options(args)
       const post = resolvePost(titleArg(positional))

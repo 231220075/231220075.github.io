@@ -1,68 +1,86 @@
 import { completePath, normalizePath, parseList, readDirectory, resolveFile, unquote } from './filesystem.mjs'
 
 const commands = [
-  { usage: 'ls [-l] [目录] [-t 标签]', label: '列出文件，显示详情或按标签筛选', command: 'ls -l ~/posts', href: '/archives/' },
-  { usage: 'cd <目录>', label: '进入目录并列出文件', prefill: 'cd ' },
+  { usage: 'ls [-l] [dir] [-t tag]', label: '列出目录', command: 'ls -l ~/posts', href: '/archives/' },
+  { usage: 'cd [dir]', label: '切换目录', prefill: 'cd ' },
   { usage: 'pwd', label: '显示当前路径', command: 'pwd' },
-  { usage: 'cat <文件>', label: '在原网址阅读文章或页面', prefill: 'cat ' },
-  { usage: 'open <文件 / 标题>', label: '按文件名或文章标题打开', prefill: 'open ' },
-  { usage: 'rg <关键词>', label: '搜索标题、标签和正文', prefill: 'rg ' },
+  { usage: 'cat <file>', label: '阅读文章或页面', prefill: 'cat ' },
+  { usage: 'open <file | title>', label: '按文件名或标题打开', prefill: 'open ' },
+  { usage: 'rg <pattern>', label: '检索文章', prefill: 'rg ' },
   { usage: 'whoami', label: '关于', href: '/about/' },
   { usage: 'proj', label: '项目', href: '/proj/' },
   { usage: 'archive', label: '归档', href: '/archives/' },
-  { usage: 'tags', label: '所有标签', href: '/tags/' },
-  { usage: 'categories', label: '所有分类', href: '/categories/' },
+  { usage: 'tags', label: '标签', href: '/tags/' },
+  { usage: 'categories', label: '分类', href: '/categories/' },
   { usage: 'links', label: '友链', href: '/links/' },
   { usage: 'open github', label: 'GitHub', route: 'github' },
   { usage: 'open email', label: '邮件', route: 'email' },
   { usage: 'theme [dark|light|auto]', label: '切换主题', prefill: 'theme ' },
-  { usage: 'clear', label: '清空输出', command: 'clear' },
-  { usage: 'reset', label: '回到首页，恢复初始视图', command: 'reset', href: '/' },
+  { usage: 'fastfetch', label: '显示博客信息', command: 'fastfetch', href: '/' },
+  { usage: 'clear', label: '清屏', command: 'clear' },
+  { usage: 'reset', label: '重置终端', command: 'reset', href: '/' },
 ]
 
 const routes = Object.fromEntries(commands.filter(entry => entry.href && !entry.command).map(entry => [entry.usage, entry.href]))
 Object.assign(routes, { home: '/', about: '/about/', archives: '/archives/' })
 const names = [...new Set(commands.map(entry => entry.usage.split(' ')[0]).concat(
-  Object.keys(routes), 'help', 'posts', 'fastfetch', 'search', 'grep', 'github', 'email',
+  Object.keys(routes), 'help', 'posts', 'search', 'grep', 'github', 'email',
 ))]
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char])
 }
 
+export function promptPath(cwd) {
+  return cwd === '/' ? '~' : '~' + cwd
+}
+
+export function quoteArgument(value) {
+  return /['"\s\\]/.test(value) ? JSON.stringify(value) : value
+}
+
+export function renderCommand(cwd, command, homeLink = false) {
+  let path = escapeHtml(promptPath(cwd))
+  if (homeLink) {
+    const [, section, ...rest] = cwd.split('/')
+    const href = { posts: '/archives/', tags: '/tags/', categories: '/categories/' }[section]
+    const prefix = section ? `/${section}` : ''
+    path = `<a href="/" aria-label="首页">~</a>` +
+      (href ? `<a href="${href}">${escapeHtml(prefix)}</a>` : escapeHtml(prefix)) +
+      (rest.length ? '/' + escapeHtml(rest.join('/')) : '')
+  }
+  return `<div class="command-entry"><div class="prompt-path">${path}</div><div><span class="prompt-glyph" aria-hidden="true">&gt;&gt;</span> ${escapeHtml(command)}</div></div>`
+}
+
 export function renderHelp({ github, email }) {
   const external = { github, email: `mailto:${email}` }
-  const items = commands.map(({ usage, label, href, command, prefill, route }) => {
-    const content = `${escapeHtml(usage)}<span>${escapeHtml(label)}</span>`
+  return `<dl class="help-list">${commands.map(({ usage, label, href, command, prefill, route }) => {
+    const text = escapeHtml(usage)
     const action = command ? ` data-command="${escapeHtml(command)}"` : ''
     const target = href || external[route]
-    if (target) return `<a href="${escapeHtml(target)}"${action}>${content}</a>`
     const input = prefill ? ` data-prefill="${escapeHtml(prefill)}"` : action
-    return `<p class="help-fallback">${content}</p><button type="button" class="help-command"${input}>${content}</button>`
-  }).join('')
-  return `<div class="help-list">${items}</div><p class="shortcut-note">/ 或 ⌘/Ctrl K 聚焦 · ↑ ↓ 历史 · Tab 补全 · Esc 清空输入</p>`
+    const control = target ? `<a href="${escapeHtml(target)}"${action}>${text}</a>` :
+      `<span class="help-fallback">${text}</span><button class="help-command" type="button"${input}>${text}</button>`
+    return `<dt>${control}</dt><dd>${escapeHtml(label)}</dd>`
+  }).join('')}</dl>`
 }
 
-function fileList(result, { long, tag }, directories) {
-  const entries = tag ? result.entries.filter(entry => entry.tags?.some(name => name.toLowerCase() === tag)) : result.entries
-  const parent = result.path === '/' ? '' : directoryLink({
-    name: '..', url: directories[normalizePath(result.path, '..')].url,
-  }, normalizePath(result.path, '..'))
-  const rows = entries.map(entry => {
-    if (entry.type === 'directory') return directoryLink(entry, normalizePath(result.path, entry.name))
-    const { name, url, title, date, tags } = entry
-    return `<a class="file-entry post-entry${long ? ' file-detail' : ''}" href="${escapeHtml(url)}">` +
-      `<span class="pixel-file" aria-hidden="true"></span><span class="file-name">${escapeHtml(long ? title : name)}</span>` +
-      (long && date ? `<time class="entry-meta" datetime="${escapeHtml(date)}">${escapeHtml(date)}</time>` : '') +
-      (long && title !== name ? `<span class="file-meta">${escapeHtml(name)}${tags?.length ? ` <span class="file-tags">${tags.map(t => '#' + escapeHtml(t)).join(' ')}</span>` : ''}</span>` : '') + '</a>'
-  }).join('')
-  return `<div class="file-list">${parent}${rows || `<p>${tag ? '没有匹配的文章。' : '空目录。'}</p>`}</div>`
-}
-
-function directoryLink(entry, path) {
-  const command = 'cd ' + JSON.stringify(path)
-  return `<a class="file-entry directory-entry" href="${escapeHtml(entry.url)}" data-command="${escapeHtml(command)}">` +
-    `<span class="pixel-folder" aria-hidden="true"></span><span class="file-name">${escapeHtml(entry.name)}/</span></a>`
+function fileList(result, { long, tag }) {
+  const entries = result.entries.filter(entry => !tag || entry.tags?.some(name => name.toLowerCase() === tag))
+    .sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'))
+  if (!entries.length) return ''
+  return `<ul class="ls-list">${entries.map(entry => {
+    const directory = entry.type === 'directory'
+    const name = quoteArgument(entry.name + (directory ? '/' : ''))
+    const action = directory ? ` class="shell-directory" data-command="${escapeHtml('ls ' + quoteArgument(normalizePath(result.path, entry.name)))}"` : ''
+    const title = entry.title ? ` title="${escapeHtml(entry.title)}"` : ''
+    const link = `<a href="${escapeHtml(entry.url)}"${action}${title}>${escapeHtml(name)}</a>`
+    if (!long) return `<li>${link}</li>`
+    const mode = directory ? 'dr-xr-xr-x' : '-r--r--r--'
+    const date = entry.date ? `<time datetime="${escapeHtml(entry.date)}">${escapeHtml(entry.date)}</time>` : '<span></span>'
+    const tags = entry.tags?.length ? ` <span class="ls-tags">${escapeHtml(entry.tags.map(t => '#' + t).join(' '))}</span>` : ''
+    return `<li class="ls-long"><span class="ls-mode">${mode}</span>${date}<span>${link}${tags}</span></li>`
+  }).join('')}</ul>`
 }
 
 function resultLinks(entries, terms) {
@@ -75,10 +93,9 @@ function resultLinks(entries, terms) {
     const lowered = body.toLowerCase()
     const matches = terms.map(term => lowered.indexOf(term)).filter(index => index >= 0)
     const start = matches.length ? Math.max(0, Math.min(...matches) - 30) : 0
-    const size = 145
-    const excerpt = matches.length ? `${start ? '…' : ''}${body.slice(start, start + size)}${body.length > start + size ? '…' : ''}` : item.excerpt
-    return `<a class="search-result" href="${escapeHtml(item.url)}"><span class="r-title">${highlight(item.title)}</span>` +
-      (excerpt ? `<span class="r-excerpt">${highlight(excerpt)}</span>` : '') + '</a>'
+    const end = start + 145
+    const excerpt = matches.length ? `${start ? '…' : ''}${body.slice(start, end)}${body.length > end ? '…' : ''}` : item.title
+    return `<div class="rg-line"><a class="rg-path" href="${escapeHtml(item.url)}" title="${escapeHtml(item.title)}">${escapeHtml(item.path || item.url)}</a>:${highlight(excerpt)}</div>`
   }).join('')
 }
 
@@ -88,9 +105,9 @@ export function initTerminal(site, applyTheme) {
   const terminal = form.closest('.terminal')
   const input = form.elements.command
   const output = terminal.querySelector('.command-output')
-  const workspace = terminal.querySelector('.terminal-workspace')
-  const overview = workspace.querySelector('.home-overview')
-  const promptPath = form.querySelector('[data-prompt-path]')
+  const startup = terminal.querySelector('[data-startup]')
+  const banner = startup.querySelector('.home-overview')
+  const pathLabel = form.querySelector('[data-prompt-path]')
   const external = { github: site.github, email: `mailto:${site.email}` }
   let cwd = terminal.dataset.cwd || '/'
   let history = []
@@ -98,14 +115,13 @@ export function initTerminal(site, applyTheme) {
     history = JSON.parse(sessionStorage.getItem('sf-commands') || '[]')
     if (!Array.isArray(history) || history.some(entry => typeof entry !== 'string')) history = []
   } catch {}
-  let cursor = history.length, pending = '', revision = 0
+  let cursor = history.length, pending = '', queue = Promise.resolve()
   let directories, vfsPromise, indexPromise
 
-  function loadJson(path) {
-    return fetch(path).then(response => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      return response.json()
-    })
+  async function loadJson(path) {
+    const response = await fetch(path, { cache: 'no-cache' })
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    return response.json()
   }
   function loadVfs() {
     if (!vfsPromise) vfsPromise = loadJson('/vfs.json').then(data => directories = data).catch(error => {
@@ -123,105 +139,107 @@ export function initTerminal(site, applyTheme) {
   }
   function setDirectory(path) {
     cwd = path
-    promptPath.textContent = path === '/' ? '~' : '~' + path
-  }
-  function show(command, html) {
-    if (overview) overview.hidden = true
-    output.innerHTML = `<p class="command-echo">$ ${escapeHtml(command)}</p>${html}`
-    output.hidden = false
-    workspace.scrollTop = 0
-    output.scrollTop = 0
+    pathLabel.textContent = promptPath(cwd).slice(1)
   }
   function clear() {
-    if (overview) overview.hidden = true
-    output.hidden = true
+    startup.hidden = true
     output.replaceChildren()
   }
-  function reset() {
-    if (!overview) { location.assign('/'); return }
-    clear()
-    setDirectory('/')
-    overview.hidden = false
-    workspace.scrollTop = 0
+  function showError(result, message) {
+    result.classList.add('terminal-error')
+    result.textContent = message
   }
 
-  async function find(query, byTitle, command, token) {
+  async function find(query, name, result) {
+    const byTitle = name === 'cat' || name === 'open'
     query = query.trim()
-    if (!query) return show(command, `<p>${byTitle ? 'cat &lt;文件&gt; / open &lt;标题&gt;' : 'rg &lt;关键词&gt;'}</p>`)
-    show(command, '<p>搜索中…</p>')
-    try {
-      const index = await loadIndex()
-      if (token !== revision) return
-      const lower = query.toLowerCase()
-      const terms = [...new Set(lower.split(/\s+/))]
-      const entries = index.map(item => {
-        const title = item.title.toLowerCase()
-        const haystack = byTitle ? title : [title, item.tags.join(' '), item.content].join(' ').toLowerCase()
-        const score = title === lower ? 100 : terms.filter(term => title.includes(term)).length
-        return { item, score, match: terms.every(term => haystack.includes(term)) }
-      }).filter(entry => entry.match).sort((a, b) => b.score - a.score)
-      if (byTitle && (entries.length === 1 || entries[0]?.score === 100)) {
-        location.assign(entries[0].item.url)
-        return
-      }
-      show(command, entries.length ? resultLinks(entries, terms) : '<p>无结果。</p>')
-    } catch {
-      if (token === revision) show(command, '<p>索引加载失败，请重试。</p>')
+    if (!query) return showError(result, `usage: ${name} ${byTitle ? '<file>' : '<pattern>'}`)
+    let index
+    try { index = await loadIndex() } catch { return showError(result, `${name}: 无法读取索引`) }
+    const lower = query.toLowerCase()
+    const terms = [...new Set(lower.split(/\s+/))]
+    const entries = index.map(item => {
+      const title = item.title.toLowerCase()
+      const haystack = byTitle ? title : [title, item.tags.join(' '), item.content].join(' ').toLowerCase()
+      const score = title === lower ? 100 : terms.filter(term => title.includes(term)).length
+      return { item, score, match: terms.every(term => haystack.includes(term)) }
+    }).filter(entry => entry.match).sort((a, b) => b.score - a.score)
+    if (byTitle && (entries.length === 1 || entries[0]?.score === 100)) {
+      location.assign(entries[0].item.url)
+      return
     }
+    if (byTitle && !entries.length) return showError(result, `${name}: ${query}: 文件不存在`)
+    result.innerHTML = resultLinks(entries, terms)
   }
 
-  async function execute(raw) {
+  async function execute(command) {
+    const [, verb, args = ''] = command.match(/^(\S+)(?:\s+([\s\S]*))?$/)
+    const name = verb.toLowerCase(), arg = unquote(args)
+    if (name === 'clear') { clear(); return }
+    if (name === 'reset') {
+      if (!banner) { location.assign('/'); return }
+      clear()
+      setDirectory('/')
+      startup.hidden = false
+      return
+    }
+    const turn = document.createElement('div')
+    turn.className = 'terminal-turn'
+    turn.innerHTML = renderCommand(cwd, command)
+    const result = document.createElement('div')
+    result.className = 'terminal-result'
+    turn.append(result)
+    output.append(turn)
+
+    if (name === 'fastfetch') {
+      if (banner) result.append(banner.cloneNode(true))
+      else location.assign('/')
+    } else if (name === 'help') result.innerHTML = renderHelp(site)
+    else if (name === 'pwd') result.textContent = cwd
+    else if (name === 'theme') {
+      if (arg && !['dark', 'light', 'auto'].includes(arg)) showError(result, 'usage: theme [dark|light|auto]')
+      else applyTheme(arg || (document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'), true)
+    } else if (Object.hasOwn(routes, name) || Object.hasOwn(external, name)) location.assign(routes[name] || external[name])
+    else if (name === 'open' && Object.hasOwn(external, arg)) location.assign(external[arg])
+    else if (['rg', 'search', 'grep'].includes(name)) await find(arg, name, result)
+    else if (['ls', 'cd', 'posts', 'open', 'cat'].includes(name)) {
+      try {
+        await loadVfs().catch(() => { throw new Error('无法读取目录') })
+        if (name === 'open' || name === 'cat') {
+          const file = resolveFile(directories, cwd, arg)
+          if (file) location.assign(file.url)
+          else await find(arg, name, result)
+        } else {
+          const options = name === 'ls' ? parseList(args) : { target: name === 'posts' ? '~/posts' : arg || '~' }
+          const directory = readDirectory(directories, cwd, options.target)
+          if (name !== 'ls') setDirectory(directory.path)
+          if (name !== 'cd') result.innerHTML = fileList(directory, options)
+        }
+      } catch (error) {
+        showError(result, `${name}: ${error.message}`)
+      }
+    } else showError(result, `command not found: ${verb}`)
+    return turn.querySelector('.command-entry')
+  }
+
+  function submit(raw) {
     const command = raw.trim()
-    if (!command) return
-    const token = ++revision
+    if (!command) return queue
     if (history.at(-1) !== command) history = [...history.slice(-79), command]
     try { sessionStorage.setItem('sf-commands', JSON.stringify(history)) } catch {}
     cursor = history.length
     pending = input.value = ''
-    const [, verb, args = ''] = command.match(/^(\S+)(?:\s+([\s\S]*))?$/)
-    const name = verb.toLowerCase(), arg = unquote(args)
-    if (name === 'clear') return clear()
-    if (name === 'reset' || name === 'fastfetch') return reset()
-    if (name === 'help') return show(command, renderHelp(site))
-    if (name === 'pwd') return show(command, `<p>${escapeHtml(cwd === '/' ? '~' : '~' + cwd)}</p>`)
-    if (name === 'theme') {
-      if (arg && !['dark', 'light', 'auto'].includes(arg)) return show(command, '<p>theme [dark|light|auto]</p>')
-      const mode = arg || (document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')
-      return show(command, `<p>${applyTheme(mode, true)}</p>`)
-    }
-    if (Object.hasOwn(routes, name) || Object.hasOwn(external, name)) {
-      location.assign(routes[name] || external[name])
-      return
-    }
-    if (['rg', 'search', 'grep'].includes(name)) return find(arg, false, command, token)
-    if (name === 'open' && Object.hasOwn(external, arg)) { location.assign(external[arg]); return }
-    if (['ls', 'cd', 'posts', 'open', 'cat'].includes(name)) {
-      try { await loadVfs() } catch {
-        if (token === revision) show(command, '<p>目录加载失败，请重试。</p>')
-        return
-      }
-      if (token !== revision) return
-      if (name === 'open' || name === 'cat') {
-        const file = resolveFile(directories, cwd, arg)
-        if (file) { location.assign(file.url); return }
-        return find(arg, true, command, token)
-      }
-      try {
-        const options = name === 'ls' ? parseList(args) : { target: name === 'posts' ? '~/posts' : arg || '~' }
-        const result = readDirectory(directories, cwd, options.target)
-        if (name !== 'ls') setDirectory(result.path)
-        show(command, fileList(result, options, directories))
-      } catch (error) {
-        show(command, `<p>${escapeHtml(error.message)}</p>`)
-      }
-      return
-    }
-    show(command, '<p>未知命令。<button type="button" class="text-btn accent" data-command="help">help</button></p>')
+    queue = queue.then(async () => {
+      const entry = await execute(command)
+      const target = document.activeElement === input || !entry ? form : entry
+      target.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+    })
+    return queue
   }
 
-  form.addEventListener('submit', event => { event.preventDefault(); execute(input.value) })
+  form.addEventListener('submit', event => { event.preventDefault(); submit(input.value) })
   input.addEventListener('focus', () => loadVfs().catch(() => {}))
-  document.addEventListener('click', async event => {
+  document.addEventListener('click', event => {
     const control = event.target.closest('[data-command], [data-prefill]')
     if (!control || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
     event.preventDefault()
@@ -230,13 +248,7 @@ export function initTerminal(site, applyTheme) {
       input.focus()
       return
     }
-    const run = execute(control.dataset.command)
-    const token = revision
-    await run
-    if (event.detail === 0 && token === revision && (document.activeElement === control || document.activeElement === document.body)) {
-      const target = output.hidden ? (overview?.hidden === false ? workspace : input) : output
-      target.focus()
-    }
+    submit(control.dataset.command)
   })
   input.addEventListener('keydown', event => {
     if (event.isComposing || event.keyCode === 229) return
@@ -250,15 +262,15 @@ export function initTerminal(site, applyTheme) {
     if (event.key === 'Tab' && !event.shiftKey && input.value && input.selectionEnd === input.value.length) {
       const path = /^(cd|ls(?:\s+-l)?|cat|open)\s+(.*)$/.exec(input.value)
       const matches = path && directories ? completePath(directories, cwd, path[2], /^(cd|ls)/.test(path[1])).map(value => {
-        return `${path[1]} ${/['"\s\\]/.test(value) ? JSON.stringify(value) : value}`
+        return `${path[1]} ${quoteArgument(value)}`
       }) : names.filter(name => name.startsWith(input.value.toLowerCase())).map(name => name + ' ')
       if (matches.length === 1 && matches[0] !== input.value) { event.preventDefault(); input.value = matches[0] }
     }
     if (event.key === 'Escape') { input.value = ''; cursor = history.length }
-    if (event.ctrlKey && event.key.toLowerCase() === 'l') { event.preventDefault(); execute('clear') }
+    if (event.ctrlKey && event.key.toLowerCase() === 'l') { event.preventDefault(); submit('clear') }
   })
   document.addEventListener('keydown', event => {
-    if (event.isComposing || event.keyCode === 229 || event.defaultPrevented) return
+    if (event.isComposing || event.keyCode === 229 || event.defaultPrevented || document.querySelector('.lightbox.show')) return
     const active = document.activeElement
     const typing = active?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active?.tagName)
     if ((event.key === '/' && !typing && !event.metaKey && !event.ctrlKey && !event.altKey) ||
@@ -269,4 +281,5 @@ export function initTerminal(site, applyTheme) {
   })
   form.hidden = false
   document.documentElement.classList.add('terminal-ready')
+  if (banner && matchMedia('(hover: hover) and (pointer: fine)').matches && document.activeElement === document.body) input.focus({ preventScroll: true })
 }

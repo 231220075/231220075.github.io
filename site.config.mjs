@@ -1,5 +1,5 @@
 /**
- * 站点配置 —— 想改网站名字、导航、社交链接，只改这个文件就够了。
+ * 站点配置 —— 网站名称、个人信息、项目和社交链接。
  * 改完运行 `./blog build` 或 `./blog publish` 即可生效。
  */
 
@@ -8,7 +8,8 @@ export default {
   title: 'Summer Flower',
   description:
     'forever 的文章与项目。',
-  introduction: '南京大学计算机专业。写 Rust、开发工具和项目实践。',
+  affiliation: 'NJU CS',
+  focus: 'Rust / 开发工具 / 项目实践',
   keywords: ['博客', '技术', '计算机', '摄影', 'forever', 'Summer Flower'],
   author: 'forever',
   email: '231220075@smail.nju.edu.cn',
@@ -17,19 +18,11 @@ export default {
 
   /** 站点根地址。GitHub Pages 用户站固定为下面这个，不要改成别的域名。 */
   siteUrl: 'https://231220075.github.io',
-  /** 部署在子路径时填写，例如 '/blog'；用户站留空 */
-  basePath: '',
 
   // ---------- 外观 ----------
   favicon: '/img/terminal.svg',
   /** 主题色（用于页面高亮、按钮） */
   accent: '#a3e08c',
-
-  // ---------- 导航 ----------
-  // 次要入口通过 help 访问。
-  nav: [
-    { name: 'proj', url: '/proj/' },
-  ],
 
   projects: [
     {
@@ -62,20 +55,14 @@ export default {
 
   // ---------- 功能开关 ----------
   features: {
-    /** 本地全文搜索（零依赖，纯前端） */
-    search: true,
     /** 文章右侧目录 */
     toc: true,
     /** 图片点击放大 */
     lightbox: true,
     /** 代码块复制按钮 */
     copyCode: true,
-    /** 暗色模式切换 */
-    darkMode: true,
     /** 阅读进度条 */
     readingProgress: true,
-    /** 相关文章推荐 */
-    relatedPosts: false,
   },
 
   /** 评论系统（Giscus，基于 GitHub Discussions） */
@@ -120,12 +107,5 @@ export default {
     '/tags/HP/': '/categories/随笔/',
     '/tags/多媒体/': '/tags/前端/',
     '/tags/测试/': '/tags/博客/',
-  },
-
-  // ---------- 页脚 ----------
-  footer: {
-    since: 2025,
-    /** 备案号，没有就留空字符串 */
-    icp: '',
   },
 }

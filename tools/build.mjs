@@ -6,16 +6,17 @@
  */
 
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import config from '../site.config.mjs'
 import { renderMarkdown, parseFrontMatter, extractText, escapeHtml } from './markdown.mjs'
-import { renderHelp } from '../assets/js/terminal.mjs'
+import { installOutput } from './output.mjs'
+import { promptPath, quoteArgument, renderCommand, renderHelp } from '../assets/js/terminal.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const DEST = path.join(ROOT, 'public')
-const OUT = path.join(ROOT, `.blog-build-${process.pid}`)
+const OUT = fs.mkdtempSync(path.join(os.tmpdir(), 'summer-flower-build-'))
 
 /* ================================================================== */
 /* 工具                                                                */
@@ -42,7 +43,6 @@ function toDate(value, fallback) {
 function fmtDate(d, style) {
   const y = d.getFullYear(), mo = pad(d.getMonth() + 1), da = pad(d.getDate())
   if (style === 'iso') return `${y}-${mo}-${da}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}+08:00`
-  if (style === 'short') return `${mo}-${da}`
   return `${y}-${mo}-${da}`
 }
 
@@ -101,14 +101,13 @@ function absUrl(rel) {
 /* 图标                                                                */
 /* ================================================================== */
 
-const S = (d, extra) =>
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${extra || ''}>${d}</svg>`
+const S = (d) =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
 
 const ICONS = {
   book: S('<path d="M4 5h16v15H4zM8 5v15"/>'),
   arrowUp: S('<path d="M12 19V5M6 11l6-6 6 6"/>'),
   folder: S('<path d="M3 7h6l2 2h10v11H3z"/>'),
-  tag: S('<path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="7" cy="7" r="1"/>'),
   message: S('<path d="M3 4h18v14H8l-5 3z"/>'),
 }
 
@@ -140,66 +139,39 @@ const flower = String.raw`    .-.   .-.
     \__|__/`
 
 function renderHomeOverview(posts) {
-  const entries = posts.slice(0, 3).map(post => `<li>
-    <a class="recent-post" href="${link(post.url)}">
-      <time datetime="${fmtDate(post.date)}">${fmtDate(post.date, 'short')}</time>
-      <span>${escapeHtml(post.title)}</span>
-    </a>
-  </li>`).join('\n')
-
+  const art = flower.split('\n').map(line => `<span>${escapeHtml(line)}</span>`).join('')
   return `<div class="home-overview">
-    <p class="command-echo"><span aria-hidden="true">$ </span>fastfetch</p>
-    <div class="home-profile">
-      <pre class="home-flower" aria-hidden="true">${escapeHtml(flower)}</pre>
-      <div class="profile-text">
-        <h1>${escapeHtml(config.author)}</h1>
-        <p>${escapeHtml(config.introduction)}</p>
-        <div class="profile-meta"><span>${posts.length} 篇文章 · ${config.projects.length} 个项目</span><a href="${escapeHtml(config.github)}">GitHub</a></div>
-      </div>
-    </div>
-    ${entries ? `<section class="home-recent" aria-labelledby="recent-posts-title">
-      <h2 id="recent-posts-title"><span aria-hidden="true"># </span>最近文章</h2>
-      <ul>${entries}</ul>
-    </section>` : ''}
+    <pre class="home-flower" aria-hidden="true">${art}</pre>
+    <dl class="profile-fields">
+      <dt>User</dt><dd><a href="/about/">${escapeHtml(config.author)}</a> @ ${escapeHtml(config.affiliation)}</dd>
+      <dt>Focus</dt><dd>${escapeHtml(config.focus)}</dd>
+      <dt>Posts</dt><dd><a href="/archives/" data-command="ls -l ~/posts" aria-label="浏览 ${posts.length} 篇文章">${posts.length}</a></dd>
+      <dt>Projects</dt><dd><a href="/proj/" aria-label="查看 ${config.projects.length} 个项目">${config.projects.length}</a></dd>
+      <dt>GitHub</dt><dd><a href="${escapeHtml(config.github)}">${escapeHtml(config.github.replace(/^https?:\/\//, ''))}</a></dd>
+    </dl>
   </div>`
 }
 
-function renderTerminal({ home, cwd, posts }) {
-  const list = '<a href="/archives/" data-command="ls -l ~/posts">ls</a>'
-  const help = '<a href="/help/" data-command="help">help</a>'
-  const dock = `<div class="terminal-dock">
-    ${home ? `<nav class="terminal-shortcuts" aria-label="快捷命令">
-      <a href="/archives/" data-command="ls -l ~/posts" aria-label="ls posts，浏览文章">ls posts/</a>
-      <a href="/proj/" aria-label="cat projects.md，查看项目">cat projects.md</a>
-      <a href="/about/" aria-label="cat about.md，关于我">cat about.md</a>
-      ${help}
-    </nav>` : ''}
-    <form class="command-form" autocomplete="off" hidden>
-      <span class="prompt" aria-hidden="true"><span class="prompt-user">${escapeHtml(config.author)}</span>:<span class="prompt-path" data-prompt-path>${escapeHtml(cwd === '/' ? '~' : '~' + cwd)}</span> $</span>
-      <div class="command-field">
-        <input class="command-input" name="command" placeholder="输入命令" aria-label="输入命令，help 查看帮助" spellcheck="false" autocapitalize="off" autocorrect="off">
+function renderTerminal({ home, cwd, posts, content, initialCommand }) {
+  const initial = home ? `<h1 class="visually-hidden">${escapeHtml(config.title)}</h1>${renderHomeOverview(posts)}` :
+    renderCommand(cwd, initialCommand, true) + `<div class="terminal-page">${content}</div>`
+  return `<section class="terminal" aria-label="博客终端" data-cwd="${escapeHtml(cwd)}">
+  <div data-startup>${initial}</div>
+  <div class="command-output" role="log" aria-label="命令记录" aria-relevant="additions text"></div>
+  <form class="command-form" autocomplete="off" hidden>
+    <div class="prompt-path"><a href="/" aria-label="首页">~</a><span data-prompt-path>${escapeHtml(promptPath(cwd).slice(1))}</span></div>
+    <label class="command-line">
+      <span class="prompt-glyph" aria-hidden="true">&gt;&gt;</span>
+      <span class="command-field">
+        <input class="command-input" name="command" placeholder=" " aria-label="命令" spellcheck="false" autocapitalize="off" autocorrect="off" enterkeyhint="go">
         <span class="prompt-cursor" aria-hidden="true"></span>
-      </div>
-      <button class="command-run" type="submit" aria-label="执行命令">↵</button>
-    </form>
-  </div>`
-  const workspace = `<div class="terminal-workspace" tabindex="-1">
-    ${home ? renderHomeOverview(posts) : ''}
-    <div class="command-output" tabindex="-1" role="region" aria-label="命令输出" aria-live="polite" hidden></div>
-  </div>`
-  return `<section class="terminal${home ? ' terminal-home' : ''}" aria-label="博客命令行" data-cwd="${escapeHtml(cwd)}">
-  <div class="terminal-titlebar">
-    <a class="terminal-brand" href="/" aria-label="${escapeHtml(config.title)} 首页"><span class="pixel-mark" aria-hidden="true">&gt;_</span>${escapeHtml(config.title.toLowerCase().replace(/\s+/g, '_'))}</a>
-    <div class="terminal-actions">
-      ${home ? '' : `<nav aria-label="导航">${list}${config.nav.map(item => `<a href="${escapeHtml(item.url)}">${escapeHtml(item.name)}</a>`).join('')}${help}</nav>`}
-      ${config.features.darkMode ? '<button class="text-btn theme-toggle" type="button" data-theme-toggle aria-label="切换主题" hidden>light</button>' : ''}
-    </div>
-  </div>
-  ${home ? workspace + dock : dock + workspace}
+      </span>
+    </label>
+  </form>
 </section>`
 }
 
-function renderShell({ title, description, url, content, bodyClass, extraHead, cwd = '/', posts = [] }) {
+function renderShell({ title, description, url, content, bodyClass, extraHead, cwd = '/', posts = [], initialCommand = '' }) {
   const fullTitle = title ? `${escapeHtml(title)} | ${escapeHtml(config.title)}` : escapeHtml(config.title)
   const desc = description || config.description
   const canonical = absUrl(url)
@@ -213,7 +185,7 @@ function renderShell({ title, description, url, content, bodyClass, extraHead, c
 <meta name="description" content="${escapeHtml(desc)}">
 <meta name="author" content="${escapeHtml(config.author)}">
 <meta name="keywords" content="${escapeHtml((config.keywords || []).join(','))}">
-<meta name="theme-color" content="#111413">
+<meta name="theme-color" content="#141d19">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="${bodyClass === 'is-post' ? 'article' : 'website'}">
 <meta property="og:title" content="${escapeHtml(title || config.title)}">
@@ -223,7 +195,6 @@ function renderShell({ title, description, url, content, bodyClass, extraHead, c
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="${config.favicon}">
-<link rel="preload" href="/fonts/fusion-pixel.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
 <style>${accentCss}</style>
 <script>${themeBoot}</script>
@@ -234,10 +205,9 @@ ${extraHead || ''}
 <a class="skip-link" href="#main">跳到主要内容</a>
 <div class="progress-bar"></div>
 <main class="site-main" id="main">
-<div class="container">${renderTerminal({ home: bodyClass === 'is-home', cwd, posts })}</div>
-${content}
+${renderTerminal({ home: bodyClass === 'is-home', cwd, posts, content, initialCommand })}
 </main>
-<button class="back-top" type="button" aria-label="回到顶部">${icon('arrowUp')}</button>
+${bodyClass === 'is-post' ? `<button class="back-top" type="button" aria-label="回到顶部">${icon('arrowUp')}</button>` : ''}
 <div class="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
   <button class="lightbox-close" type="button" aria-label="关闭">✕</button>
   <img src="" alt="">
@@ -273,8 +243,6 @@ function loadPosts() {
         updated: data.updated ? toDate(data.updated, date) : date,
         tags: [].concat(data.tags || []).filter(Boolean),
         categories: [].concat(data.categories || []).filter(Boolean).length ? [].concat(data.categories).filter(Boolean) : ['未分类'],
-        description: data.description || '',
-        cover: data.cover || '',
         comments: data.comments !== false,
         html,
         headings,
@@ -315,20 +283,6 @@ function loadPages() {
 /* 组件                                                                */
 /* ================================================================== */
 
-function postCard(post) {
-  const tags = post.tags.slice(0, 2).map((t) => `<a class="post-tag" href="${link(termUrl('tags', t))}">#${escapeHtml(t)}</a>`).join(' ')
-  return `<article class="post-card">
-  <time class="post-date" datetime="${fmtDate(post.date)}">${fmtDate(post.date)}</time>
-  <div class="post-card-body">
-    <h3 class="post-card-title"><a href="${link(post.url)}">${escapeHtml(post.title)}</a></h3>
-    <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
-    <div class="post-card-meta">${tags}<span>${post.minutes} min read</span></div>
-  </div>
-  <a class="post-arrow" href="${link(post.url)}" aria-label="阅读 ${escapeHtml(post.title)}">↗</a>
-</article>`
-}
-
-
 function renderToc(headings) {
   const list = (headings || []).filter((h) => h.level >= 2 && h.level <= 4)
   if (!list.length) return ''
@@ -340,7 +294,7 @@ function renderToc(headings) {
 </aside>`
 }
 
-function giscusBlock(term) {
+function giscusBlock() {
   const g = config.giscus || {}
   if (!g.enable) return ''
   return `<section class="comments" id="comments">
@@ -350,8 +304,7 @@ function giscusBlock(term) {
     data-repo-id="${g.repoId}"
     data-category="${g.category}"
     data-category-id="${g.categoryId}"
-    data-mapping="${term ? 'specific' : g.mapping}"
-    data-term="${term ? escapeHtml(term) : ''}"></div>
+    data-mapping="${g.mapping}"></div>
 </section>`
 }
 
@@ -363,37 +316,24 @@ function buildHome(posts) {
   write('index.html', renderShell({ title: '', bodyClass: 'is-home', url: '/', content: '', posts }))
 }
 
-function projectArt(name) {
-  const shapes = {
-    'Env Controller': '<path d="M12 16h72v8H12zm0 20h72v8H12zm0 20h72v8H12z" opacity=".35"/><path d="M26 12h12v16H26zm31 20h12v16H57zM38 52h12v16H38z"/>',
-    'edge-orchestrator': '<path d="M44 24h8v32h-8zM16 40h64v8H16z"/><path d="M32 4h32v24H32zM4 44h24v28H4zm64 0h24v28H68z"/>',
-    git: '<path d="M24 12h8v52h-8zm8 20h32v8H32zm24-20h8v20h-8z"/><path d="M16 4h24v16H16zm32 0h24v16H48zM16 60h24v16H16z"/>',
-    mega: '<path d="M44 20h8v20h-8zM12 36h72v8H12zm0 8h8v16h-8zm32 0h8v16h-8zm32 0h8v16h-8z"/><path d="M32 0h32v24H32zM4 56h24v24H4zm32 0h24v24H36zm32 0h24v24H68z"/>',
-  }
-  return `<svg viewBox="0 0 96 80" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true">${shapes[name] || shapes.git}</svg>`
-}
-
 function buildProjects() {
   const projects = config.projects.map(project => {
     const article = project.article ? `<a href="${link(project.article)}">项目文章</a>` : ''
     const repo = project.featured ? 'GitHub 源码' : project.url.replace('https://github.com/', '')
-    const preview = project.preview ? `<a href="${escapeHtml(project.preview.url)}">${escapeHtml(project.preview.label)} <span aria-hidden="true">↓</span></a>` : ''
+    const preview = project.preview ? `<a href="${escapeHtml(project.preview.url)}">${escapeHtml(project.preview.label)}</a>` : ''
 
-    return `<article class="project${project.featured ? ' project-featured' : ''}">
-      <div class="project-visual" aria-hidden="true">${projectArt(project.name)}</div>
+    return `<article class="project">
       <h2>${escapeHtml(project.name)}</h2>
       <p>${escapeHtml(project.description)}</p>
       <div class="project-links">
-        ${article}<a href="${escapeHtml(project.url)}" target="_blank" rel="noopener">${escapeHtml(repo)} <span aria-hidden="true">↗</span></a>${preview}
+        ${article}<a href="${escapeHtml(project.url)}" target="_blank" rel="noopener">${escapeHtml(repo)}</a>${preview}
       </div>
     </article>`
   }).join('\n')
 
   write('proj/index.html', renderShell({
-    title: 'proj', url: '/proj/',
-    content: `<div class="container"><section class="page-box projects"><div class="page-head"><h1>proj/</h1></div>
-    <div class="project-grid">${projects}</div>
-    </section></div>`,
+    title: 'proj', url: '/proj/', initialCommand: 'cat projects.md',
+    content: `<section class="projects"><h1 class="visually-hidden">项目</h1>${projects}</section>`,
   }))
 }
 
@@ -414,12 +354,10 @@ function buildPost(post, posts) {
     ? `<a class="next" href="${link(newer.url)}"><span class="nav-label">下一篇 →</span><span class="nav-title">${escapeHtml(newer.title)}</span></a>`
     : '<span class="placeholder"></span>'
 
-  const related = config.features.relatedPosts ? relatedPosts(post, posts) : ''
   const toc = config.features.toc ? renderToc(post.headings) : ''
 
   const article = `<article class="article">
   <header class="article-header">
-    <a class="back-link" href="/archives/">← posts</a>
     <h1 class="article-title">${escapeHtml(post.title)}</h1>
     <div class="article-meta">
       <span class="meta-item">${icon('calendar')}${fmtDate(post.date)}</span>
@@ -439,7 +377,6 @@ function buildPost(post, posts) {
     ${article}
     ${toc}
   </div>
-  ${related}
   ${post.comments ? giscusBlock() : ''}
 </div>`
 
@@ -450,128 +387,53 @@ function buildPost(post, posts) {
     content,
     bodyClass: 'is-post',
     cwd: '/posts',
+    initialCommand: 'cat ' + quoteArgument(post.file),
     extraHead: `<meta property="article:published_time" content="${fmtDate(post.date, 'iso')}">
 <meta property="article:author" content="${escapeHtml(config.author)}">`,
   }))
 }
 
-function relatedPosts(post, posts) {
-  const scored = posts
-    .filter((p) => p.slug !== post.slug)
-    .map((p) => {
-      let score = 0
-      p.tags.forEach((t) => { if (post.tags.includes(t)) score += 3 })
-      p.categories.forEach((c) => { if (post.categories.includes(c)) score += 2 })
-      return { post: p, score }
-    })
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score || b.post.date - a.post.date)
-    .slice(0, 3)
-
-  if (!scored.length) return ''
-  return `<div class="container">
-  <div class="section-head">
-    <h2>相关文章</h2>
-    <span class="line"></span>
-  </div>
-  <div class="post-list">
-    ${scored.map((x) => postCard(x.post)).join('\n')}
-  </div>
-</div>`
+function renderArchiveEntries(posts) {
+  return `<ul class="archive-list">${posts.map(post => `<li class="archive-item">
+    <time datetime="${fmtDate(post.date)}">${fmtDate(post.date)}</time>
+    <a href="${link(post.url)}">${escapeHtml(post.title)}</a>
+  </li>`).join('')}</ul>`
 }
 
 function buildArchives(posts) {
   const byYear = new Map()
-  posts.forEach((p) => {
-    const y = p.date.getFullYear()
-    if (!byYear.has(y)) byYear.set(y, [])
-    byYear.get(y).push(p)
-  })
+  for (const post of posts) {
+    const year = post.date.getFullYear()
+    if (!byYear.has(year)) byYear.set(year, [])
+    byYear.get(year).push(post)
+  }
   const years = [...byYear.keys()].sort((a, b) => b - a)
+  const section = (label, href, list) => `<section class="archive-group">
+    <h2><a class="shell-directory" href="${href}">${label}/</a></h2>${renderArchiveEntries(list)}
+  </section>`
+  write('archives/index.html', renderShell({
+    title: '归档', url: '/archives/', cwd: '/posts', initialCommand: 'ls -l',
+    content: `<h1 class="visually-hidden">归档</h1>${years.map(year => section(year, `/archives/${year}/`, byYear.get(year))).join('')}`,
+  }))
 
-  const content = `<div class="container">
-  <div class="page-box">
-    <div class="page-head">
-      <p class="eyebrow">$ ls -l ~/posts</p>
-      <h1>归档<span class="accent">.</span></h1>
-      <p>${posts.length} entries · 按时间排序</p>
-    </div>
-    ${years.map((y) => `<section class="archive-year">
-      <div class="archive-year-head">
-        <span class="year"><a href="/archives/${y}/">${y}</a></span>
-        <span class="count">${byYear.get(y).length} 篇</span>
-        <span class="line"></span>
-      </div>
-      <ul class="archive-list">
-        ${byYear.get(y).map((p) => `<li class="archive-item">
-          <a href="${link(p.url)}">
-            <span class="date">${pad(p.date.getMonth() + 1)}-${pad(p.date.getDate())}</span>
-            <span class="name">${escapeHtml(p.title)}</span>
-          </a>
-        </li>`).join('\n')}
-      </ul>
-    </section>`).join('\n')}
-  </div>
-</div>`
-
-  write('archives/index.html', renderShell({ title: '归档', url: '/archives/', cwd: '/posts', content }))
-
-  /* 年 / 月归档子页，沿用旧站的 URL 规则：/archives/2025/、/archives/2025/08/ */
-  const listHtml = (list) => `<ul class="archive-list">
-        ${list.map((p) => `<li class="archive-item">
-          <a href="${link(p.url)}">
-            <span class="date">${pad(p.date.getMonth() + 1)}-${pad(p.date.getDate())}</span>
-            <span class="name">${escapeHtml(p.title)}</span>
-          </a>
-        </li>`).join('\n')}
-      </ul>`
-
-  for (const y of years) {
-    const yPosts = byYear.get(y)
+  for (const year of years) {
     const byMonth = new Map()
-    yPosts.forEach((p) => {
-      const m = p.date.getMonth() + 1
-      if (!byMonth.has(m)) byMonth.set(m, [])
-      byMonth.get(m).push(p)
-    })
-    const months = [...byMonth.keys()].sort((a, b) => b - a)
-
-    write(`archives/${y}/index.html`, renderShell({
-      title: `${y} 年归档`,
-      url: `/archives/${y}/`,
-      description: `${y} 年的全部文章`,
-      content: `<div class="container">
-  <div class="page-box">
-    <div class="page-head">
-      <h1>${y} 年归档</h1>
-      <p>共 ${yPosts.length} 篇 · <a href="/archives/">查看全部归档</a></p>
-    </div>
-    ${months.map((m) => `<section class="archive-year">
-      <div class="archive-year-head">
-        <span class="year"><a href="/archives/${y}/${pad(m)}/">${y} 年 ${pad(m)} 月</a></span>
-        <span class="count">${byMonth.get(m).length} 篇</span>
-        <span class="line"></span>
-      </div>
-      ${listHtml(byMonth.get(m))}
-    </section>`).join('\n')}
-  </div>
-</div>`,
+    for (const post of byYear.get(year)) {
+      const month = pad(post.date.getMonth() + 1)
+      if (!byMonth.has(month)) byMonth.set(month, [])
+      byMonth.get(month).push(post)
+    }
+    const url = `/archives/${year}/`
+    write(`archives/${year}/index.html`, renderShell({
+      title: `${year} 年归档`, url, cwd: '/posts', initialCommand: 'archive',
+      description: `${year} 年的全部文章`,
+      content: `<h1 class="visually-hidden">${year} 年归档</h1><a class="shell-directory" href="/archives/">../</a>${[...byMonth].map(([month, list]) => section(month, url + month + '/', list)).join('')}`,
     }))
-
-    for (const m of months) {
-      write(`archives/${y}/${pad(m)}/index.html`, renderShell({
-        title: `${y} 年 ${pad(m)} 月归档`,
-        url: `/archives/${y}/${pad(m)}/`,
-        description: `${y} 年 ${pad(m)} 月的全部文章`,
-        content: `<div class="container">
-  <div class="page-box">
-    <div class="page-head">
-      <h1>${y} 年 ${pad(m)} 月</h1>
-      <p>共 ${byMonth.get(m).length} 篇 · <a href="/archives/${y}/">${y} 年归档</a> · <a href="/archives/">全部归档</a></p>
-    </div>
-    ${listHtml(byMonth.get(m))}
-  </div>
-</div>`,
+    for (const [month, list] of byMonth) {
+      write(`archives/${year}/${month}/index.html`, renderShell({
+        title: `${year} 年 ${month} 月归档`, url: url + month + '/', cwd: '/posts', initialCommand: 'archive',
+        description: `${year} 年 ${month} 月的全部文章`,
+        content: `<h1 class="visually-hidden">${year} 年 ${month} 月归档</h1><a class="shell-directory" href="${url}">../</a>${renderArchiveEntries(list)}`,
       }))
     }
   }
@@ -580,7 +442,6 @@ function buildArchives(posts) {
 /** 旧地址跳转页：把 site.config.mjs 里 legacyRedirects 的每一项生成一个跳转页 */
 function buildLegacyRedirects() {
   const map = config.legacyRedirects || {}
-  let n = 0
   for (const [from, to] of Object.entries(map)) {
     const clean = String(from).replace(/^\/+|\/+$/g, '')
     if (!clean) continue
@@ -600,51 +461,24 @@ function buildLegacyRedirects() {
 <p>这个地址已经变了，正在前往 <a href="${escapeHtml(target)}">${escapeHtml(target)}</a>…</p>
 </body>
 </html>`)
-    n += 1
   }
-  return n
 }
 
-function buildTermPage(kind, posts, terms) {
+function buildTermPage(kind, terms) {
   const singular = kind === 'tags' ? '标签' : '分类'
-  const max = Math.max(1, ...terms.map((t) => t.count))
-
-  const cloud = terms.map((t) => `<a class="term-item${t.count >= max * 0.6 ? ' hot' : ''}" href="${link(termUrl(kind, t.name))}">
-    <span>${escapeHtml(t.name)}</span><span class="num">${t.count}</span>
-  </a>`).join('\n')
-
+  const directories = terms.map(term => `<li><a class="shell-directory" href="${link(termUrl(kind, term.name))}">${escapeHtml(termSlug(term.name))}/</a></li>`).join('')
   write(`${kind}/index.html`, renderShell({
-    title: singular,
-    url: `/${kind}/`,
-    cwd: `/${kind}`,
-    content: `<div class="container">
-  <div class="page-box">
-    <div class="page-head">
-      <h1>${singular}</h1>
-      <p>共 ${terms.length} 个${singular}，${posts.length} 篇文章</p>
-    </div>
-    <div class="term-cloud">${cloud}</div>
-  </div>
-</div>`,
+    title: singular, url: `/${kind}/`, cwd: `/${kind}`, initialCommand: 'ls',
+    content: `<h1 class="visually-hidden">${singular}</h1><ul class="ls-list">${directories}</ul>`,
   }))
 
-  terms.forEach((t) => {
-    const list = t.posts
-    write(`${kind}/${termSlug(t.name)}/index.html`, renderShell({
-      title: `${singular}：${t.name}`,
-      url: termUrl(kind, t.name),
-      cwd: `/${kind}/${termSlug(t.name)}`,
-      content: `<div class="container">
-  <div class="page-box">
-    <div class="page-head">
-      <h1>${icon(singular === '标签' ? 'tag' : 'folder')} ${escapeHtml(t.name)}</h1>
-      <p>共 ${list.length} 篇文章</p>
-    </div>
-    <div class="post-list">${list.map(postCard).join('\n')}</div>
-  </div>
-</div>`,
+  for (const term of terms) {
+    const name = termSlug(term.name)
+    write(`${kind}/${name}/index.html`, renderShell({
+      title: `${singular}：${term.name}`, url: termUrl(kind, term.name), cwd: `/${kind}/${name}`, initialCommand: 'ls -l',
+      content: `<h1 class="visually-hidden">${escapeHtml(term.name)}</h1><a class="shell-directory" href="/${kind}/">../</a>${renderArchiveEntries(term.posts)}`,
     }))
-  })
+  }
 }
 
 function collectTerms(posts, key) {
@@ -686,6 +520,7 @@ function buildStaticPages(pages) {
       title: page.title,
       description: page.description,
       url: page.url,
+      initialCommand: 'cat ' + quoteArgument(`${page.slug}.md`),
       content,
     }))
   })
@@ -693,9 +528,8 @@ function buildStaticPages(pages) {
 
 function buildHelp() {
   write('help/index.html', renderShell({
-    title: 'help', url: '/help/',
-    content: `<div class="container page-box"><div class="page-head"><h1>help</h1></div>
-    ${renderHelp(config)}</div>`,
+    title: 'help', url: '/help/', initialCommand: 'help',
+    content: `<h1 class="visually-hidden">help</h1>${renderHelp(config)}`,
   }))
 }
 
@@ -703,17 +537,8 @@ function build404() {
   write('404.html', renderShell({
     title: '页面不存在',
     url: '/404.html',
-    content: `<div class="container">
-  <div class="err-wrap">
-    <div class="err-code">404</div>
-    <h1>command not found</h1>
-    <p>页面不存在。输入 help 查看入口。</p>
-    <p>
-      <a class="btn" href="/">${icon('home')} 回到首页</a>
-      <a class="btn ghost" href="/archives/">${icon('archive')} 看看归档</a>
-    </p>
-  </div>
-</div>`,
+    initialCommand: 'open ' + quoteArgument('/404.html'),
+    content: '<h1 class="error-line">404: 页面不存在</h1>',
   }))
 }
 
@@ -783,6 +608,7 @@ function buildSearchIndex(posts, pages) {
   const data = [
     ...posts.map((p) => ({
       title: p.title,
+      path: `posts/${p.file}`,
       url: link(p.url),
       date: fmtDate(p.date),
       excerpt: p.excerpt,
@@ -791,6 +617,7 @@ function buildSearchIndex(posts, pages) {
     })),
     ...pages.filter((p) => !['archives', 'sitemap'].includes(p.slug)).map((p) => ({
       title: p.title,
+      path: `${p.slug}.md`,
       url: link(p.url),
       date: fmtDate(p.date),
       excerpt: p.description || '',
@@ -809,46 +636,18 @@ function copyAssets() {
   copyDir(path.join(ROOT, 'assets', 'css'), path.join(OUT, 'css'))
   copyDir(path.join(ROOT, 'assets', 'js'), path.join(OUT, 'js'))
   copyDir(path.join(ROOT, 'assets', 'img'), path.join(OUT, 'img'))
-  copyDir(path.join(ROOT, 'assets', 'fonts'), path.join(OUT, 'fonts'))
   copyDir(path.join(ROOT, 'assets', 'photos'), path.join(OUT, 'photos'))
-  // Retain media referenced by existing posts, without the gallery page.
+  // 保留文章仍引用的旧相册资源地址。
   copyDir(path.join(ROOT, 'assets', 'photos-gallery'), path.join(OUT, 'photos-gallery'))
   copyDir(path.join(ROOT, 'static'), OUT)
-
-  // 去掉从 Hexo 遗留的域名相关脚本
-  const stale = ['js/redirect-handler.js']
-  stale.forEach((f) => {
-    const p = path.join(OUT, f)
-    if (fs.existsSync(p)) fs.unlinkSync(p)
-  })
 }
 
 /* ================================================================== */
 /* 主流程                                                              */
 /* ================================================================== */
 
-/** 递归删除目录（用 unlink+rmdir，避免系统回收站带来的不确定性） */
-function removeDir(dir) {
-  if (!fs.existsSync(dir)) return
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, entry.name)
-    if (entry.isDirectory()) removeDir(p)
-    else { try { fs.unlinkSync(p) } catch (e) { /* ignore */ } }
-  }
-  try { fs.rmdirSync(dir) } catch (e) { /* ignore */ }
-}
-
-function clean() {
-  if (path.dirname(OUT) !== ROOT || path.basename(OUT) !== `.blog-build-${process.pid}`) {
-    throw new Error('拒绝清理未知目录：' + OUT)
-  }
-  removeDir(OUT)
-}
-
 function main() {
   const t0 = Date.now()
-  clean()
-  fs.mkdirSync(OUT, { recursive: true })
 
   const posts = loadPosts()
   const pages = loadPages()
@@ -862,8 +661,8 @@ function main() {
   posts.forEach((p) => buildPost(p, posts))
   buildArchives(posts)
   buildLegacyRedirects()
-  buildTermPage('tags', posts, tags)
-  buildTermPage('categories', posts, categories)
+  buildTermPage('tags', tags)
+  buildTermPage('categories', categories)
   buildStaticPages(pages)
   buildHelp()
   build404()
@@ -881,17 +680,8 @@ function main() {
   }
 
   const fileCount = count(OUT)
-  const backup = path.join(ROOT, `.blog-build-previous-${process.pid}`)
-  // Keep the last successful site available until every output is ready.
-  if (fs.existsSync(DEST)) fs.renameSync(DEST, backup)
-  try {
-    fs.renameSync(OUT, DEST)
-  } catch (error) {
-    if (fs.existsSync(backup)) fs.renameSync(backup, DEST)
-    throw error
-  }
-  removeDir(backup)
+  installOutput(ROOT, OUT)
   console.log(`built ${posts.length} posts · ${fileCount} files · ${Date.now() - t0}ms → public/`)
 }
 
-try { main() } finally { clean() }
+try { main() } finally { fs.rmSync(OUT, { recursive: true, force: true }) }

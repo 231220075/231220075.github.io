@@ -5,14 +5,12 @@ Thumbs.db
 # ---- 依赖与构建产物 ----
 node_modules/
 public/
+# macOS 桌面同步产生的数字后缀副本
+/public [0-9]*/
+!/public [0-9]*[!0-9]*/
 *.log
 
-# ---- Hexo 时代遗留 ----
-.deploy*/
-db.json
-.hexo-backup/
-.image_map.json
-_multiconfig.yml
+# ---- 本地可恢复备份 ----
 .trash/
 
 # ---- 编辑器 ----
@@ -22,5 +20,5 @@ _multiconfig.yml
 # ---- 本地工作笔记（不发布到公开仓库）----
 .workbuddy/
 
-# Temporary output for successful-build swaps
+# 构建更新期间的临时文件和回滚备份
 .blog-build-*/
