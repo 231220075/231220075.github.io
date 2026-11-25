@@ -147,9 +147,6 @@ img { max-width: 100%; height: auto; }
 .theme-swatch { display: grid; place-items: center; width: 1.5ch; height: .8em; background: var(--bg); border: 1px solid var(--muted); }
 .theme-swatch[data-preset="auto"] { height: 1em; line-height: 1; border: 0; color: var(--muted); }
 .theme-description { color: var(--muted); }
-.theme-motion { grid-template-columns: 3ch auto; margin-block-start: .5lh; }
-.theme-motion .theme-check::before { content: '[ ]'; white-space: pre; }
-.theme-motion input:checked + .theme-check::before { content: '[x]'; }
 .page-head { margin-bottom: 16px; }
 .page-head h1 { color: var(--heading); font-size: 20px; margin: 0; }
 .page-head p { margin: 0; color: var(--muted); }
@@ -252,22 +249,6 @@ th { color: var(--heading); background: var(--surface); font-weight: 500; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .terminal-ready body { transition: background-color .2s ease-out, color .2s ease-out; }
-}
-@media screen and (prefers-reduced-motion: no-preference) {
-  :root[data-background-motion] :is(.is-home, .is-settings) { isolation: isolate; }
-  :root[data-background-motion] :is(.is-home, .is-settings)::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background: radial-gradient(ellipse at 78% 72%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 68%);
-    animation: background-drift 48s ease-in-out infinite alternate;
-  }
-  @keyframes background-drift {
-    from { opacity: .3; }
-    to { opacity: .85; }
-  }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 @media print {

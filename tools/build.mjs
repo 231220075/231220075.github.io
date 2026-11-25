@@ -120,7 +120,18 @@ const icon = (name) => ICONS[name] || ICONS.book
 
 const accentCss = `:root{--accent:${config.accent};}`
 
-const themeBoot = `(${applyThemePreference.toString()})(${JSON.stringify(themeModes)});\n(${applyBackgroundMotion.toString()})();`
+const themeBoot = `(${applyThemePreference.toString()})(${JSON.stringify(themeModes)});`
+
+const motionBoot = `(function(apply) {
+  const enabled = apply();
+  document.addEventListener('DOMContentLoaded', function () {
+    const control = document.querySelector('input[name="background-motion"]');
+    if (!control) return;
+    control.checked = enabled;
+    control.disabled = false;
+    control.addEventListener('change', function () { apply(control.checked); });
+  }, { once: true });
+})(${applyBackgroundMotion.toString()});`
 
 function siteScript() {
   return `window.__SITE__=${JSON.stringify({
@@ -181,6 +192,7 @@ function renderShell({ title, description, url, content, bodyClass, extraHead, c
   const fullTitle = title ? `${escapeHtml(title)} | ${escapeHtml(config.title)}` : escapeHtml(config.title)
   const desc = description || config.description
   const canonical = absUrl(url)
+  const supportsMotion = bodyClass === 'is-home' || bodyClass === 'is-settings'
 
   return `<!DOCTYPE html>
 <html lang="${config.lang}" data-theme="dark">
@@ -202,8 +214,9 @@ function renderShell({ title, description, url, content, bodyClass, extraHead, c
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="${config.favicon}">
 <link rel="stylesheet" href="/css/style.css">
+${supportsMotion ? '<link rel="stylesheet" href="/css/background-motion.css">' : ''}
 <style>${accentCss}</style>
-<script>${themeBoot}</script>
+<script>${themeBoot}${supportsMotion ? '\n' + motionBoot : ''}</script>
 <script>${siteScript()}</script>
 ${extraHead || ''}
 </head>
@@ -548,13 +561,12 @@ function buildSettings() {
   write('settings/index.html', renderShell({
     title: settingsFile.title, url: settingsFile.url, bodyClass: 'is-settings', initialCommand: `cat ${settingsFile.name}`,
     content: `<h1 class="visually-hidden">${settingsFile.title}</h1>
-    <fieldset class="theme-settings" data-theme-settings disabled><legend>theme</legend>${choices}
-      <label class="theme-choice theme-motion">
-        <input class="visually-hidden" type="checkbox" name="background-motion">
-        <span class="theme-check" aria-hidden="true"></span>
-        <span class="theme-name">动态底色</span>
-      </label>
-    </fieldset>
+    <fieldset class="theme-settings" data-theme-settings disabled><legend>theme</legend>${choices}</fieldset>
+    <label class="theme-choice theme-motion">
+      <input class="visually-hidden" type="checkbox" name="background-motion" disabled>
+      <span class="theme-check" aria-hidden="true"></span>
+      <span class="theme-name">动态底色</span>
+    </label>
     <noscript>启用 JavaScript 后可调整配色设置。</noscript>`,
   }))
 }

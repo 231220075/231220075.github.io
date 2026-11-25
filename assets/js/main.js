@@ -1,5 +1,5 @@
 import { initTerminal } from './terminal.mjs'
-import { applyBackgroundMotion, applyThemePreference, themeModes } from './themes.mjs'
+import { applyThemePreference, themeModes } from './themes.mjs'
 
 /* Summer Flower — read-only blog shell. */
 (function () {
@@ -18,14 +18,10 @@ import { applyBackgroundMotion, applyThemePreference, themeModes } from './theme
 
   function initTheme() {
     applyTheme()
-    var motion = applyBackgroundMotion()
     if (settings) {
-      var motionControl = settings.querySelector('input[name="background-motion"]')
-      if (motionControl) motionControl.checked = motion
       settings.disabled = false
       settings.addEventListener('change', function (event) {
         if (event.target.name === 'theme') applyTheme(event.target.value)
-        if (event.target === motionControl) applyBackgroundMotion(motionControl.checked)
       })
     }
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
