@@ -31,7 +31,7 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char])
 }
 
-export function promptPath(cwd) {
+function promptPath(cwd) {
   return cwd === '/' ? '~' : '~' + cwd
 }
 
@@ -39,16 +39,16 @@ export function quoteArgument(value) {
   return /['"\s\\]/.test(value) ? JSON.stringify(value) : value
 }
 
+export function renderPathSuffix(cwd) {
+  const [, section, ...rest] = cwd.split('/')
+  const href = { posts: '/archives/', tags: '/tags/', categories: '/categories/' }[section]
+  const prefix = section ? `/${section}` : ''
+  return (href ? `<a href="${href}">${escapeHtml(prefix)}</a>` : escapeHtml(prefix)) +
+    (rest.length ? '/' + escapeHtml(rest.join('/')) : '')
+}
+
 export function renderCommand(cwd, command, homeLink = false) {
-  let path = escapeHtml(promptPath(cwd))
-  if (homeLink) {
-    const [, section, ...rest] = cwd.split('/')
-    const href = { posts: '/archives/', tags: '/tags/', categories: '/categories/' }[section]
-    const prefix = section ? `/${section}` : ''
-    path = `<a href="/" aria-label="首页">~</a>` +
-      (href ? `<a href="${href}">${escapeHtml(prefix)}</a>` : escapeHtml(prefix)) +
-      (rest.length ? '/' + escapeHtml(rest.join('/')) : '')
-  }
+  const path = homeLink ? `<a href="/" aria-label="首页">~</a>${renderPathSuffix(cwd)}` : escapeHtml(promptPath(cwd))
   return `<div class="command-entry"><div class="prompt-path">${path}</div><div><span class="prompt-glyph" aria-hidden="true">&gt;&gt;</span> ${escapeHtml(command)}</div></div>`
 }
 
@@ -139,7 +139,7 @@ export function initTerminal(site, applyTheme) {
   }
   function setDirectory(path) {
     cwd = path
-    pathLabel.textContent = promptPath(cwd).slice(1)
+    pathLabel.innerHTML = renderPathSuffix(cwd)
   }
   function clear() {
     startup.hidden = true

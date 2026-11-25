@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url'
 import config from '../site.config.mjs'
 import { renderMarkdown, parseFrontMatter, extractText, escapeHtml } from './markdown.mjs'
 import { installOutput } from './output.mjs'
-import { promptPath, quoteArgument, renderCommand, renderHelp } from '../assets/js/terminal.mjs'
+import { quoteArgument, renderCommand, renderHelp, renderPathSuffix } from '../assets/js/terminal.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -154,13 +154,16 @@ function renderHomeOverview(posts) {
 
 function renderTerminal({ home, post, cwd, posts, content, initialCommand }) {
   const page = home ? '' : `<div class="terminal-page">${content}</div>`
-  const initial = home ? `<h1 class="visually-hidden">${escapeHtml(config.title)}</h1>${renderHomeOverview(posts)}` :
-    renderCommand(cwd, initialCommand, true) + (post ? '' : page)
-  return `<section class="terminal" aria-label="博客终端" data-cwd="${escapeHtml(cwd)}">
-  <div data-startup>${initial}</div>
+  let initial = ''
+  if (home) initial = `<h1 class="visually-hidden">${escapeHtml(config.title)}</h1>${renderHomeOverview(posts)}`
+  else if (!post) initial = renderCommand(cwd, initialCommand, true) + page
+  const homeLink = '<a href="/" aria-label="首页">~</a>'
+  const path = renderPathSuffix(cwd)
+  return `<section class="terminal" aria-label="博客终端" data-cwd="${escapeHtml(cwd)}">${post ? `\n  <noscript><div class="prompt-path">${homeLink}${path}</div></noscript>` : ''}
+  <div data-startup${post ? ' hidden' : ''}>${initial}</div>
   <div class="command-output" role="log" aria-label="命令记录" aria-relevant="additions text"></div>
   <form class="command-form" autocomplete="off" hidden>
-    <div class="prompt-path"><a href="/" aria-label="首页">~</a><span data-prompt-path>${escapeHtml(promptPath(cwd).slice(1))}</span></div>
+    <div class="prompt-path">${homeLink}<span data-prompt-path>${path}</span></div>
     <label class="command-line">
       <span class="prompt-glyph" aria-hidden="true">&gt;&gt;</span>
       <span class="command-field">
@@ -388,7 +391,6 @@ function buildPost(post, posts) {
     content,
     bodyClass: 'is-post',
     cwd: '/posts',
-    initialCommand: 'cat ' + quoteArgument(post.file),
     extraHead: `<meta property="article:published_time" content="${fmtDate(post.date, 'iso')}">
 <meta property="article:author" content="${escapeHtml(config.author)}">`,
   }))
