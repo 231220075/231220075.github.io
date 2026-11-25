@@ -1,4 +1,5 @@
 import { completePath, normalizePath, parseList, readDirectory, resolveFile, unquote } from './filesystem.mjs'
+import { settingsFile, themeModes, themeUsage } from './themes.mjs'
 
 const commands = [
   { usage: 'ls [-l] [dir] [-t tag]', label: '列出目录', command: 'ls -l ~/posts', href: '/archives/' },
@@ -15,7 +16,8 @@ const commands = [
   { usage: 'links', label: '友链', href: '/links/' },
   { usage: 'open github', label: 'GitHub', route: 'github' },
   { usage: 'open email', label: '邮件', route: 'email' },
-  { usage: 'theme [dark|light|auto]', label: '切换主题', prefill: 'theme ' },
+  { usage: settingsFile.name, label: settingsFile.title, href: settingsFile.url },
+  { usage: 'theme [preset]', label: '切换配色', prefill: 'theme ' },
   { usage: 'fastfetch', label: '显示博客信息', command: 'fastfetch', href: '/' },
   { usage: 'clear', label: '清屏', command: 'clear' },
   { usage: 'reset', label: '重置终端', command: 'reset', href: '/' },
@@ -197,8 +199,8 @@ export function initTerminal(site, applyTheme) {
     } else if (name === 'help') result.innerHTML = renderHelp(site)
     else if (name === 'pwd') result.textContent = cwd
     else if (name === 'theme') {
-      if (arg && !['dark', 'light', 'auto'].includes(arg)) showError(result, 'usage: theme [dark|light|auto]')
-      else applyTheme(arg || (document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'), true)
+      if (arg && !themeModes.includes(arg)) showError(result, `usage: ${themeUsage}`)
+      else applyTheme(arg || (document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'))
     } else if (Object.hasOwn(routes, name) || Object.hasOwn(external, name)) location.assign(routes[name] || external[name])
     else if (name === 'open' && Object.hasOwn(external, arg)) location.assign(external[arg])
     else if (['rg', 'search', 'grep'].includes(name)) await find(arg, name, result)
@@ -261,9 +263,12 @@ export function initTerminal(site, applyTheme) {
     }
     if (event.key === 'Tab' && !event.shiftKey && input.value && input.selectionEnd === input.value.length) {
       const path = /^(cd|ls(?:\s+-l)?|cat|open)\s+(.*)$/.exec(input.value)
-      const matches = path && directories ? completePath(directories, cwd, path[2], /^(cd|ls)/.test(path[1])).map(value => {
-        return `${path[1]} ${quoteArgument(value)}`
-      }) : names.filter(name => name.startsWith(input.value.toLowerCase())).map(name => name + ' ')
+      const theme = /^theme\s+(\S*)$/i.exec(input.value)
+      let matches
+      if (theme) matches = themeModes.filter(mode => mode.startsWith(theme[1])).map(mode => `theme ${mode}`)
+      else if (path && directories) matches = completePath(directories, cwd, path[2], /^(cd|ls)/.test(path[1]))
+        .map(value => `${path[1]} ${quoteArgument(value)}`)
+      else matches = names.filter(name => name.startsWith(input.value.toLowerCase())).map(name => name + ' ')
       if (matches.length === 1 && matches[0] !== input.value) { event.preventDefault(); input.value = matches[0] }
     }
     if (event.key === 'Escape') { input.value = ''; cursor = history.length }

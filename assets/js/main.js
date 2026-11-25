@@ -1,4 +1,5 @@
 import { initTerminal } from './terminal.mjs'
+import { applyThemePreference, themeModes } from './themes.mjs'
 
 /* Summer Flower — read-only blog shell. */
 (function () {
@@ -6,26 +7,25 @@ import { initTerminal } from './terminal.mjs'
   var SITE = window.__SITE__ || {}
   var FEATURES = SITE.features || {}
 
-  var themeMode = 'dark'
+  var settings = document.querySelector('[data-theme-settings]')
 
-  function applyTheme(mode, persist) {
-    if (!['dark', 'light', 'auto'].includes(mode)) mode = 'dark'
-    var actual = mode === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode
-    document.documentElement.dataset.theme = actual
-    themeMode = mode
-    var meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) meta.content = actual === 'dark' ? '#141d19' : '#f5f6f0'
-    if (persist) { try { localStorage.setItem('sf-theme', mode) } catch (e) {} }
+  function applyTheme(mode) {
+    var selected = applyThemePreference(themeModes, mode)
+    var option = settings && settings.querySelector('input[value="' + selected + '"]')
+    if (option) option.checked = true
     if (window.__syncGiscus) window.__syncGiscus()
-    return mode
   }
 
   function initTheme() {
-    var saved = 'dark'
-    try { saved = localStorage.getItem('sf-theme') || 'dark' } catch (e) {}
-    applyTheme(saved)
+    applyTheme()
+    if (settings) {
+      settings.disabled = false
+      settings.addEventListener('change', function (event) {
+        if (event.target.name === 'theme') applyTheme(event.target.value)
+      })
+    }
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-      if (themeMode === 'auto') applyTheme('auto')
+      if (document.documentElement.dataset.themeMode === 'auto') applyTheme('auto')
     })
   }
 
@@ -154,7 +154,7 @@ import { initTerminal } from './terminal.mjs'
     if (!host) return
 
     var themeOf = function () {
-      return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
+      return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
     }
 
     var s = document.createElement('script')

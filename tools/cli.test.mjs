@@ -168,6 +168,7 @@ test('home exposes a plain shell prompt and builds a flat post directory with ta
   assert.doesNotMatch(main, /<button|placeholder="输入命令"/)
   assert.match(main, /<h1 class="visually-hidden">Summer Flower<\/h1>/)
   assert.match(main, /<dt>Posts<\/dt><dd><a href="\/archives\/" data-command="ls -l ~\/posts"/)
+  assert.match(main, /href="\/settings\/">settings<\/a>/)
   assert.match(main, /class="prompt-glyph" aria-hidden="true">&gt;&gt;<\/span>/)
   assert.ok(main.indexOf('data-startup') < main.indexOf('class="command-output"'))
   assert.ok(main.indexOf('class="command-output"') < main.indexOf('class="command-form"'))
@@ -179,6 +180,13 @@ test('home exposes a plain shell prompt and builds a flat post directory with ta
   assert.equal((articleTop.match(/class="prompt-glyph"/g) || []).length, 1)
   assert.match(articleTop, /class="command-form"[\s\S]*href="\/archives\/">\/posts<\/a>/)
   const vfs = JSON.parse(fs.readFileSync(path.join(output, 'vfs.json'), 'utf8'))
+  assert.deepEqual(vfs['/'].entries.find(entry => entry.name === 'settings'), {
+    type: 'file', name: 'settings', title: '配色设置', url: '/settings/',
+  })
+  const settings = fs.readFileSync(path.join(output, 'settings/index.html'), 'utf8')
+  assert.match(settings, /cat settings/)
+  assert.deepEqual([...settings.matchAll(/name="theme" value="([^"]+)"/g)].map(match => match[1]),
+    ['dark', 'slate', 'roast', 'dusk', 'light', 'auto'])
   const search = JSON.parse(fs.readFileSync(path.join(output, 'search.json'), 'utf8'))
   assert.deepEqual(vfs['/posts'].entries.map(file => file.name), ['env-controller.md', 'uncategorized.md', '多分类笔记.md'])
   assert.deepEqual(search.map(entry => entry.path), ['posts/env-controller.md', 'posts/uncategorized.md', 'posts/多分类笔记.md'])

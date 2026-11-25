@@ -41,7 +41,8 @@ rg 工作区
 - `cd <目录>` 切换目录，`pwd` 显示当前位置。文章平铺在 `~/posts/`，也可从 `~/tags/` 和 `~/categories/` 查找。路径支持中文、引号、空格、`~`、`..` 和绝对路径。
 - `cat ~/about.md` 和 `cat ~/projects.md` 查看功能页。`cat` 或 `open` 可用文件名或标题打开文章，直接进入文章原网址。
 - `rg <关键词>`（别名 `search`、`grep`）检索标题、标签与正文，从命中处显示上下文。
-- `clear` 清屏，`reset` 恢复初始状态。`fastfetch` 显示博客信息，`help` 列出命令，`theme [dark|light|auto]` 切换主题。
+- `cat ~/settings` 或 `settings` 打开配色设置。也可用 `theme [dark|slate|roast|dusk|light|auto]` 切换，选择保存在当前浏览器。
+- `clear` 清屏，`reset` 恢复初始状态。`fastfetch` 显示博客信息，`help` 列出命令。
 
 `/` 或 `⌘/Ctrl K` 聚焦输入，`↑ ↓` 浏览当前标签页的命令历史，`Tab` 补全唯一匹配，`Esc` 清空输入。归档、项目和个人页均有静态链接，关闭 JavaScript 仍可浏览。虚拟目录与搜索索引由构建生成，项目简介配置在 `site.config.mjs`。
 

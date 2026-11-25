@@ -13,6 +13,7 @@ import config from '../site.config.mjs'
 import { renderMarkdown, parseFrontMatter, extractText, escapeHtml } from './markdown.mjs'
 import { installOutput } from './output.mjs'
 import { quoteArgument, renderCommand, renderHelp, renderPathSuffix } from '../assets/js/terminal.mjs'
+import { applyThemePreference, settingsFile, themes, themeModes } from '../assets/js/themes.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -119,7 +120,7 @@ const icon = (name) => ICONS[name] || ICONS.book
 
 const accentCss = `:root{--accent:${config.accent};}`
 
-const themeBoot = `(function(){try{var m=localStorage.getItem('sf-theme')||'dark';var d=m==='dark'||(m==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();`
+const themeBoot = `(${applyThemePreference.toString()})(${JSON.stringify(themeModes)});`
 
 function siteScript() {
   return `window.__SITE__=${JSON.stringify({
@@ -148,6 +149,7 @@ function renderHomeOverview(posts) {
       <dt>Posts</dt><dd><a href="/archives/" data-command="ls -l ~/posts" aria-label="浏览 ${posts.length} 篇文章">${posts.length}</a></dd>
       <dt>Projects</dt><dd><a href="/proj/" aria-label="查看 ${config.projects.length} 个项目">${config.projects.length}</a></dd>
       <dt>GitHub</dt><dd><a href="${escapeHtml(config.github)}">${escapeHtml(config.github.replace(/^https?:\/\//, ''))}</a></dd>
+      <dt>Config</dt><dd><a href="${settingsFile.url}">${settingsFile.name}</a></dd>
     </dl>
   </div>`
 }
@@ -536,6 +538,21 @@ function buildHelp() {
   }))
 }
 
+function buildSettings() {
+  const choices = themeModes.map(mode => `<label class="theme-choice">
+    <input class="visually-hidden" type="radio" name="theme" value="${mode}"${mode === 'dark' ? ' checked' : ''}>
+    <span class="theme-check" aria-hidden="true"></span>
+    <span class="theme-swatch" data-preset="${mode}" aria-hidden="true">${mode === 'auto' ? '◐' : ''}</span>
+    <span class="theme-name">${mode}</span><span class="theme-description">${themes[mode]}</span>
+  </label>`).join('\n')
+  write('settings/index.html', renderShell({
+    title: settingsFile.title, url: settingsFile.url, initialCommand: `cat ${settingsFile.name}`,
+    content: `<h1 class="visually-hidden">${settingsFile.title}</h1>
+    <fieldset class="theme-settings" data-theme-settings disabled><legend>theme</legend>${choices}</fieldset>
+    <noscript>启用 JavaScript 后可切换配色。</noscript>`,
+  }))
+}
+
 function build404() {
   write('404.html', renderShell({
     title: '页面不存在',
@@ -558,6 +575,7 @@ function buildSitemap(posts, pages) {
     { url: '/tags/', date: new Date(), priority: '0.6' },
     ...posts.map((p) => ({ url: p.url, date: p.updated, priority: '0.9' })),
     { url: '/help/', date: new Date(), priority: '0.5' },
+    { url: settingsFile.url, date: new Date(), priority: '0.5' },
     { url: '/proj/', date: new Date(), priority: '0.7' },
     ...pages.filter((p) => !['archives', 'sitemap'].includes(p.slug)).map((p) => ({ url: p.url, date: p.date, priority: '0.5' })),
   ]
@@ -590,6 +608,7 @@ function buildFilesystem(posts, pages, termsByKind) {
     '/': { url: '/', entries: [directory('posts', '/archives/'), directory('tags', '/tags/'), directory('categories', '/categories/'),
       ...pages.filter(page => !['archives', 'sitemap'].includes(page.slug)).map(page => file(`${page.slug}.md`, page.title, link(page.url))),
       file('projects.md', '项目', '/proj/'),
+      file(settingsFile.name, settingsFile.title, settingsFile.url),
     ] },
     '/posts': { url: '/archives/', entries: [...files.values()] },
   }
@@ -668,6 +687,7 @@ function main() {
   buildTermPage('categories', categories)
   buildStaticPages(pages)
   buildHelp()
+  buildSettings()
   build404()
   buildSitemap(posts, pages)
   buildSearchIndex(posts, pages)

@@ -1,5 +1,5 @@
 /* Summer Flower — terminal notebook */
-:root {
+:root, .theme-swatch[data-preset="dark"] {
   color-scheme: dark;
   --bg: #141d19;
   --surface: #171c19;
@@ -9,18 +9,46 @@
   --accent: #a3e08c;
   --border: #2b352e;
   --code: #141a16;
-  --gutter: clamp(16px, 2.2vw, 40px);
-  --panel-gap: 24px;
-  --reading-width: 980px;
-  --font: Menlo, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  --shell-gutter: clamp(10px, 1vw, 18px);
   --shell-path: #94d4db;
   --shell-error: #ff9aae;
   --shell-yellow: #f5d99f;
   --shell-purple: #d8aeea;
   --shell-blue: #9bbef2;
 }
-:root[data-theme="light"] {
+:root[data-theme="slate"], .theme-swatch[data-preset="slate"] {
+  --bg: #202a36;
+  --surface: #263343;
+  --text: #d7e1ea;
+  --heading: #edf3f8;
+  --muted: #a2afbd;
+  --accent: #abcadd;
+  --border: #3b4a59;
+  --code: #1b2430;
+  --shell-path: #b4c7e3;
+}
+:root[data-theme="roast"], .theme-swatch[data-preset="roast"] {
+  --bg: #2b241f;
+  --surface: #342a24;
+  --text: #e5dbd0;
+  --heading: #f3ece3;
+  --muted: #b9a99c;
+  --accent: #dfc39a;
+  --border: #504137;
+  --code: #251e1a;
+  --shell-path: #a9ccc3;
+}
+:root[data-theme="dusk"], .theme-swatch[data-preset="dusk"] {
+  --bg: #282331;
+  --surface: #302939;
+  --text: #e0d9e7;
+  --heading: #f4eef8;
+  --muted: #b4a8c0;
+  --accent: #d6bfeb;
+  --border: #4b3e55;
+  --code: #231e2b;
+  --shell-path: #a9c9d9;
+}
+:root[data-theme="light"], .theme-swatch[data-preset="light"] {
   color-scheme: light;
   --bg: #f5f6f0;
   --surface: #ecefe6;
@@ -35,6 +63,13 @@
   --shell-yellow: #835b18;
   --shell-purple: #795287;
   --shell-blue: #3e629c;
+}
+:root {
+  --gutter: clamp(16px, 2.2vw, 40px);
+  --panel-gap: 24px;
+  --reading-width: 980px;
+  --font: Menlo, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --shell-gutter: clamp(10px, 1vw, 18px);
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 32px; }
@@ -102,6 +137,16 @@ img { max-width: 100%; height: auto; }
 .help-command { appearance: none; border: 0; background: none; font: inherit; padding: 0; text-align: left; }
 .help-command, .terminal-ready .help-fallback { display: none; }
 .terminal-ready .help-command { display: inline; }
+.theme-settings { margin: 0; padding: 0; border: 0; }
+.theme-settings legend { padding: 0; color: var(--muted); }
+.theme-choice { display: grid; grid-template-columns: 1ch 1.5ch 5ch auto; align-items: center; gap: 1ch; width: fit-content; min-height: 36px; cursor: pointer; }
+.theme-check { color: var(--accent); }
+.theme-choice input:checked + .theme-check::before { content: '*'; }
+.theme-choice input:focus-visible + .theme-check { outline: 1px solid var(--accent); outline-offset: 2px; min-height: 1em; }
+.theme-choice:hover .theme-name { text-decoration: underline; }
+.theme-swatch { display: grid; place-items: center; width: 1.5ch; height: .8em; background: var(--bg); border: 1px solid var(--muted); }
+.theme-swatch[data-preset="auto"] { height: 1em; line-height: 1; border: 0; color: var(--muted); }
+.theme-description { color: var(--muted); }
 .page-head { margin-bottom: 16px; }
 .page-head h1 { color: var(--heading); font-size: 20px; margin: 0; }
 .page-head p { margin: 0; color: var(--muted); }
@@ -202,9 +247,12 @@ th { color: var(--heading); background: var(--surface); font-weight: 500; }
   .article-body h3 { font-size: 16px; }
   .page-head h1 { font-size: 24px; }
 }
+@media (prefers-reduced-motion: no-preference) {
+  .terminal-ready body { transition: background-color .2s ease-out, color .2s ease-out; }
+}
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 @media print {
-  :root { --bg: #fff; --text: #111; --heading: #000; --muted: #555; --border: #ccc; --accent: #333; }
+  :root[data-theme] { --bg: #fff; --text: #111; --heading: #000; --muted: #555; --border: #ccc; --accent: #333; }
   .terminal > [data-startup] > .command-entry, .command-output, .command-form, .toc, .back-top, .progress-bar, .comments, .post-nav, .code-copy { display: none; }
   .site-main { padding: 0; }
   .container { width: 100%; }
