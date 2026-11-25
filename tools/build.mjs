@@ -13,7 +13,7 @@ import config from '../site.config.mjs'
 import { renderMarkdown, parseFrontMatter, extractText, escapeHtml } from './markdown.mjs'
 import { installOutput } from './output.mjs'
 import { quoteArgument, renderCommand, renderHelp, renderPathSuffix } from '../assets/js/terminal.mjs'
-import { applyThemePreference, settingsFile, themes, themeModes } from '../assets/js/themes.mjs'
+import { applyBackgroundMotion, applyThemePreference, settingsFile, themes, themeModes } from '../assets/js/themes.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -120,7 +120,7 @@ const icon = (name) => ICONS[name] || ICONS.book
 
 const accentCss = `:root{--accent:${config.accent};}`
 
-const themeBoot = `(${applyThemePreference.toString()})(${JSON.stringify(themeModes)});`
+const themeBoot = `(${applyThemePreference.toString()})(${JSON.stringify(themeModes)});\n(${applyBackgroundMotion.toString()})();`
 
 function siteScript() {
   return `window.__SITE__=${JSON.stringify({
@@ -546,10 +546,16 @@ function buildSettings() {
     <span class="theme-name">${mode}</span><span class="theme-description">${themes[mode]}</span>
   </label>`).join('\n')
   write('settings/index.html', renderShell({
-    title: settingsFile.title, url: settingsFile.url, initialCommand: `cat ${settingsFile.name}`,
+    title: settingsFile.title, url: settingsFile.url, bodyClass: 'is-settings', initialCommand: `cat ${settingsFile.name}`,
     content: `<h1 class="visually-hidden">${settingsFile.title}</h1>
-    <fieldset class="theme-settings" data-theme-settings disabled><legend>theme</legend>${choices}</fieldset>
-    <noscript>启用 JavaScript 后可切换配色。</noscript>`,
+    <fieldset class="theme-settings" data-theme-settings disabled><legend>theme</legend>${choices}
+      <label class="theme-choice theme-motion">
+        <input class="visually-hidden" type="checkbox" name="background-motion">
+        <span class="theme-check" aria-hidden="true"></span>
+        <span class="theme-name">动态底色</span>
+      </label>
+    </fieldset>
+    <noscript>启用 JavaScript 后可调整配色设置。</noscript>`,
   }))
 }
 

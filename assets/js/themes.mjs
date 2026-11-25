@@ -32,3 +32,15 @@ export function applyThemePreference(modes, choice) {
   }
   return choice
 }
+
+export function applyBackgroundMotion(enabled) {
+  const root = document.documentElement
+  if (enabled === undefined) {
+    try { enabled = localStorage.getItem('sf-background-motion') === 'on' }
+    catch { enabled = root.hasAttribute('data-background-motion') }
+  } else {
+    try { localStorage.setItem('sf-background-motion', enabled ? 'on' : 'off') } catch {}
+  }
+  root.toggleAttribute('data-background-motion', enabled)
+  return enabled
+}

@@ -185,6 +185,8 @@ test('home exposes a plain shell prompt and builds a flat post directory with ta
   })
   const settings = fs.readFileSync(path.join(output, 'settings/index.html'), 'utf8')
   assert.match(settings, /cat settings/)
+  assert.match(settings, /<body class="is-settings">/)
+  assert.match(settings, /type="checkbox" name="background-motion">/)
   assert.deepEqual([...settings.matchAll(/name="theme" value="([^"]+)"/g)].map(match => match[1]),
     ['dark', 'slate', 'roast', 'dusk', 'light', 'auto'])
   const search = JSON.parse(fs.readFileSync(path.join(output, 'search.json'), 'utf8'))
