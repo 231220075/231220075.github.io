@@ -152,9 +152,10 @@ function renderHomeOverview(posts) {
   </div>`
 }
 
-function renderTerminal({ home, cwd, posts, content, initialCommand }) {
+function renderTerminal({ home, post, cwd, posts, content, initialCommand }) {
+  const page = home ? '' : `<div class="terminal-page">${content}</div>`
   const initial = home ? `<h1 class="visually-hidden">${escapeHtml(config.title)}</h1>${renderHomeOverview(posts)}` :
-    renderCommand(cwd, initialCommand, true) + `<div class="terminal-page">${content}</div>`
+    renderCommand(cwd, initialCommand, true) + (post ? '' : page)
   return `<section class="terminal" aria-label="博客终端" data-cwd="${escapeHtml(cwd)}">
   <div data-startup>${initial}</div>
   <div class="command-output" role="log" aria-label="命令记录" aria-relevant="additions text"></div>
@@ -167,7 +168,7 @@ function renderTerminal({ home, cwd, posts, content, initialCommand }) {
         <span class="prompt-cursor" aria-hidden="true"></span>
       </span>
     </label>
-  </form>
+  </form>${post ? '\n  ' + page : ''}
 </section>`
 }
 
@@ -205,7 +206,7 @@ ${extraHead || ''}
 <a class="skip-link" href="#main">跳到主要内容</a>
 <div class="progress-bar"></div>
 <main class="site-main" id="main">
-${renderTerminal({ home: bodyClass === 'is-home', cwd, posts, content, initialCommand })}
+${renderTerminal({ home: bodyClass === 'is-home', post: bodyClass === 'is-post', cwd, posts, content, initialCommand })}
 </main>
 ${bodyClass === 'is-post' ? `<button class="back-top" type="button" aria-label="回到顶部">${icon('arrowUp')}</button>` : ''}
 <div class="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">

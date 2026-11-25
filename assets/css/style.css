@@ -88,6 +88,7 @@ img { max-width: 100%; height: auto; }
 .command-input:placeholder-shown + .prompt-cursor { display: block; }
 .terminal-result:empty { display: none; }
 .terminal-page { margin-block-start: .5lh; }
+.is-post .command-form:not([hidden]) + .terminal-page { margin-block-start: 1lh; }
 .terminal-error, .error-line { color: var(--shell-error); }
 .error-line { font: inherit; margin: 0; }
 .shell-directory, .rg-path { color: var(--shell-path); }

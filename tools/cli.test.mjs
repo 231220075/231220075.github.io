@@ -175,6 +175,7 @@ test('home exposes a plain shell prompt and builds a flat post directory with ta
   assert.match(archive, /href="\/2026\/11\/18\/env-controller\/">Env Controller/)
   const article = fs.readFileSync(path.join(output, '2026/11/18/env-controller/index.html'), 'utf8')
   assert.match(article, /&gt;&gt;<\/span> cat env-controller\.md/)
+  assert.match(article, /class="command-output"[\s\S]*class="command-form"[\s\S]*<article class="article">/)
   const vfs = JSON.parse(fs.readFileSync(path.join(output, 'vfs.json'), 'utf8'))
   const search = JSON.parse(fs.readFileSync(path.join(output, 'search.json'), 'utf8'))
   assert.deepEqual(vfs['/posts'].entries.map(file => file.name), ['env-controller.md', 'uncategorized.md', '多分类笔记.md'])
