@@ -10,12 +10,12 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import config from '../site.config.mjs'
 import { renderMarkdown, parseFrontMatter, extractText, escapeHtml } from './markdown.mjs'
+import { renderHelp } from '../assets/js/terminal.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const DEST = path.join(ROOT, 'public')
 const OUT = path.join(ROOT, `.blog-build-${process.pid}`)
-let directories = []
 
 /* ================================================================== */
 /* 工具                                                                */
@@ -125,25 +125,38 @@ const themeBoot = `(function(){try{var m=localStorage.getItem('sf-theme')||'dark
 function siteScript() {
   return `window.__SITE__=${JSON.stringify({
     features: config.features,
-    searchPath: '/search.json',
     github: config.github,
     email: config.email,
-    directories,
   }).replace(/</g, '\\u003c')};`
 }
 
-function renderHomeOverview(recentPosts) {
-  const entries = recentPosts.map(post => `<li>
+const flower = String.raw`    .-.   .-.
+   (   \ /   )
+ .--'   o   '--.
+(     /   \     )
+ \__.'     '.__/
+    '.___.'
+       |
+    \__|__/`
+
+function renderHomeOverview(posts) {
+  const entries = posts.slice(0, 3).map(post => `<li>
     <a class="recent-post" href="${link(post.url)}">
-      <span class="pixel-file" aria-hidden="true"></span>
-      <span>${escapeHtml(post.title)}</span>
       <time datetime="${fmtDate(post.date)}">${fmtDate(post.date, 'short')}</time>
+      <span>${escapeHtml(post.title)}</span>
     </a>
   </li>`).join('\n')
 
   return `<div class="home-overview">
-    <p class="home-prompt"><span aria-hidden="true">$ </span><a href="/about/">whoami</a></p>
-    <h1 class="home-intro">${escapeHtml(config.introduction)}</h1>
+    <p class="command-echo"><span aria-hidden="true">$ </span>fastfetch</p>
+    <div class="home-profile">
+      <pre class="home-flower" aria-hidden="true">${escapeHtml(flower)}</pre>
+      <div class="profile-text">
+        <h1>${escapeHtml(config.author)}</h1>
+        <p>${escapeHtml(config.introduction)}</p>
+        <div class="profile-meta"><span>${posts.length} 篇文章 · ${config.projects.length} 个项目</span><a href="${escapeHtml(config.github)}">GitHub</a></div>
+      </div>
+    </div>
     ${entries ? `<section class="home-recent" aria-labelledby="recent-posts-title">
       <h2 id="recent-posts-title"><span aria-hidden="true"># </span>最近文章</h2>
       <ul>${entries}</ul>
@@ -151,32 +164,42 @@ function renderHomeOverview(recentPosts) {
   </div>`
 }
 
-function renderTerminal({ home = false, cwd = '/', recentPosts = [] } = {}) {
-  const folders = directories.map(dir => `<a class="file-entry directory-entry" href="${dir.url}" data-command="${escapeHtml('cd ' + JSON.stringify('/' + dir.name))}"><span class="pixel-folder" aria-hidden="true"></span><span>${escapeHtml(dir.name)}/</span><span class="entry-meta">${dir.files.length}</span></a>`).join('')
+function renderTerminal({ home, cwd, posts }) {
+  const list = '<a href="/archives/" data-command="ls -l ~/posts">ls</a>'
+  const help = '<a href="/help/" data-command="help">help</a>'
+  const dock = `<div class="terminal-dock">
+    ${home ? `<nav class="terminal-shortcuts" aria-label="快捷命令">
+      <a href="/archives/" data-command="ls -l ~/posts" aria-label="ls posts，浏览文章">ls posts/</a>
+      <a href="/proj/" aria-label="cat projects.md，查看项目">cat projects.md</a>
+      <a href="/about/" aria-label="cat about.md，关于我">cat about.md</a>
+      ${help}
+    </nav>` : ''}
+    <form class="command-form" autocomplete="off" hidden>
+      <span class="prompt" aria-hidden="true"><span class="prompt-user">${escapeHtml(config.author)}</span>:<span class="prompt-path" data-prompt-path>${escapeHtml(cwd === '/' ? '~' : '~' + cwd)}</span> $</span>
+      <div class="command-field">
+        <input class="command-input" name="command" placeholder="输入命令" aria-label="输入命令，help 查看帮助" spellcheck="false" autocapitalize="off" autocorrect="off">
+        <span class="prompt-cursor" aria-hidden="true"></span>
+      </div>
+      <button class="command-run" type="submit" aria-label="执行命令">↵</button>
+    </form>
+  </div>`
+  const workspace = `<div class="terminal-workspace" tabindex="-1">
+    ${home ? renderHomeOverview(posts) : ''}
+    <div class="command-output" tabindex="-1" role="region" aria-label="命令输出" aria-live="polite" hidden></div>
+  </div>`
   return `<section class="terminal${home ? ' terminal-home' : ''}" aria-label="博客命令行" data-cwd="${escapeHtml(cwd)}">
   <div class="terminal-titlebar">
     <a class="terminal-brand" href="/" aria-label="${escapeHtml(config.title)} 首页"><span class="pixel-mark" aria-hidden="true">&gt;_</span>${escapeHtml(config.title.toLowerCase().replace(/\s+/g, '_'))}</a>
-    <nav class="terminal-actions" aria-label="导航">
-      <a href="/categories/" data-command="ls">ls</a>
-      ${config.nav.map(item => `<a class="nav-link" href="${item.url}">${escapeHtml(item.name)}</a>`).join('')}
-      <a href="/help/" data-command="help">help</a>
-      ${config.features.darkMode ? '<button class="text-btn theme-toggle" type="button" data-theme-toggle aria-label="切换主题">light</button>' : ''}
-    </nav>
+    <div class="terminal-actions">
+      ${home ? '' : `<nav aria-label="导航">${list}${config.nav.map(item => `<a href="${escapeHtml(item.url)}">${escapeHtml(item.name)}</a>`).join('')}${help}</nav>`}
+      ${config.features.darkMode ? '<button class="text-btn theme-toggle" type="button" data-theme-toggle aria-label="切换主题" hidden>light</button>' : ''}
+    </div>
   </div>
-  <form class="command-form" autocomplete="off">
-    <label class="prompt" for="command-input"><span class="prompt-user">${escapeHtml(config.author)}</span>:<span class="prompt-path" data-prompt-path>${escapeHtml(cwd === '/' ? '~' : '~' + cwd)}</span> $</label>
-    <input id="command-input" class="command-input" name="command" placeholder="help" aria-label="输入命令，help 查看帮助" spellcheck="false" autocapitalize="off" autocorrect="off">
-    <button class="command-run" type="submit" aria-label="执行命令">↵</button>
-  </form>
-  <div class="terminal-workspace">
-  ${home ? renderHomeOverview(recentPosts) : ''}
-  <div class="command-output" role="region" aria-label="命令输出" aria-live="polite"${home ? '' : ' hidden'}>${home ? `<p class="command-echo">$ ls</p><div class="file-list directory-list">${folders || '<p>空目录。</p>'}</div>` : ''}</div>
-  </div>
-  <div class="terminal-status"><span data-current-path>${escapeHtml(cwd === '/' ? '~/' : '~' + cwd + '/')}</span><span>${new Set(directories.flatMap(dir => dir.files.map(file => file.url))).size} posts</span></div>
+  ${home ? workspace + dock : dock + workspace}
 </section>`
 }
 
-function renderShell({ title, description, url, content, bodyClass, extraHead, cwd = '/', recentPosts = [] }) {
+function renderShell({ title, description, url, content, bodyClass, extraHead, cwd = '/', posts = [] }) {
   const fullTitle = title ? `${escapeHtml(title)} | ${escapeHtml(config.title)}` : escapeHtml(config.title)
   const desc = description || config.description
   const canonical = absUrl(url)
@@ -192,7 +215,7 @@ function renderShell({ title, description, url, content, bodyClass, extraHead, c
 <meta name="keywords" content="${escapeHtml((config.keywords || []).join(','))}">
 <meta name="theme-color" content="#111413">
 <link rel="canonical" href="${canonical}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="${bodyClass === 'is-post' ? 'article' : 'website'}">
 <meta property="og:title" content="${escapeHtml(title || config.title)}">
 <meta property="og:description" content="${escapeHtml(desc)}">
 <meta property="og:url" content="${canonical}">
@@ -211,7 +234,7 @@ ${extraHead || ''}
 <a class="skip-link" href="#main">跳到主要内容</a>
 <div class="progress-bar"></div>
 <main class="site-main" id="main">
-<div class="container">${renderTerminal({ home: bodyClass === 'is-home', cwd, recentPosts })}</div>
+<div class="container">${renderTerminal({ home: bodyClass === 'is-home', cwd, posts })}</div>
 ${content}
 </main>
 <button class="back-top" type="button" aria-label="回到顶部">${icon('arrowUp')}</button>
@@ -337,7 +360,7 @@ function giscusBlock(term) {
 /* ================================================================== */
 
 function buildHome(posts) {
-  write('index.html', renderShell({ title: '', bodyClass: 'is-home', url: '/', content: '', recentPosts: posts.slice(0, 2) }))
+  write('index.html', renderShell({ title: '', bodyClass: 'is-home', url: '/', content: '', posts }))
 }
 
 function projectArt(name) {
@@ -396,7 +419,7 @@ function buildPost(post, posts) {
 
   const article = `<article class="article">
   <header class="article-header">
-    <a class="back-link" href="/">← posts</a>
+    <a class="back-link" href="/archives/">← posts</a>
     <h1 class="article-title">${escapeHtml(post.title)}</h1>
     <div class="article-meta">
       <span class="meta-item">${icon('calendar')}${fmtDate(post.date)}</span>
@@ -426,9 +449,8 @@ function buildPost(post, posts) {
     url: post.url,
     content,
     bodyClass: 'is-post',
-    cwd: '/' + termSlug(post.categories[0]),
-    extraHead: `<meta property="og:type" content="article">
-<meta property="article:published_time" content="${fmtDate(post.date, 'iso')}">
+    cwd: '/posts',
+    extraHead: `<meta property="article:published_time" content="${fmtDate(post.date, 'iso')}">
 <meta property="article:author" content="${escapeHtml(config.author)}">`,
   }))
 }
@@ -470,7 +492,7 @@ function buildArchives(posts) {
   const content = `<div class="container">
   <div class="page-box">
     <div class="page-head">
-      <p class="eyebrow">$ ls -R ./posts</p>
+      <p class="eyebrow">$ ls -l ~/posts</p>
       <h1>归档<span class="accent">.</span></h1>
       <p>${posts.length} entries · 按时间排序</p>
     </div>
@@ -492,7 +514,7 @@ function buildArchives(posts) {
   </div>
 </div>`
 
-  write('archives/index.html', renderShell({ title: '归档', url: '/archives/', content }))
+  write('archives/index.html', renderShell({ title: '归档', url: '/archives/', cwd: '/posts', content }))
 
   /* 年 / 月归档子页，沿用旧站的 URL 规则：/archives/2025/、/archives/2025/08/ */
   const listHtml = (list) => `<ul class="archive-list">
@@ -594,6 +616,7 @@ function buildTermPage(kind, posts, terms) {
   write(`${kind}/index.html`, renderShell({
     title: singular,
     url: `/${kind}/`,
+    cwd: `/${kind}`,
     content: `<div class="container">
   <div class="page-box">
     <div class="page-head">
@@ -610,6 +633,7 @@ function buildTermPage(kind, posts, terms) {
     write(`${kind}/${termSlug(t.name)}/index.html`, renderShell({
       title: `${singular}：${t.name}`,
       url: termUrl(kind, t.name),
+      cwd: `/${kind}/${termSlug(t.name)}`,
       content: `<div class="container">
   <div class="page-box">
     <div class="page-head">
@@ -671,23 +695,7 @@ function buildHelp() {
   write('help/index.html', renderShell({
     title: 'help', url: '/help/',
     content: `<div class="container page-box"><div class="page-head"><h1>help</h1></div>
-    <div class="help-list">
-      <a href="/categories/">ls [目录] <span>列出分类 / 文章</span></a>
-      <p>cd &lt;目录&gt; <span>进入分类；.. 返回</span></p>
-      <p>pwd <span>当前目录</span></p>
-      <p>open &lt;文件 / 标题&gt; <span>打开文章</span></p>
-      <a href="/proj/">proj <span>项目</span></a>
-      <p>search &lt;关键词&gt; <span>搜索全文</span></p>
-      <a href="/archives/">archive <span>归档</span></a>
-      <a href="/tags/">tags <span>标签</span></a>
-      <a href="/categories/">categories <span>分类</span></a>
-      <a href="/about/">whoami <span>关于</span></a>
-      <a href="/links/">links <span>友链</span></a>
-      <a href="${config.github}">github <span>代码</span></a>
-      <a href="mailto:${config.email}">email <span>联系</span></a>
-      <p>theme [dark|light|auto] <span>主题</span></p>
-      <p>clear <span>清空</span></p>
-    </div><p class="shortcut-note">/ · ⌘/Ctrl K 聚焦 · ↑ ↓ 历史 · Tab 补全 · Esc 清空</p></div>`,
+    ${renderHelp(config)}</div>`,
   }))
 }
 
@@ -742,6 +750,33 @@ Disallow: /search.json
 
 Sitemap: ${absUrl('/sitemap.xml')}
 `)
+}
+
+function buildFilesystem(posts, pages, termsByKind) {
+  const directory = (name, url) => ({ type: 'directory', name, url })
+  const file = (name, title, url) => ({ type: 'file', name, title, url })
+  const files = new Map(posts.map(post => [post, {
+    ...file(post.file, post.title, link(post.url)), date: fmtDate(post.date), tags: post.tags,
+  }]))
+  const directories = {
+    '/': { url: '/', entries: [directory('posts', '/archives/'), directory('tags', '/tags/'), directory('categories', '/categories/'),
+      ...pages.filter(page => !['archives', 'sitemap'].includes(page.slug)).map(page => file(`${page.slug}.md`, page.title, link(page.url))),
+      file('projects.md', '项目', '/proj/'),
+    ] },
+    '/posts': { url: '/archives/', entries: [...files.values()] },
+  }
+  for (const [kind, terms] of Object.entries(termsByKind)) {
+    const entries = terms.map(term => {
+      const name = termSlug(term.name)
+      const url = link(termUrl(kind, term.name))
+      const pathname = `/${kind}/${name}`
+      if (Object.hasOwn(directories, pathname)) throw new Error(`目录重名：${pathname}`)
+      directories[pathname] = { url, entries: term.posts.map(post => files.get(post)) }
+      return directory(name, url)
+    })
+    directories[`/${kind}`] = { url: `/${kind}/`, entries }
+  }
+  write('vfs.json', JSON.stringify(directories))
 }
 
 function buildSearchIndex(posts, pages) {
@@ -819,16 +854,7 @@ function main() {
   const pages = loadPages()
   const tags = collectTerms(posts, 'tags')
   const categories = collectTerms(posts, 'categories')
-  const names = new Set()
-  directories = categories.map(category => {
-    const name = termSlug(category.name)
-    if (names.has(name)) throw new Error('分类目录重名：' + name)
-    names.add(name)
-    return {
-      name, url: link(termUrl('categories', category.name)),
-      files: category.posts.map(post => ({ name: post.file, title: post.title, url: link(post.url), date: fmtDate(post.date) })),
-    }
-  })
+  buildFilesystem(posts, pages, { categories, tags })
 
   copyAssets()
   buildHome(posts)

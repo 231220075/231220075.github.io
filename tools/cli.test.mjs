@@ -13,6 +13,7 @@ function fixture(t) {
   fs.mkdirSync(path.join(root, 'tools'))
   fs.mkdirSync(path.join(root, 'content/posts'), { recursive: true })
   for (const name of ['cli.mjs', 'build.mjs', 'markdown.mjs']) fs.copyFileSync(path.join(source, 'tools', name), path.join(root, 'tools', name))
+  fs.cpSync(path.join(source, 'assets/js'), path.join(root, 'assets/js'), { recursive: true })
   fs.copyFileSync(path.join(source, 'site.config.mjs'), path.join(root, 'site.config.mjs'))
   t.after(() => fs.rmSync(root, { recursive: true, force: true }))
   return {
@@ -100,7 +101,7 @@ test('drafts stay out of all outputs; update keeps the existing public URL', t =
   ok(f.run(['new', 'Secret draft', '--slug', 'secret', '--draft']))
   ok(f.run(['build']))
   const read = file => fs.readFileSync(path.join(f.root, 'public', file), 'utf8')
-  for (const file of ['index.html', 'archives/index.html', 'search.json', 'sitemap.xml']) assert.doesNotMatch(read(file), /Secret draft/)
+  for (const file of ['index.html', 'archives/index.html', 'vfs.json', 'search.json', 'sitemap.xml']) assert.doesNotMatch(read(file), /Secret draft/)
   assert.ok(fs.existsSync(path.join(f.root, 'public/2025/02/28/stable/index.html')))
   ok(f.run(['update', 'stable']))
   ok(f.run(['update', 'secret', '--no-draft']))
@@ -136,9 +137,9 @@ test('a failed build preserves the last successful site and removes staging file
   assert.deepEqual(fs.readdirSync(f.root).filter(name => name.startsWith('.blog-build-')), [])
 })
 
-test('home lists the latest published posts and all categories without pagination or a feed', t => {
+test('home links to recent articles and builds a flat post directory with tag and category views', t => {
   const f = fixture(t)
-  f.write('多分类笔记', '---\ntitle: 多分类笔记\ndate: 2025-01-02\ncategories:\n  - 学习记录\n  - 技术\n---\nBody')
+  f.write('多分类笔记', '---\ntitle: 多分类笔记\ndate: 2025-01-02\ncategories:\n  - 学习记录\n  - 技术\ntags:\n  - Rust\n---\nBody')
   f.write('uncategorized', '---\ntitle: Uncategorized\ndate: 2025-01-03\n---\nBody')
   f.write('env-controller', '---\ntitle: Env Controller\ndate: 2026-11-18\ncategories:\n  - 技术\n---\nBody')
   f.write('hidden', '---\ntitle: Hidden\ndate: 2027-01-02\ncategories:\n  - Secret\ndraft: true\n---\nBody')
@@ -147,20 +148,19 @@ test('home lists the latest published posts and all categories without paginatio
   const home = fs.readFileSync(path.join(output, 'index.html'), 'utf8')
   const main = /<main[\s\S]*?<\/main>/.exec(home)[0]
   assert.doesNotMatch(main, /post-card|pagination|pixel-garden/)
-  assert.match(main, /<h1 class="home-intro">forever/)
+  assert.match(main, /<h1>forever<\/h1>/)
+  assert.match(main, /<a href="\/archives\/" data-command="ls -l ~\/posts"/)
   const recent = /<section class="home-recent"[\s\S]*?<\/section>/.exec(main)[0]
   assert.deepEqual([...recent.matchAll(/class="recent-post" href="([^"]+)"/g)].map(match => match[1]), [
-    '/2026/11/18/env-controller/', '/2025/01/03/uncategorized/',
+    '/2026/11/18/env-controller/', '/2025/01/03/uncategorized/', '/2025/01/02/%E5%A4%9A%E5%88%86%E7%B1%BB%E7%AC%94%E8%AE%B0/',
   ])
-  assert.match(main, /directory-entry/)
-  assert.match(main, /学习记录\//)
-  const site = JSON.parse(/window\.__SITE__=(.*?);<\/script>/s.exec(home)[1])
-  assert.deepEqual(new Set(site.directories.map(d => d.name)), new Set(['学习记录', '技术', '未分类']))
-  assert.equal(site.directories.find(d => d.name === '未分类').files[0].name, 'uncategorized.md')
-  const files = site.directories.flatMap(d => d.files)
-  assert.equal(new Set(files.map(file => file.url)).size, 3)
-  assert.equal(files.filter(file => file.name === '多分类笔记.md').length, 2)
-  assert.doesNotMatch(home, /Hidden|Secret/)
+  const vfs = JSON.parse(fs.readFileSync(path.join(output, 'vfs.json'), 'utf8'))
+  assert.deepEqual(vfs['/posts'].entries.map(file => file.name), ['env-controller.md', 'uncategorized.md', '多分类笔记.md'])
+  assert.deepEqual(new Set(vfs['/categories'].entries.map(entry => entry.name)), new Set(['学习记录', '技术', '未分类']))
+  assert.equal(vfs['/categories/未分类'].entries[0].name, 'uncategorized.md')
+  assert.deepEqual(vfs['/tags/Rust'].entries[0], vfs['/posts'].entries[2])
+  assert.deepEqual(vfs['/categories/学习记录'].entries[0], vfs['/posts'].entries[2])
+  assert.doesNotMatch(home + JSON.stringify(vfs), /Hidden|Secret/)
   for (const name of ['page', 'atom.xml', 'feed.xml']) assert.equal(fs.existsSync(path.join(output, name)), false)
   const proj = fs.readFileSync(path.join(output, 'proj/index.html'), 'utf8')
   const firstProject = /<article class="project[^>]*>[\s\S]*?<\/article>/.exec(proj)[0]

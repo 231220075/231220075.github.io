@@ -27,29 +27,23 @@ Markdown 博客，零依赖 Node.js 构建，GitHub Pages 托管。
 
 ## 站内终端
 
-首页在终端内显示自我介绍、最近两篇已发布文章和分类文件夹。点击或使用命令浏览：
+首页显示近三篇已发布文章和可点击的快捷命令，底部提示符可以直接输入。
 
 ```sh
-ls
-cd 技术
-ls
-open "用rust复刻git.md"
-cd ..
-proj
+ls -l ~/posts
+ls ~/posts -t Rust
+cd ~/tags/Rust
+cat "用rust复刻git.md"
+rg 工作区
 ```
 
-- `ls [目录]`：列出分类或文章；文章可直接点击。
-- `cd <目录>`：进入并列出目录；`cd ..` 返回，`cd /` 回到根目录。
-- `pwd`：显示当前目录。
-- `open <文件 / 标题>`（别名 `cat`）：打开文章。
-- `proj`：项目简介与 GitHub 链接。
-- `search <关键词>`（别名 `grep`）：全文搜索。
-- `archive`、`tags`、`categories`、`whoami`、`links`、`github`、`email`：其他入口。
-- `theme [dark|light|auto]`、`clear`、`help`：主题、清空、帮助。
+- `ls [-l] [目录] [-t 标签]` 浏览虚拟文件。`-l` 显示标题、日期、文件名和标签。`-t` 按标签筛选，忽略大小写。
+- `cd <目录>` 进入目录并列出文件，`pwd` 显示当前位置。文章平铺在 `~/posts/`，也可从 `~/tags/` 和 `~/categories/` 查找。路径支持中文、引号、空格、`~`、`..` 和绝对路径。
+- `cat ~/about.md` 和 `cat ~/projects.md` 查看功能页。`cat` 或 `open` 可用文件名或标题打开文章，直接进入文章原网址。
+- `rg <关键词>`（别名 `search`、`grep`）检索标题、标签与正文，从命中处显示上下文。
+- `clear` 清空输出，`reset`（别名 `fastfetch`）回到首页初始视图。`help` 列出命令，`theme [dark|light|auto]` 切换主题。
 
-`/` 或 `⌘/Ctrl K` 聚焦，`↑ ↓` 历史，`Tab` 补全命令或路径，`Esc` 清空。路径支持引号、空格、中文、`~` 和绝对路径。无分类文章归入 `未分类/`；多分类文章可从各分类访问。没有 JavaScript 时，文件夹链接仍可进入分类页阅读。
-
-首页不生成文章卡片或分页。阅读页保留顶部终端。项目简介配置在 `site.config.mjs`，构建无需联网。
+`/` 或 `⌘/Ctrl K` 聚焦输入，`↑ ↓` 浏览当前标签页的命令历史，`Tab` 补全唯一匹配，`Esc` 清空输入。归档、项目、个人页和帮助均有静态链接，关闭 JavaScript 仍可浏览。虚拟目录与搜索索引由构建生成，项目简介配置在 `site.config.mjs`。
 
 ## 文章
 

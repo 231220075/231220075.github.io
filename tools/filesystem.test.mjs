@@ -1,50 +1,62 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { normalizePath, readDirectory, resolveFile, completePath } from '../assets/js/filesystem.mjs'
+import { normalizePath, readDirectory, resolveFile, completePath, parseList, unquote } from '../assets/js/filesystem.mjs'
 
-const file = { name: 'Rust 笔记.md', title: 'Rust 笔记', url: '/2025/01/02/rust/', date: '2025-01-02' }
-const directories = [
-  { name: '学习记录', url: '/categories/学习记录/', files: [file] },
-  { name: '技术', url: '/categories/技术/', files: [file, { name: 'other.md', url: '/other/' }] },
-  { name: 'computer science', url: '/categories/computer-science/', files: [] },
-]
+const post = { type: 'file', name: 'Rust 笔记.md', title: 'Rust 笔记', url: '/2025/01/02/rust/', date: '2025-01-02', tags: ['Rust'] }
+const about = { type: 'file', name: 'about.md', title: '关于', url: '/about/' }
+const directory = (name, url) => ({ type: 'directory', name, url })
+const directories = {
+  '/': { url: '/', entries: [directory('posts', '/archives/'), directory('tags', '/tags/'), directory('categories', '/categories/'), about] },
+  '/posts': { url: '/archives/', entries: [post] },
+  '/tags': { url: '/tags/', entries: [directory('Rust', '/tags/Rust/')] },
+  '/tags/Rust': { url: '/tags/Rust/', entries: [post] },
+  '/categories': { url: '/categories/', entries: [directory('技术', '/categories/技术/'), directory('computer science', '/categories/computer-science/')] },
+  '/categories/技术': { url: '/categories/技术/', entries: [post] },
+  '/categories/computer science': { url: '/categories/computer-science/', entries: [] },
+}
 
-test('root lists categories; category paths list only their posts', () => {
+test('root lists files and folders; post and tag views use the same article URL', () => {
   const root = readDirectory(directories, '/')
   assert.equal(root.path, '/')
-  assert.deepEqual(root.entries.map(e => [e.type, e.name]), [['directory', '学习记录'], ['directory', '技术'], ['directory', 'computer science']])
-  const category = readDirectory(directories, '/', '学习记录/')
-  assert.equal(category.path, '/学习记录')
-  assert.deepEqual(category.entries.map(e => [e.type, e.name]), [['file', 'Rust 笔记.md']])
-  assert.throws(() => readDirectory(directories, '/学习记录', 'missing'), /目录不存在/)
+  assert.deepEqual(root.entries.map(e => e.name), ['posts', 'tags', 'categories', 'about.md'])
+  assert.equal(readDirectory(directories, '/posts', '../tags/Rust').entries[0].url, post.url)
+  assert.equal(readDirectory(directories, '/posts').entries[0].url, post.url)
+  assert.throws(() => readDirectory(directories, '/posts', 'missing'), /目录不存在/)
 })
 
-test('relative, absolute, quoted and home paths normalize without escaping root', () => {
-  assert.equal(normalizePath('/学习记录', '..'), '/')
-  assert.equal(normalizePath('/学习记录', '../../..'), '/')
-  assert.equal(normalizePath('/学习记录', '../技术/./'), '/技术')
-  assert.equal(normalizePath('/学习记录', '~/技术'), '/技术')
-  assert.equal(normalizePath('/学习记录', '~'), '/')
-  assert.equal(readDirectory(directories, '/', '"computer science"').path, '/computer science')
-  assert.equal(readDirectory(directories, '/', "'学习记录'").path, '/学习记录')
+test('relative, absolute and quoted paths resolve without escaping home', () => {
+  assert.equal(normalizePath('/posts', '..'), '/')
+  assert.equal(normalizePath('/posts', '../../..'), '/')
+  assert.equal(normalizePath('/posts', '../tags/Rust/./'), '/tags/Rust')
+  assert.equal(normalizePath('/posts', '~/tags'), '/tags')
+  assert.equal(normalizePath('/posts', '~'), '/')
+  assert.equal(readDirectory(directories, '/', unquote('"categories/computer science"')).path, '/categories/computer science')
+  assert.equal(unquote(JSON.stringify('含 "引号" 的文章.md')), '含 "引号" 的文章.md')
 })
 
-test('open resolves filenames with spaces, absolute paths and shared category entries', () => {
-  assert.deepEqual(resolveFile(directories, '/学习记录', '"Rust 笔记.md"'), file)
-  assert.deepEqual(resolveFile(directories, '/', 'Rust 笔记.md'), file)
-  assert.deepEqual(resolveFile(directories, '/技术', '/学习记录/Rust 笔记.md'), file)
+test('old category shortcuts and bare filenames still resolve from home', () => {
+  assert.equal(readDirectory(directories, '/', '技术').path, '/categories/技术')
+  assert.deepEqual(resolveFile(directories, '/', 'Rust 笔记.md'), post)
+  assert.deepEqual(resolveFile(directories, '/', '技术/Rust 笔记.md'), post)
+  assert.deepEqual(resolveFile(directories, '/tags/Rust', '../../about.md'), about)
+  assert.deepEqual(resolveFile(directories, '/posts', 'Rust 笔记.md'), post)
   assert.equal(resolveFile(directories, '/', 'missing.md'), null)
   assert.equal(resolveFile(directories, '/', 'https://example.com'), null)
-  const ambiguous = [{ name: 'one', files: [{ name: 'same.md', url: '/one/' }] }, { name: 'two', files: [{ name: 'same.md', url: '/two/' }] }]
-  assert.equal(resolveFile(ambiguous, '/', 'same.md'), null)
-  assert.equal(resolveFile(ambiguous, '/one', 'same.md').url, '/one/')
 })
 
-test('path completion supports directories and filenames without changing cwd', () => {
-  assert.deepEqual(completePath(directories, '/', '学', true), ['学习记录/'])
-  assert.deepEqual(completePath(directories, '/技术', '../学', true), ['../学习记录/'])
-  assert.deepEqual(completePath(directories, '/学习记录', 'Rust'), ['Rust 笔记.md'])
-  assert.deepEqual(completePath(directories, '/', '/学习记录/Rust'), ['/学习记录/Rust 笔记.md'])
-  assert.deepEqual(completePath(directories, '/学习记录', 'Rust', true), [])
+test('path completion handles nested, relative and quoted paths', () => {
+  assert.deepEqual(completePath(directories, '/', 'p', true), ['posts/'])
+  assert.deepEqual(completePath(directories, '/posts', '../tags/R', true), ['../tags/Rust/'])
+  assert.deepEqual(completePath(directories, '/', '"categories/computer s', true), ['categories/computer science/'])
+  assert.deepEqual(completePath(directories, '/posts', 'Rust'), ['Rust 笔记.md'])
+  assert.deepEqual(completePath(directories, '/', '/posts/Rust'), ['/posts/Rust 笔记.md'])
+  assert.deepEqual(completePath(directories, '/posts', 'Rust', true), [])
   assert.deepEqual(completePath(directories, '/', '/missing/'), [])
+})
+
+test('ls accepts options on either side of a directory and preserves quoted spaces', () => {
+  assert.deepEqual(parseList('-l posts/ -t RuSt'), { target: 'posts/', long: true, tag: 'rust' })
+  assert.deepEqual(parseList('-t "GitHub Pages" "categories/computer science" -l'), { target: 'categories/computer science', long: true, tag: 'github pages' })
+  assert.throws(() => parseList('posts -t -l'), /需要标签名/)
+  assert.throws(() => parseList('posts -z'), /未知参数/)
 })

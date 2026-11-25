@@ -1,4 +1,4 @@
-import { readDirectory, resolveFile, completePath, unquote } from './filesystem.mjs'
+import { initTerminal } from './terminal.mjs'
 
 /* Summer Flower — read-only blog shell. */
 (function () {
@@ -6,18 +6,13 @@ import { readDirectory, resolveFile, completePath, unquote } from './filesystem.
   var SITE = window.__SITE__ || {}
   var FEATURES = SITE.features || {}
 
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-    })
-  }
-
   function applyTheme(mode, persist) {
     if (!['dark', 'light', 'auto'].includes(mode)) mode = 'dark'
     var actual = mode === 'auto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode
     document.documentElement.dataset.theme = actual
     var btn = document.querySelector('[data-theme-toggle]')
     if (btn) {
+      btn.hidden = false
       btn.dataset.mode = mode
       btn.textContent = actual === 'dark' ? 'light' : 'dark'
       btn.setAttribute('aria-label', actual === 'dark' ? '切换亮色' : '切换暗色')
@@ -40,169 +35,6 @@ import { readDirectory, resolveFile, completePath, unquote } from './filesystem.
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
       if (btn && btn.dataset.mode === 'auto') applyTheme('auto')
     })
-    document.querySelectorAll('.nav-link').forEach(function (a) {
-      var href = a.getAttribute('href')
-      var active = href === '/' ? location.pathname === '/' : location.pathname.startsWith(href)
-      if (active) { a.classList.add('active'); a.setAttribute('aria-current', 'page') }
-    })
-  }
-
-  function initTerminal() {
-    var form = document.querySelector('.command-form')
-    if (!form) return
-    var terminal = form.closest('.terminal')
-    var input = form.querySelector('input')
-    var output = terminal.querySelector('.command-output')
-    var homeWorkspace = terminal.classList.contains('terminal-home') ? output.parentElement : null
-    var directories = SITE.directories || []
-    var cwd = terminal.dataset.cwd || '/'
-    var history = [], cursor = 0, pending = '', revision = 0, indexPromise
-    var routes = {
-      home: '/', archive: '/archives/', archives: '/archives/', tags: '/tags/',
-      categories: '/categories/', whoami: '/about/', about: '/about/', proj: '/proj/',
-      links: '/links/', github: SITE.github, email: 'mailto:' + SITE.email
-    }
-    var commands = [
-      ['ls [目录]', '分类 / 文章'], ['cd <目录>', '进入；.. 返回'], ['pwd', '当前目录'],
-      ['open <文件 / 标题>', '文章'], ['proj', '项目'], ['search <关键词>', '搜索全文'],
-      ['archive', '归档'], ['tags', '标签'], ['categories', '分类'], ['whoami', '关于'],
-      ['links', '友链'], ['github', '代码'], ['email', '联系'],
-      ['theme [dark|light|auto]', '主题'], ['clear', '清空'], ['help', '帮助']
-    ]
-    var names = commands.map(function (c) { return c[0].split(' ')[0] }).concat(['posts', 'home', 'about', 'archives', 'cat', 'grep'])
-    function hasRoute(name) { return Object.prototype.hasOwnProperty.call(routes, name) }
-    function quote(value) { return JSON.stringify(value) }
-    function show(html, command) {
-      output.hidden = false
-      output.innerHTML = (command ? '<p class="command-echo">$ ' + escapeHtml(command) + '</p>' : '') + html
-      if (homeWorkspace) homeWorkspace.scrollTop = output.offsetTop
-      else output.scrollTop = 0
-    }
-    function clear() { revision++; output.hidden = true; output.replaceChildren() }
-    function setDirectory(pathname) {
-      cwd = pathname
-      terminal.querySelector('[data-prompt-path]').textContent = cwd === '/' ? '~' : '~' + cwd
-      terminal.querySelector('[data-current-path]').textContent = cwd === '/' ? '~/' : '~' + cwd + '/'
-    }
-    function list(target, command, changeDirectory) {
-      try {
-        var result = readDirectory(directories, cwd, target)
-        if (changeDirectory) setDirectory(result.path)
-        var parent = result.path === '/' ? '' : '<a class="file-entry parent-entry" href="/categories/" data-command="cd /"><span class="pixel-folder" aria-hidden="true"></span><span>../</span></a>'
-        show('<div class="file-list' + (result.path === '/' ? ' directory-list' : '') + '">' + parent + result.entries.map(function (entry) {
-          if (entry.type === 'directory') {
-            return '<a class="file-entry directory-entry" href="' + escapeHtml(entry.url) + '" data-command="' + escapeHtml('cd ' + quote('/' + entry.name)) + '"><span class="pixel-folder" aria-hidden="true"></span><span>' + escapeHtml(entry.name) + '/</span><span class="entry-meta">' + entry.files.length + '</span></a>'
-          }
-          return '<a class="file-entry post-entry" href="' + escapeHtml(entry.url) + '" title="' + escapeHtml(entry.title) + '"><span class="pixel-file" aria-hidden="true"></span><span>' + escapeHtml(entry.name) + '</span><time class="entry-meta">' + escapeHtml(entry.date) + '</time></a>'
-        }).join('') + (result.entries.length ? '' : '<p>空目录。</p>') + '</div>', command)
-      } catch (e) { show('<p>' + escapeHtml(e.message) + '</p>', command) }
-    }
-    function help() {
-      show('<div class="help-list">' + commands.map(function (c) {
-        var name = c[0].split(' ')[0]
-        if (hasRoute(name)) return '<a href="' + escapeHtml(routes[name]) + '">' + escapeHtml(c[0]) + '<span>' + c[1] + '</span></a>'
-        return '<button type="button" class="help-command" data-command="' + escapeHtml(c[0]) + '">' + escapeHtml(c[0]) + '<span>' + c[1] + '</span></button>'
-      }).join('') + '</div><p class="shortcut-note">/ · ⌘/Ctrl K 聚焦 · ↑ ↓ 历史 · Tab 补全 · Esc 清空</p>', 'help')
-    }
-    function loadIndex() {
-      if (!indexPromise) indexPromise = fetch(SITE.searchPath || '/search.json').then(function (r) {
-        if (!r.ok) throw new Error('index')
-        return r.json()
-      }).catch(function (err) { indexPromise = null; throw err })
-      return indexPromise
-    }
-    function highlight(text, query) {
-      var terms = query.toLowerCase().split(/\s+/).filter(Boolean)
-      var pattern = terms.map(function (t) { return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }).join('|')
-      return String(text).split(new RegExp('(' + pattern + ')', 'gi')).map(function (piece) {
-        return terms.includes(piece.toLowerCase()) ? '<mark>' + escapeHtml(piece) + '</mark>' : escapeHtml(piece)
-      }).join('')
-    }
-    async function find(query, open, command, token) {
-      if (!query) { show('<p>' + (open ? 'open &lt;文件 / 标题&gt;' : 'search &lt;关键词&gt;') + '</p>', command); return }
-      var file = open && resolveFile(directories, cwd, query)
-      if (file) { location.assign(file.url); return }
-      show('<p>搜索中…</p>', command)
-      try {
-        var index = await loadIndex()
-        if (token !== revision) return
-        var terms = query.toLowerCase().split(/\s+/).filter(Boolean)
-        var entries = index.map(function (item) {
-          var title = item.title.toLowerCase()
-          var haystack = [item.title, item.content, (item.tags || []).join(' ')].join(' ').toLowerCase()
-          var score = title === query.toLowerCase() ? 100 : 0
-          terms.forEach(function (term) { if (title.includes(term)) score += 12 })
-          return { item: item, score: score, match: terms.every(function (term) { return (open ? title : haystack).includes(term) }) }
-        }).filter(function (x) { return x.match }).sort(function (a, b) { return b.score - a.score })
-        if (open && entries.length && (entries.length === 1 || entries[0].score >= 100)) {
-          location.assign(entries[0].item.url); return
-        }
-        if (!entries.length) { show('<p>无结果。</p>', command); return }
-        show(entries.slice(0, 20).map(function (x) {
-          var item = x.item
-          var excerpt = item.excerpt || item.content.slice(0, 100)
-          return '<a class="search-result" href="' + escapeHtml(item.url) + '"><div class="r-title">' + highlight(item.title, query) + '</div><div class="r-excerpt">' + highlight(excerpt, query) + '</div></a>'
-        }).join(''), command)
-      } catch (e) { if (token === revision) show('<p>索引加载失败。</p>', command) }
-    }
-    function execute(raw) {
-      var command = raw.trim()
-      if (!command) return
-      var token = ++revision
-      history.push(command); cursor = history.length; pending = ''; input.value = ''
-      var parts = command.match(/^(\S+)(?:\s+([\s\S]*))?$/)
-      var name = parts[1].toLowerCase(), arg = unquote(parts[2] || '')
-      if (name === 'clear') { clear(); return }
-      if (name === 'help') { help(); return }
-      if (name === 'ls') { list(arg, command, false); return }
-      if (name === 'cd' || name === 'posts') { list(name === 'posts' ? '/' : arg || '/', command, true); return }
-      if (name === 'pwd') { show('<p>' + escapeHtml(cwd) + '</p>', command); return }
-      if (hasRoute(name)) { location.assign(routes[name]); return }
-      if (name === 'search' || name === 'grep' || name === 'open' || name === 'cat') {
-        find(arg, name === 'open' || name === 'cat', command, token); return
-      }
-      if (name === 'theme') {
-        if (arg && !['dark', 'light', 'auto'].includes(arg)) { show('<p>theme [dark|light|auto]</p>', command); return }
-        var mode = arg || (document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')
-        applyTheme(mode, true); show('<p>' + mode + '</p>', command); return
-      }
-      show('<p>未知命令。<button class="text-btn accent" data-command="help">help</button></p>', command)
-    }
-    form.addEventListener('submit', function (e) { e.preventDefault(); execute(input.value) })
-    document.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-command]')
-      if (!btn) return
-      e.preventDefault()
-      var command = btn.dataset.command
-      form.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
-      if (command.includes('<') || command.includes('[')) {
-        input.value = command.split(' ')[0] + ' '; input.focus()
-      } else { execute(command); input.focus() }
-    })
-    input.addEventListener('keydown', function (e) {
-      if (e.isComposing) return
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.preventDefault()
-        if (cursor === history.length) pending = input.value
-        cursor = Math.max(0, Math.min(history.length, cursor + (e.key === 'ArrowUp' ? -1 : 1)))
-        input.value = cursor === history.length ? pending : history[cursor]
-        requestAnimationFrame(function () { input.setSelectionRange(input.value.length, input.value.length) })
-      }
-      if (e.key === 'Tab' && input.value) {
-        var match = /^(ls|cd|open|cat)\s+([\s\S]*)$/.exec(input.value)
-        var matches = match ? completePath(directories, cwd, match[2], match[1] === 'cd').map(function (path) { return match[1] + ' ' + quote(path) }) : names.filter(function (name) { return name.startsWith(input.value.toLowerCase()) }).map(function (name) { return name + ' ' })
-        if (matches.length === 1) { e.preventDefault(); input.value = matches[0] }
-      }
-      if (e.key === 'Escape') { input.value = ''; clear(); input.blur() }
-    })
-    document.addEventListener('keydown', function (e) {
-      var active = document.activeElement
-      var typing = active && (active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName))
-      if ((e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
-        e.preventDefault(); input.focus(); form.scrollIntoView({ block: 'nearest' })
-      }
-    })
-    try { setDirectory(readDirectory(directories, '/', cwd).path) } catch { setDirectory('/') }
   }
 
   /* ---------- 阅读进度 ---------- */
@@ -375,7 +207,7 @@ import { readDirectory, resolveFile, completePath, unquote } from './filesystem.
 
 
   function boot() {
-    initTheme(); initTerminal(); initProgress(); initBackTop(); initToc(); initCopy(); initLightbox(); initGiscus()
+    initTheme(); initTerminal(SITE, applyTheme); initProgress(); initBackTop(); initToc(); initCopy(); initLightbox(); initGiscus()
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot)
   else boot()

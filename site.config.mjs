@@ -8,7 +8,7 @@ export default {
   title: 'Summer Flower',
   description:
     'forever 的文章与项目。',
-  introduction: 'forever，南京大学计算机专业，写 Rust、开发工具和项目实践。',
+  introduction: '南京大学计算机专业。写 Rust、开发工具和项目实践。',
   keywords: ['博客', '技术', '计算机', '摄影', 'forever', 'Summer Flower'],
   author: 'forever',
   email: '231220075@smail.nju.edu.cn',

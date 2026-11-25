@@ -1,16 +1,17 @@
-/** Read-only virtual directories. Paths never touch a real filesystem. */
+/** Read-only virtual paths. Commands never touch a real filesystem. */
 export function unquote(value) {
   const text = String(value).trim()
-  return /^("[\s\S]*"|'[\s\S]*')$/.test(text) ? text.slice(1, -1) : text
+  if (text.startsWith('"') && text.endsWith('"')) {
+    try { return JSON.parse(text) } catch { return text.slice(1, -1) }
+  }
+  return text.length >= 2 && text.startsWith("'") && text.endsWith("'") ? text.slice(1, -1) : text
 }
 
-export function normalizePath(cwd, value = '') {
-  let target = unquote(value)
+export function normalizePath(cwd, target = '') {
   if (target === '~') target = '/'
   else if (target.startsWith('~/')) target = target.slice(1)
-  const parts = (target.startsWith('/') ? target : cwd + '/' + target).split('/')
   const segments = []
-  for (const part of parts) {
+  for (const part of (target.startsWith('/') ? target : `${cwd}/${target}`).split('/')) {
     if (!part || part === '.') continue
     if (part === '..') segments.pop()
     else segments.push(part)
@@ -18,35 +19,60 @@ export function normalizePath(cwd, value = '') {
   return '/' + segments.join('/')
 }
 
-export function readDirectory(directories, cwd, target = '') {
+function resolvePath(directories, cwd, target) {
   const pathname = normalizePath(cwd, target)
-  if (pathname === '/') return { path: '/', entries: directories.map(dir => ({ ...dir, type: 'directory' })) }
-  const dir = directories.find(dir => '/' + dir.name === pathname)
-  if (!dir) throw new Error('目录不存在。')
-  return { path: pathname, entries: dir.files.map(file => ({ ...file, type: 'file' })) }
+  const category = pathname.split('/')[1]
+  // Old shortcuts such as `cd 技术` still work from the root.
+  if (!Object.hasOwn(directories, '/' + category) && Object.hasOwn(directories, '/categories/' + category)) {
+    return '/categories' + pathname
+  }
+  return pathname
+}
+
+export function readDirectory(directories, cwd, target = '') {
+  const pathname = resolvePath(directories, cwd, target)
+  const directory = directories[pathname]
+  if (!directory) throw new Error('目录不存在。')
+  return { path: pathname, ...directory }
 }
 
 export function resolveFile(directories, cwd, target) {
-  const pathname = normalizePath(cwd, target)
-  const candidates = []
-  for (const dir of directories) {
-    for (const file of dir.files) {
-      if ('/' + dir.name + '/' + file.name === pathname ||
-          (cwd === '/' && !unquote(target).includes('/') && file.name === unquote(target))) candidates.push(file)
-    }
-  }
-  const unique = [...new Map(candidates.map(file => [file.url, file])).values()]
-  return unique.length === 1 ? unique[0] : null
+  if (!target) return null
+  const pathname = resolvePath(directories, cwd, target)
+  const slash = pathname.lastIndexOf('/')
+  const parent = pathname.slice(0, slash) || '/'
+  const name = pathname.slice(slash + 1)
+  const inDirectory = (directory) => directories[directory]?.entries.find(entry => entry.type === 'file' && entry.name === name)
+  return inDirectory(parent) || (parent === '/' && !target.includes('/') ? inDirectory('/posts') : null) || null
 }
 
 export function completePath(directories, cwd, value, onlyDirectories = false) {
-  const target = unquote(value)
+  // An opening quote is common while typing a path containing spaces.
+  const target = /^['"]/.test(value) && (value.length === 1 || value.at(-1) !== value[0]) ? value.slice(1) : unquote(value)
   const slash = target.lastIndexOf('/')
-  const prefix = slash >= 0 ? target.slice(0, slash + 1) : ''
+  const prefix = target.slice(0, slash + 1)
   const partial = target.slice(slash + 1)
   try {
     return readDirectory(directories, cwd, prefix || '.').entries
       .filter(entry => (!onlyDirectories || entry.type === 'directory') && entry.name.startsWith(partial))
       .map(entry => prefix + entry.name + (entry.type === 'directory' ? '/' : ''))
   } catch { return [] }
+}
+
+export function parseList(args) {
+  const words = args.match(/"(?:\\.|[^"\\])*"|'[^']*'|[^\s"']+/g) || []
+  const directories = []
+  let long = false
+  let tag = ''
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i]
+    if (word === '-l') long = true
+    else if (word === '-t') {
+      const next = words[++i]
+      if (!next || next.startsWith('-')) throw new Error('-t 需要标签名。')
+      tag = unquote(next).toLowerCase()
+    } else if (word.startsWith('-')) throw new Error(`未知参数 ${word}。用法：ls [-l] [目录] [-t 标签]`)
+    else directories.push(unquote(word))
+  }
+  return { target: directories.join(' '), long, tag }
 }
