@@ -13,6 +13,7 @@ function fixture(t) {
   fs.mkdirSync(path.join(root, 'tools'))
   fs.mkdirSync(path.join(root, 'content/posts'), { recursive: true })
   for (const name of ['cli.mjs', 'build.mjs', 'markdown.mjs', 'output.mjs']) fs.copyFileSync(path.join(source, 'tools', name), path.join(root, 'tools', name))
+  fs.cpSync(path.join(source, 'assets/css'), path.join(root, 'assets/css'), { recursive: true })
   fs.cpSync(path.join(source, 'assets/js'), path.join(root, 'assets/js'), { recursive: true })
   fs.copyFileSync(path.join(source, 'site.config.mjs'), path.join(root, 'site.config.mjs'))
   t.after(() => fs.rmSync(root, { recursive: true, force: true }))
@@ -164,7 +165,14 @@ test('home exposes a plain shell prompt and builds a flat post directory with ta
   ok(f.run(['build']))
   const output = path.join(f.root, 'public')
   const home = fs.readFileSync(path.join(output, 'index.html'), 'utf8')
-  assert.match(home, /href="\/css\/background-motion\.css"/)
+  assert.doesNotMatch(home, /background-motion/)
+  const version = /src="\/js\/([a-f0-9]{12})\/main\.js"/.exec(home)?.[1]
+  assert.ok(version, 'home references versioned JavaScript')
+  assert.ok(home.includes(`href="/css/style.css?v=${version}"`))
+  for (const name of ['main.js', 'terminal.mjs', 'filesystem.mjs', 'themes.mjs']) {
+    assert.ok(fs.existsSync(path.join(output, 'js', version, name)))
+  }
+  assert.equal(fs.existsSync(path.join(output, 'css/background-motion.css')), false)
   const main = /<main[\s\S]*?<\/main>/.exec(home)[0]
   assert.doesNotMatch(main, /<button|placeholder="输入命令"/)
   assert.match(main, /<h1 class="visually-hidden">Summer Flower<\/h1>/)
@@ -176,7 +184,6 @@ test('home exposes a plain shell prompt and builds a flat post directory with ta
   const archive = fs.readFileSync(path.join(output, 'archives/index.html'), 'utf8')
   assert.match(archive, /href="\/2026\/11\/18\/env-controller\/">Env Controller/)
   const article = fs.readFileSync(path.join(output, '2026/11/18/env-controller/index.html'), 'utf8')
-  assert.doesNotMatch(article, /href="\/css\/background-motion\.css"/)
   const articleTop = article.slice(0, article.indexOf('<article class="article">'))
   assert.doesNotMatch(articleTop, /class="command-entry"|cat env-controller\.md/)
   assert.equal((articleTop.match(/class="prompt-glyph"/g) || []).length, 1)
@@ -188,9 +195,12 @@ test('home exposes a plain shell prompt and builds a flat post directory with ta
   const settings = fs.readFileSync(path.join(output, 'settings/index.html'), 'utf8')
   assert.match(settings, /cat settings/)
   assert.match(settings, /<body class="is-settings">/)
-  assert.match(settings, /type="checkbox" name="background-motion" disabled>/)
+  assert.doesNotMatch(settings, /background-motion|动态底色/)
   assert.deepEqual([...settings.matchAll(/name="theme" value="([^"]+)"/g)].map(match => match[1]),
-    ['dark', 'slate', 'roast', 'dusk', 'light', 'auto'])
+    ['dark', 'slate', 'roast', 'dusk', 'light', 'mac', 'auto'])
+  const help = fs.readFileSync(path.join(output, 'help/index.html'), 'utf8')
+  assert.match(help, /href="\/settings\/">settings<\/a>/)
+  assert.doesNotMatch(help, /theme \[preset\]/)
   const search = JSON.parse(fs.readFileSync(path.join(output, 'search.json'), 'utf8'))
   assert.deepEqual(vfs['/posts'].entries.map(file => file.name), ['env-controller.md', 'uncategorized.md', '多分类笔记.md'])
   assert.deepEqual(search.map(entry => entry.path), ['posts/env-controller.md', 'posts/uncategorized.md', 'posts/多分类笔记.md'])

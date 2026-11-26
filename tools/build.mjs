@@ -6,6 +6,7 @@
  */
 
 import fs from 'node:fs'
+import { createHash } from 'node:crypto'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -13,10 +14,11 @@ import config from '../site.config.mjs'
 import { renderMarkdown, parseFrontMatter, extractText, escapeHtml } from './markdown.mjs'
 import { installOutput } from './output.mjs'
 import { quoteArgument, renderCommand, renderHelp, renderPathSuffix } from '../assets/js/terminal.mjs'
-import { applyBackgroundMotion, applyThemePreference, settingsFile, themes, themeModes } from '../assets/js/themes.mjs'
+import { applyThemePreference, settingsFile, themes, themeModes } from '../assets/js/themes.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
+const clientVersion = browserAssetVersion()
 const OUT = fs.mkdtempSync(path.join(os.tmpdir(), 'summer-flower-build-'))
 
 /* ================================================================== */
@@ -122,17 +124,6 @@ const accentCss = `:root{--accent:${config.accent};}`
 
 const themeBoot = `(${applyThemePreference.toString()})(${JSON.stringify(themeModes)});`
 
-const motionBoot = `(function(apply) {
-  const enabled = apply();
-  document.addEventListener('DOMContentLoaded', function () {
-    const control = document.querySelector('input[name="background-motion"]');
-    if (!control) return;
-    control.checked = enabled;
-    control.disabled = false;
-    control.addEventListener('change', function () { apply(control.checked); });
-  }, { once: true });
-})(${applyBackgroundMotion.toString()});`
-
 function siteScript() {
   return `window.__SITE__=${JSON.stringify({
     features: config.features,
@@ -192,7 +183,6 @@ function renderShell({ title, description, url, content, bodyClass, extraHead, c
   const fullTitle = title ? `${escapeHtml(title)} | ${escapeHtml(config.title)}` : escapeHtml(config.title)
   const desc = description || config.description
   const canonical = absUrl(url)
-  const supportsMotion = bodyClass === 'is-home' || bodyClass === 'is-settings'
 
   return `<!DOCTYPE html>
 <html lang="${config.lang}" data-theme="dark">
@@ -213,10 +203,9 @@ function renderShell({ title, description, url, content, bodyClass, extraHead, c
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="${config.favicon}">
-<link rel="stylesheet" href="/css/style.css">
-${supportsMotion ? '<link rel="stylesheet" href="/css/background-motion.css">' : ''}
+<link rel="stylesheet" href="/css/style.css?v=${clientVersion}">
 <style>${accentCss}</style>
-<script>${themeBoot}${supportsMotion ? '\n' + motionBoot : ''}</script>
+<script>${themeBoot}</script>
 <script>${siteScript()}</script>
 ${extraHead || ''}
 </head>
@@ -231,7 +220,7 @@ ${bodyClass === 'is-post' ? `<button class="back-top" type="button" aria-label="
   <button class="lightbox-close" type="button" aria-label="关闭">✕</button>
   <img src="" alt="">
 </div>
-<script type="module" src="/js/main.js"></script>
+<script type="module" src="/js/${clientVersion}/main.js"></script>
 </body>
 </html>`
 }
@@ -562,11 +551,6 @@ function buildSettings() {
     title: settingsFile.title, url: settingsFile.url, bodyClass: 'is-settings', initialCommand: `cat ${settingsFile.name}`,
     content: `<h1 class="visually-hidden">${settingsFile.title}</h1>
     <fieldset class="theme-settings" data-theme-settings disabled><legend>theme</legend>${choices}</fieldset>
-    <label class="theme-choice theme-motion">
-      <input class="visually-hidden" type="checkbox" name="background-motion" disabled>
-      <span class="theme-check" aria-hidden="true"></span>
-      <span class="theme-name">动态底色</span>
-    </label>
     <noscript>启用 JavaScript 后可调整配色设置。</noscript>`,
   }))
 }
@@ -672,9 +656,24 @@ function buildSearchIndex(posts, pages) {
 /* 静态资源                                                            */
 /* ================================================================== */
 
+// Keep the entry point and its relative imports on the same asset version.
+function browserAssetVersion() {
+  const hash = createHash('sha256')
+  for (const kind of ['css', 'js']) {
+    const directory = path.join(ROOT, 'assets', kind)
+    for (const name of fs.readdirSync(directory, { recursive: true }).sort()) {
+      const file = path.join(directory, name)
+      if (path.basename(name) === '.DS_Store' || !fs.statSync(file).isFile()) continue
+      const content = fs.readFileSync(file)
+      hash.update(`${kind}/${name}:${content.length}\0`).update(content)
+    }
+  }
+  return hash.digest('hex').slice(0, 12)
+}
+
 function copyAssets() {
   copyDir(path.join(ROOT, 'assets', 'css'), path.join(OUT, 'css'))
-  copyDir(path.join(ROOT, 'assets', 'js'), path.join(OUT, 'js'))
+  copyDir(path.join(ROOT, 'assets', 'js'), path.join(OUT, 'js', clientVersion))
   copyDir(path.join(ROOT, 'assets', 'img'), path.join(OUT, 'img'))
   copyDir(path.join(ROOT, 'assets', 'photos'), path.join(OUT, 'photos'))
   // 保留文章仍引用的旧相册资源地址。

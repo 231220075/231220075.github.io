@@ -154,7 +154,7 @@ import { applyThemePreference, themeModes } from './themes.mjs'
     if (!host) return
 
     var themeOf = function () {
-      return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
+      return getComputedStyle(document.documentElement).colorScheme === 'light' ? 'light' : 'dark'
     }
 
     var s = document.createElement('script')
@@ -190,7 +190,7 @@ import { applyThemePreference, themeModes } from './themes.mjs'
 
 
   function boot() {
-    initTheme(); initTerminal(SITE, applyTheme); initProgress(); initBackTop(); initToc(); initCopy(); initLightbox(); initGiscus()
+    initTheme(); initTerminal(SITE); initProgress(); initBackTop(); initToc(); initCopy(); initLightbox(); initGiscus()
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot)
   else boot()
